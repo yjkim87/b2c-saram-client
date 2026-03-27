@@ -11,7 +11,7 @@ export function HeroSection() {
       <div className="relative mx-auto flex min-h-[calc(100vh-5rem)] max-w-[1520px] flex-col px-4 py-10 sm:px-6 md:py-14 lg:px-8">
         <div className="relative z-20 mx-auto w-full max-w-[1080px] text-center md:mx-0 md:text-left">
           <p className="text-[clamp(1rem,0.92rem+0.35vw,1.25rem)] font-semibold text-[#FF741D]">
-            사람의 발견을 원하면-
+            사람의 발견을 원하면-사발면!!
           </p>
 
           <h1 className="mt-4 text-[clamp(2.1rem,1.6rem+2.6vw,3.75rem)] font-bold leading-[1.16] tracking-[-0.02em] text-[#0C0C0C]">
