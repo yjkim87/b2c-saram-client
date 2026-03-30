@@ -8,6 +8,7 @@ import { useEffect, useMemo, useState } from "react"
 import { cn } from "@/shared/lib/utils"
 
 type CTAEmphasis = "high" | "normal"
+const DIRECTION_SHEET_OPEN_ATTR = "data-direction-sheet-open"
 
 interface MobileCTAConfig {
   label: string
@@ -73,6 +74,7 @@ export function MobileFloatingReservationCTA() {
   const pathname = usePathname()
   const config = useMemo(() => getMobileCTAConfig(pathname), [pathname])
   const [scrollProgress, setScrollProgress] = useState(0)
+  const [isBlockedByDirectionSheet, setIsBlockedByDirectionSheet] = useState(false)
 
   useEffect(() => {
     setScrollProgress(0)
@@ -112,7 +114,25 @@ export function MobileFloatingReservationCTA() {
     }
   }, [config])
 
-  if (!config) {
+  useEffect(() => {
+    const updateBlockedState = () => {
+      setIsBlockedByDirectionSheet(document.body.hasAttribute(DIRECTION_SHEET_OPEN_ATTR))
+    }
+
+    updateBlockedState()
+
+    const observer = new MutationObserver(updateBlockedState)
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: [DIRECTION_SHEET_OPEN_ATTR],
+    })
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [])
+
+  if (!config || isBlockedByDirectionSheet) {
     return null
   }
 

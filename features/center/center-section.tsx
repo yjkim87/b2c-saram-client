@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { ArrowLeft, ArrowRight, CircleCheck } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "@/shared/hooks/use-toast";
 
 type SectionVariant = "preview" | "full";
@@ -271,48 +272,80 @@ function CenterGallery() {
   );
 }
 function CenterSectionPreview() {
-  const ADDRESS_SUMMARY = "부산시 해운대구 센텀동로 99, 백산센텀클래스원(1차) 406호";
+  const ADDRESS_TEXT = "부산시 해운대구 센텀동로 99, 백산센텀클래스원(1차) 406호";
+  const [isDirectionSheetOpen, setIsDirectionSheetOpen] = useState(false);
+
+  const openDirectionSheet = () => setIsDirectionSheetOpen(true);
+  const closeDirectionSheet = () => setIsDirectionSheetOpen(false);
+
+  const openMapWith = (url: string) => {
+    window.open(url, "_blank", "noopener,noreferrer");
+    closeDirectionSheet();
+  };
+
+  useEffect(() => {
+    const attrName = "data-direction-sheet-open";
+
+    if (isDirectionSheetOpen) {
+      document.body.setAttribute(attrName, "true");
+    } else {
+      document.body.removeAttribute(attrName);
+    }
+
+    return () => {
+      document.body.removeAttribute(attrName);
+    };
+  }, [isDirectionSheetOpen]);
 
   return (
-    <section className="relative z-0 w-full bg-white py-16 md:py-20">
+    <section className="relative z-0 w-full bg-white py-14 md:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 flex flex-col items-center text-center lg:mb-10">
-          <div className="mb-4 inline-flex items-center rounded-full border border-slate-200/70 bg-white px-4 py-2 shadow-sm">
-            <span className="text-xs font-semibold tracking-[0.14em] text-slate-700">센터 안내</span>
-          </div>
-          <h2 className="text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">
-            마음성장 코칭 센터
-          </h2>
-          <p className="mt-3 text-sm text-neutral-600 sm:text-base">
-            아이와 부모님이 편안하게 이야기 나눌 수 있는 따뜻한 공간입니다
-          </p>
-        </div>
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.02fr_1fr] lg:gap-6">
+          <div className="relative isolate min-h-[360px] overflow-hidden rounded-3xl bg-neutral-300 lg:min-h-[560px]">
+            <div className="absolute inset-0 bg-gradient-to-br from-teal-100/70 via-slate-100 to-sky-100/80" />
+            <div className="absolute inset-0 opacity-30 [background-image:linear-gradient(to_right,rgba(148,163,184,0.28)_1px,transparent_1px),linear-gradient(to_bottom,rgba(148,163,184,0.28)_1px,transparent_1px)] [background-size:34px_34px]" />
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.35fr_1fr] lg:items-stretch">
-          <div className="relative isolate min-h-[320px] overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm md:min-h-[380px]">
-            <div className="absolute inset-0 bg-gradient-to-br from-teal-100 via-white to-sky-100" />
-            <div className="absolute inset-0 opacity-60 [background-image:linear-gradient(to_right,rgba(15,23,42,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(15,23,42,0.08)_1px,transparent_1px)] [background-size:28px_28px]" />
-            <div className="absolute -left-10 -top-12 h-40 w-40 rounded-full bg-teal-300/40 blur-3xl" />
-            <div className="absolute -bottom-12 -right-10 h-44 w-44 rounded-full bg-sky-300/35 blur-3xl" />
-
-            <div className="relative z-10 flex h-full items-center justify-center px-4 pb-20 pt-12">
+            <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
               <div className="flex flex-col items-center">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-teal-600 text-white shadow-lg shadow-teal-900/30">
-                  <MapPinIcon className="h-5 w-5" />
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-teal-600 text-white shadow-lg shadow-teal-900/25">
+                  <MapPinIcon className="h-6 w-6" />
                 </div>
-                <p className="mt-2 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-neutral-800 shadow-sm">
+                <p className="mt-3 rounded-full border border-neutral-200 bg-white px-4 py-1.5 text-sm font-semibold text-neutral-900 shadow-sm">
                   사람의 발견을 원하면- 센터
                 </p>
               </div>
             </div>
+          </div>
 
-            <div className="absolute inset-x-3 bottom-3 z-20 sm:inset-x-4 sm:bottom-4">
-              <div className="grid grid-cols-2 gap-2 rounded-2xl bg-white/95 p-2 shadow-lg backdrop-blur-sm">
+          <div className="flex flex-col gap-4">
+            <article className="rounded-3xl bg-neutral-100 p-5 md:p-6">
+              <div className="mb-2 flex items-center gap-3">
+                <span aria-hidden="true" className="h-7 w-7 shrink-0 rounded-full bg-neutral-200" />
+                <h3 className="text-[22px] font-bold leading-none text-neutral-900 md:text-[22px]">주소</h3>
+              </div>
+
+              <p className="text-[20px] font-medium leading-snug text-neutral-800 md:text-[20px]">{ADDRESS_TEXT}</p>
+
+              <p className="mt-3 inline-flex rounded-full bg-sky-100 px-3 py-1.5 text-sm font-medium text-sky-900">
+                동해선 센텀역 2번 출구 도보 10분
+              </p>
+
+              <div className="mt-4 md:hidden">
+                <button
+                  type="button"
+                  onClick={openDirectionSheet}
+                  className="inline-flex h-12 w-full items-center justify-center rounded-xl border border-neutral-300 bg-white px-4 text-base font-semibold text-neutral-800 transition-colors hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2"
+                >
+                  빠른 길찾기
+                </button>
+              </div>
+
+              <div className="mt-4 hidden grid-cols-2 gap-3 md:grid">
                 <a
                   href={NAVER_MAP_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex h-11 items-center justify-center rounded-xl bg-emerald-500 px-3 text-sm font-semibold text-white transition-colors hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/70 focus-visible:ring-offset-2"
+                  className="inline-flex h-12 items-center justify-center rounded-2xl bg-emerald-500 px-4 text-[16px] font-semibold text-white transition-colors hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/70 focus-visible:ring-offset-2"
                 >
                   네이버 지도
                 </a>
@@ -320,37 +353,118 @@ function CenterSectionPreview() {
                   href={KAKAO_MAP_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex h-11 items-center justify-center rounded-xl bg-yellow-300 px-3 text-sm font-semibold text-neutral-900 transition-colors hover:bg-yellow-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400/70 focus-visible:ring-offset-2"
+                  className="inline-flex h-12 items-center justify-center rounded-2xl bg-yellow-300 px-4 text-[16px] font-semibold text-neutral-900 transition-colors hover:bg-yellow-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400/70 focus-visible:ring-offset-2"
                 >
                   카카오 맵
                 </a>
               </div>
-            </div>
-          </div>
+            </article>
 
-          <aside className="flex flex-col rounded-3xl border border-neutral-200 bg-neutral-50 p-6 shadow-sm sm:p-8">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-neutral-500">주소</p>
-            <p className="mt-2 text-lg font-semibold leading-snug text-neutral-900">{ADDRESS_SUMMARY}</p>
-            <p className="mt-3 text-sm text-neutral-600">
-              Need parking, contact, and transport details? Check the full center introduction page.
-            </p>
+            <article className="rounded-3xl bg-neutral-100 p-5 md:p-6">
+              <div className="mb-2 flex items-center gap-3">
+                <span aria-hidden="true" className="h-7 w-7 shrink-0 rounded-full bg-neutral-200" />
+                <h3 className="text-[22px] font-bold leading-none text-neutral-900 md:text-[22px]">운영 시간</h3>
+              </div>
+              <p className="text-[20px] font-medium text-neutral-800 md:text-[20px]">평일 09:00 - 20:00 · 주말 09:00 - 17:00</p>
+              <p className="mt-3 rounded-lg bg-white/70 px-3 py-2 text-sm text-neutral-600">
+                * 공휴일은 휴무이며, 원활한 진행을 위해 <strong>100% 사전 예약제</strong>로 운영됩니다.
+              </p>
+            </article>
 
-            <div className="mt-6">
+            <article className="rounded-3xl bg-neutral-100 p-5 md:p-6">
+              <div className="flex items-center gap-3">
+                <span aria-hidden="true" className="h-7 w-7 shrink-0 rounded-full bg-neutral-200" />
+                <p className="text-[22px] font-semibold text-neutral-900 md:text-[22px]">
+                  전화 상담 <a href="tel:0519280944" className="ml-2 font-bold hover:underline">051-928-0944</a>
+                </p>
+              </div>
+            </article>
+
+            <div className="pt-2">
               <Link
                 href="/center"
                 className="inline-flex items-center gap-2 rounded-full border border-neutral-300 bg-white px-5 py-3 text-sm font-semibold text-neutral-800 transition-colors hover:border-neutral-400 hover:bg-neutral-100"
               >
-                Center details
+                센터 자세히 보기
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
-          </aside>
+          </div>
         </div>
       </div>
+
+      <AnimatePresence>
+        {isDirectionSheetOpen && (
+          <motion.div
+            className="fixed inset-0 z-[120] md:hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-label="지도 앱 선택"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+          >
+            <motion.button
+              type="button"
+              aria-label="닫기"
+              className="absolute inset-0 bg-black/40"
+              onClick={closeDirectionSheet}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            />
+
+            <motion.div
+              className="absolute inset-x-0 bottom-0 rounded-t-3xl bg-white px-5 pb-6 pt-4 shadow-2xl"
+              drag="y"
+              dragConstraints={{ top: 0 }}
+              dragElastic={0.2}
+              onDragEnd={(_, info) => {
+                if (info.offset.y > 100) {
+                  closeDirectionSheet();
+                }
+              }}
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+            >
+              <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-neutral-200" />
+              <h4 className="text-center text-lg font-semibold text-neutral-900">어디로 열까요?</h4>
+
+              <div className="mt-4 space-y-3">
+                <button
+                  type="button"
+                  onClick={() => openMapWith(NAVER_MAP_URL)}
+                  className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-emerald-500 text-base font-semibold text-white"
+                >
+                  네이버 지도
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openMapWith(KAKAO_MAP_URL)}
+                  className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-yellow-300 text-base font-semibold text-neutral-900"
+                >
+                  카카오 맵
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={closeDirectionSheet}
+                className="mt-4 inline-flex h-12 w-full items-center justify-center rounded-xl border border-neutral-300 bg-white text-base font-semibold text-neutral-700"
+              >
+                취소
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
-
 function CenterSectionFull({
   showGallery = true,
   showIntroText = true,

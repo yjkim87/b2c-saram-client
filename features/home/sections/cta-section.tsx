@@ -1,111 +1,109 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
-import { cn } from "@/shared/lib/utils"
-import { MessageCircle, Calendar, Sparkles } from "lucide-react"
-import { ReservationCTAButton } from "@/shared/ui/reservation-cta-button"
+import { useEffect, useRef } from "react"
+import { ArrowRight, MessageCircle } from "lucide-react"
+import { Button } from "@/shared/ui/button"
 
-export function CTASection() {
-  const sectionRef = useRef<HTMLElement>(null)
-  const [isVisible, setIsVisible] = useState(false)
+function useFadeInUp(delay = 0) {
+  const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    const el = ref.current
+    if (!el) return
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setIsVisible(true)
+          el.style.transition = `opacity 0.65s ease ${delay}ms, transform 0.65s ease ${delay}ms`
+          el.style.opacity = "1"
+          el.style.transform = "translateY(0)"
+          observer.disconnect()
         }
       },
-      { threshold: 0.2 }
+      { threshold: 0.1 }
     )
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current)
-    }
+    el.style.opacity = "0"
+    el.style.transform = "translateY(28px)"
+    observer.observe(el)
 
     return () => observer.disconnect()
-  }, [])
+  }, [delay])
+
+  return ref
+}
+
+export function CTASection() {
+  const ref = useFadeInUp(0)
 
   return (
-    <section 
-      ref={sectionRef}
-      id="reservation" 
-      className="py-20 md:py-28 bg-gradient-to-b from-background via-primary/5 to-background"
+    <section
+      id="reservation"
+      className="relative overflow-hidden px-4 py-24 sm:px-6 sm:py-28 lg:px-8 lg:py-32"
+      style={{
+        background:
+          "linear-gradient(108deg, oklch(0.22 0.06 206) 0%, oklch(0.2 0.08 197) 46%, oklch(0.18 0.07 187) 100%)",
+      }}
     >
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div 
-          className={cn(
-            "relative bg-card rounded-3xl p-8 md:p-12 shadow-xl border border-border overflow-hidden transition-all duration-700",
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          )}
+      <div className="pointer-events-none absolute inset-0">
+        <div
+          className="absolute inset-0 opacity-40"
+          style={{
+            background:
+              "radial-gradient(circle at 20% 20%, oklch(0.48 0.08 165 / 0.26), transparent 48%), radial-gradient(circle at 88% 80%, oklch(0.48 0.06 220 / 0.2), transparent 42%)",
+          }}
+        />
+      </div>
+
+      <div ref={ref} className="relative mx-auto max-w-4xl text-center">
+        <div
+          className="mx-auto mb-8 flex h-16 w-16 items-center justify-center rounded-2xl border"
+          style={{
+            background: "oklch(0.28 0.06 182 / 0.58)",
+            borderColor: "oklch(0.45 0.07 170 / 0.26)",
+          }}
         >
-          {/* Background Pattern */}
-          <div className="absolute inset-0 opacity-5">
-            <div className="absolute top-0 left-0 w-40 h-40 bg-primary rounded-full blur-3xl" />
-            <div className="absolute bottom-0 right-0 w-60 h-60 bg-accent rounded-full blur-3xl" />
-          </div>
+          <MessageCircle className="h-8 w-8" style={{ color: "oklch(0.74 0.11 167)" }} />
+        </div>
 
-          <div className="relative z-10">
-            {/* Badge */}
-            <div className="flex justify-center mb-6">
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium">
-                <Sparkles className="w-4 h-4" />
-                무료 상담 예약
-              </span>
-            </div>
+        <h2
+          className="mb-5 text-balance font-sans text-[clamp(2.1rem,1.6rem+2.6vw,3.75rem)] font-bold leading-[1.16] tracking-[-0.02em]"
+          style={{ color: "oklch(0.97 0.01 80)" }}
+        >
+          지금 바로 무료 상담을 받아보세요</h2>
 
-            {/* Title */}
-            <h2 className="mobile-auto-phrase text-2xl md:text-3xl lg:text-4xl font-bold text-foreground text-center leading-tight mb-4 text-balance">
-              우리 아이의 가능성을
-              <br />
-              지금 바로 발견해보세요
-            </h2>
+        <p
+          className="mx-auto mb-10 max-w-2xl whitespace-pre-line text-base leading-[1.75] sm:text-xl"
+          style={{ color: "oklch(0.8 0.02 230)" }}
+        >
+          {"아이의 발달에 대한 궁금증이나 걱정이 있으신가요?\n전문 코치가 친절하게 답변드립니다."}
+        </p>
 
-            {/* Subtitle */}
-            <p className="text-muted-foreground text-center text-base md:text-lg max-w-2xl mx-auto mb-8 leading-relaxed text-pretty">
-              전문가와의 1:1 맞춤 상담을 통해 아이의 타고난 기질과 잠재력을 분석하고,
-              부모님과 자녀 모두를 위한 성장 로드맵을 함께 설계합니다.
-            </p>
+        <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <Button
+            size="lg"
+            className="group h-12 min-w-[230px] cursor-pointer rounded-xl border-0 px-8 text-[1.05rem] font-semibold shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+            style={{ background: "oklch(0.69 0.13 160)", color: "oklch(0.98 0.005 85)" }}
+          >
+            무료 상담 예약하기
+            <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+          </Button>
 
-            {/* Features */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-              <div className="flex items-center gap-3 p-4 bg-background/50 rounded-xl">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <MessageCircle className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium text-foreground text-sm">대화형 예약</p>
-                  <p className="text-xs text-muted-foreground">친절한 챗봇 안내</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-4 bg-background/50 rounded-xl">
-                <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
-                  <Calendar className="w-5 h-5 text-accent" />
-                </div>
-                <div>
-                  <p className="font-medium text-foreground text-sm">유연한 일정</p>
-                  <p className="text-xs text-muted-foreground">희망 시간대 선택</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-4 bg-background/50 rounded-xl">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <Sparkles className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium text-foreground text-sm">맞춤 매칭</p>
-                  <p className="text-xs text-muted-foreground">전문가 자동 연결</p>
-                </div>
-              </div>
-            </div>
-
-            {/* CTA Button */}
-            <div className="text-center">
-              <ReservationCTAButton className="mx-auto" />
-              <p className="mt-4 text-xs text-muted-foreground">
-                예약 후 카카오톡 알림톡으로 확정 안내를 보내드립니다
-              </p>
-            </div>
-          </div>
+          <Button
+            size="lg"
+            variant="outline"
+            asChild
+            className="h-12 min-w-[165px] cursor-pointer rounded-xl border px-8 text-[1.05rem] font-medium transition-colors duration-200 hover:bg-[oklch(0.26_0.04_206)]"
+            style={{
+              borderColor: "oklch(0.52 0.03 214 / 0.55)",
+              color: "oklch(0.92 0.01 85)",
+              background: "transparent",
+            }}
+          >
+            <a href="tel:051-928-0944" aria-label="전화 상담 예약 051-928-0944">
+              전화 상담 예약
+            </a>
+          </Button>
         </div>
       </div>
     </section>
