@@ -1,24 +1,20 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
 import { useState } from "react"
 import { Menu, X } from "lucide-react"
 import { Button } from "@/shared/ui/button"
 import { cn } from "@/shared/lib/utils"
 
-const navItems = [
+const NAV_ITEMS = [
   { label: "브랜드 스토리", href: "/brand" },
   { label: "솔루션", href: "/solution" },
   { label: "전문가 소개", href: "/experts" },
-  { label: "센터 소개", href: "/center" },
+  { label: "센터 안내", href: "/center" },
 ]
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const pathname = usePathname()
-
-  const isActivePath = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
 
   return (
     <header className="fixed top-0 left-0 right-0 z-[100] border-b border-[#EDE3D8] bg-[#FFF9F4]">
@@ -44,14 +40,11 @@ export function Header() {
 
           <div className="ml-auto flex items-center gap-8">
             <nav className="flex items-center gap-10">
-              {navItems.map((item) => (
+              {NAV_ITEMS.map((item) => (
                 <Link
                   key={item.label}
                   href={item.href}
-                  className={cn(
-                    "text-[1.1rem] font-semibold text-[#0C0C0C] transition-opacity hover:opacity-70",
-                    isActivePath(item.href) && "text-primary"
-                  )}
+                  className="text-[1.1rem] font-semibold text-[#0C0C0C] transition-opacity hover:opacity-70"
                 >
                   {item.label}
                 </Link>
@@ -77,14 +70,11 @@ export function Header() {
         )}
       >
         <nav className="flex flex-col p-4 gap-4">
-          {navItems.map((item) => (
+          {NAV_ITEMS.map((item) => (
             <Link
               key={item.label}
               href={item.href}
-              className={cn(
-                "py-2 text-base font-semibold text-[#0C0C0C] transition-opacity hover:opacity-70",
-                isActivePath(item.href) && "text-primary"
-              )}
+              className="py-2 text-base font-semibold text-[#0C0C0C] transition-opacity hover:opacity-70"
               onClick={() => setMobileMenuOpen(false)}
             >
               {item.label}

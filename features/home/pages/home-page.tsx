@@ -15,9 +15,9 @@ export function HomePage() {
       <HeroSection />
       <FeaturesSection />
       <BrandSection variant="preview" />
-      <SolutionSection variant="full" />
+      <SolutionSection variant="preview" />
       <ExpertsSection variant="preview" />
-      <CenterSection variant="full" showGallery={false} />
+      <CenterSection variant="preview" />
       <CTASection />
       <Footer />
     </main>

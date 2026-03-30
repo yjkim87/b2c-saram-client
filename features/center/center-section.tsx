@@ -271,53 +271,80 @@ function CenterGallery() {
   );
 }
 function CenterSectionPreview() {
+  const ADDRESS_SUMMARY = "부산시 해운대구 센텀동로 99, 백산센텀클래스원(1차) 406호";
+
   return (
     <section className="relative z-0 w-full bg-white py-16 md:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-10 flex flex-col items-center text-center">
-          <div className="mb-4 inline-flex items-center space-x-2 rounded-full border border-slate-200/60 bg-white px-3 py-1.5 shadow-sm md:mb-6 md:px-4 md:py-2">
-            <span className="text-xs md:text-sm">*</span>
-            <span className="text-xs font-bold tracking-wide text-slate-700 md:text-sm">Center Intro</span>
+        <div className="mb-8 flex flex-col items-center text-center lg:mb-10">
+          <div className="mb-4 inline-flex items-center rounded-full border border-slate-200/70 bg-white px-4 py-2 shadow-sm">
+            <span className="text-xs font-semibold tracking-[0.14em] text-slate-700">센터 안내</span>
           </div>
-          <h2 className="mobile-auto-phrase text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">당신의 변화를 위한 공간, 센터를 소개합니다.</h2>
-          <p className="mt-3 text-neutral-500">편안한 환경에서 전문적인 상담과 맞춤형 솔루션을 제공합니다.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">
+            마음성장 코칭 센터
+          </h2>
+          <p className="mt-3 text-sm text-neutral-600 sm:text-base">
+            아이와 부모님이 편안하게 이야기 나눌 수 있는 따뜻한 공간입니다
+          </p>
         </div>
 
-        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {CENTER_GALLERY_IMAGES.slice(0, 2).map((image, index) => (
-            <div
-              key={image.src}
-              className="overflow-hidden rounded-3xl border border-neutral-200/80 bg-neutral-100 shadow-sm"
-            >
-              <img
-                src={image.src}
-                alt={`센터 내부 이미지 ${index + 1}`}
-                className="h-44 w-full object-cover transition-transform duration-300 hover:scale-[1.03] md:h-56"
-                loading="lazy"
-              />
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.35fr_1fr] lg:items-stretch">
+          <div className="relative isolate min-h-[320px] overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm md:min-h-[380px]">
+            <div className="absolute inset-0 bg-gradient-to-br from-teal-100 via-white to-sky-100" />
+            <div className="absolute inset-0 opacity-60 [background-image:linear-gradient(to_right,rgba(15,23,42,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(15,23,42,0.08)_1px,transparent_1px)] [background-size:28px_28px]" />
+            <div className="absolute -left-10 -top-12 h-40 w-40 rounded-full bg-teal-300/40 blur-3xl" />
+            <div className="absolute -bottom-12 -right-10 h-44 w-44 rounded-full bg-sky-300/35 blur-3xl" />
+
+            <div className="relative z-10 flex h-full items-center justify-center px-4 pb-20 pt-12">
+              <div className="flex flex-col items-center">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-teal-600 text-white shadow-lg shadow-teal-900/30">
+                  <MapPinIcon className="h-5 w-5" />
+                </div>
+                <p className="mt-2 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-neutral-800 shadow-sm">
+                  사람의 발견을 원하면- 센터
+                </p>
+              </div>
             </div>
-          ))}
-        </div>
 
-        <div className="rounded-3xl border border-neutral-200 bg-neutral-50 p-6 text-center shadow-sm md:p-8">
-          <p className="text-sm font-semibold text-neutral-500">Address</p>
-          <p className="mt-2 text-lg font-semibold text-neutral-900">
-            부산시 해운대구 센텀동로 99 <br />
-            백산 센텀 클래스원 (1층 406호)
-          </p>
-          <p className="mt-3 text-sm text-neutral-600">
-            전화 051-928-0944 · 팩스 051-928-0946
-          </p>
-        </div>
+            <div className="absolute inset-x-3 bottom-3 z-20 sm:inset-x-4 sm:bottom-4">
+              <div className="grid grid-cols-2 gap-2 rounded-2xl bg-white/95 p-2 shadow-lg backdrop-blur-sm">
+                <a
+                  href={NAVER_MAP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex h-11 items-center justify-center rounded-xl bg-emerald-500 px-3 text-sm font-semibold text-white transition-colors hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/70 focus-visible:ring-offset-2"
+                >
+                  네이버 지도
+                </a>
+                <a
+                  href={KAKAO_MAP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex h-11 items-center justify-center rounded-xl bg-yellow-300 px-3 text-sm font-semibold text-neutral-900 transition-colors hover:bg-yellow-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400/70 focus-visible:ring-offset-2"
+                >
+                  카카오 맵
+                </a>
+              </div>
+            </div>
+          </div>
 
-        <div className="mt-10 flex justify-center">
-          <Link
-            href="/center"
-            className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-800 transition-colors hover:border-slate-400 hover:bg-slate-50"
-          >
-            센터 자세히 보기
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+          <aside className="flex flex-col rounded-3xl border border-neutral-200 bg-neutral-50 p-6 shadow-sm sm:p-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-neutral-500">주소</p>
+            <p className="mt-2 text-lg font-semibold leading-snug text-neutral-900">{ADDRESS_SUMMARY}</p>
+            <p className="mt-3 text-sm text-neutral-600">
+              Need parking, contact, and transport details? Check the full center introduction page.
+            </p>
+
+            <div className="mt-6">
+              <Link
+                href="/center"
+                className="inline-flex items-center gap-2 rounded-full border border-neutral-300 bg-white px-5 py-3 text-sm font-semibold text-neutral-800 transition-colors hover:border-neutral-400 hover:bg-neutral-100"
+              >
+                Center details
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </aside>
         </div>
       </div>
     </section>
@@ -336,23 +363,27 @@ function CenterSectionFull({
   const [showMapFallback, setShowMapFallback] = useState(true);
   const naverClientId = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID;
 
-  const ADDRESS_TEXT = "Busan Haeundae-gu Centumdong-ro 99, Beksan Centum Class One, 1F 406";
+  const ADDRESS_TEXT = "부산시 해운대구 센텀동로 99, 백산센텀클래스원(1차) 406호";
 
   const handleCopyAddress = async () => {
     const showCopiedToast = () => {
-      toast({
+      const { dismiss } = toast({
         title: (
           <span className="inline-flex items-center gap-2 text-xs font-medium leading-none">
             <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/25">
               <CircleCheck className="h-3.5 w-3.5 text-emerald-300" />
             </span>
-            주소가 복사되었습니다.
+            주소를 복사했습니다.
           </span>
         ),
         duration: 3000,
         className:
-          "!w-auto !min-h-0 !rounded-full !border-neutral-800 !bg-neutral-900/95 !px-3 !py-2 !pr-3 !text-white shadow-xl backdrop-blur-sm [&_[toast-close]]:hidden [&>div]:!gap-0",
+          "!w-auto !min-h-0 !rounded-full !border-neutral-800 !bg-neutral-900/95 !px-3 !py-2 !pr-3 !text-white !items-center !justify-center !space-x-0 shadow-xl backdrop-blur-sm [&_[toast-close]]:hidden [&>div]:!flex [&>div]:!items-center [&>div]:!gap-2",
       });
+
+      window.setTimeout(() => {
+        dismiss();
+      }, 3000);
     };
 
     if (navigator.clipboard?.writeText) {
@@ -398,14 +429,14 @@ function CenterSectionFull({
         },
       });
 
-      // ??????뤀嶺뚯솘? ?筌먦끆留??β돦裕녻キ?????異????깆젷 嶺뚯솘?????戮?뻣.
+      // 지도 타일이 모두 로드된 시점에 fallback UI 제거
       window.naver.maps.Event.once(map, "tilesloaded", () => {
         if (isUnmounted) return;
         tileLoaded = true;
         setShowMapFallback(false);
       });
 
-      // ?筌뤾쑴理??熬곣뫁而????쒖굣???繹먮냱紐드슖?????源녿턄 ?????? ???곷さ嶺???????怨룸츩???????.
+      // 지도 로딩이 지연될 경우를 대비한 fallback 처리 (예외 상황 대응)
       fallbackTimer = setTimeout(() => {
         if (isUnmounted) return;
         if (!tileLoaded) setShowMapFallback(true);
@@ -449,13 +480,11 @@ function CenterSectionFull({
         {showIntroText && (
           <div className="mb-10 flex flex-col items-center text-center">
             <div className="mb-4 inline-flex items-center space-x-2 rounded-full border border-slate-200/60 bg-white px-3 py-1.5 shadow-sm md:mb-6 md:px-4 md:py-2">
-              <span className="text-xs md:text-sm">*</span>
+              <span className="text-xs md:text-sm">📍</span>
               <span className="text-xs font-bold tracking-wide text-slate-700 md:text-sm">
-                ???좎댉 ???六?
+                센터 소개
               </span>
             </div>
-            <h2 className="mobile-auto-phrase text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">???덈뒆??源녿데 ???좎댉 ???뉖?</h2>
-            <p className="mt-3 text-neutral-500">?筌뤾쑬????겶???⑤벡紐????ㅻ???????????寃ヨ쥈?밸굵 ?リ옇??濡㏓뎨??덈퉵??</p>
           </div>
         )}
 
@@ -486,8 +515,9 @@ function CenterSectionFull({
                     <MapPinIcon className="h-5 w-5" />
                   </div>
                   <div className="mt-2 rounded-full bg-white px-4 py-1.5 text-sm font-bold text-neutral-900 shadow-md">
-                    어세스타 부산센터</div>
+                    사람의 발견을 원하면- 센터
                 </div>
+              </div>
               </div>
 
               <div className="absolute inset-x-6 bottom-4 z-30 flex justify-center gap-3">
@@ -497,14 +527,15 @@ function CenterSectionFull({
                   rel="noopener noreferrer"
                   className="flex max-w-[140px] flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-black/20 transition-all hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/70 focus-visible:ring-offset-2"
                 >
-                  네이버지도</a>
+                  네이버 지도
+                </a>
                 <a
                   href={KAKAO_MAP_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex max-w-[140px] flex-1 items-center justify-center gap-2 rounded-xl bg-yellow-300 px-4 py-3 text-sm font-semibold text-neutral-900 shadow-lg shadow-black/20 transition-all hover:bg-yellow-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400/70 focus-visible:ring-offset-2"
                 >
-                  카카오맵
+                  카카오 맵
                 </a>
               </div>
             </div>
@@ -516,7 +547,8 @@ function CenterSectionFull({
                     <MapPinIcon className="h-4 w-4" /> 주소</h3>
                   <div className="mt-2 flex items-start justify-between gap-4">
                     <p className="text-lg font-medium leading-relaxed text-neutral-900 sm:text-xl">
-                      부산시 해운대구 센텀동로 99 <br className="hidden sm:block" />
+                      부산시 해운대구 센텀동로 99
+                      <br className="hidden sm:block" />
                       <span className="text-neutral-600">백산센텀클래스원(1차) 406호</span>
                     </p>
                     <button
@@ -531,7 +563,7 @@ function CenterSectionFull({
                 <div className="mb-8 flex gap-4 rounded-2xl !bg-neutral-100 p-5 max-[400px]:flex-col">
                   <a
                     href="tel:0519280944"
-                    aria-label="?熬곥굦??濾곌쑬?뉒뵳?051-928-0944"
+                    aria-label="?????????▲뀋????遺얘턁筌?（????????붺몭????051-928-0944"
                     className="flex-1 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 max-[400px]:flex max-[400px]:items-center max-[400px]:gap-2"
                   >
                     <div className="mb-1 flex items-center gap-1.5 text-sm font-medium text-neutral-500 max-[400px]:mb-0">
@@ -582,7 +614,8 @@ function CenterSectionFull({
                         : "font-medium text-neutral-400 hover:text-neutral-600"
                     }`}
                   >
-                    <BusIcon className="h-4 w-4" /> 버스                  </button>
+                    <BusIcon className="h-4 w-4" /> 버스
+                  </button>
                 </div>
                   <span
                     className="pointer-events-none absolute bottom-[-1px] left-0 h-[3px] w-1/3 bg-neutral-900 transition-transform duration-300 ease-out"
