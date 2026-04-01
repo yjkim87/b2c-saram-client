@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/next'
 import { Toaster } from '@/shared/ui/toaster'
 import { MobileFloatingReservationCTA } from '@/shared/ui/mobile-floating-reservation-cta'
 import { ScrollToTopOnRouteChange } from '@/shared/providers/scroll-to-top'
+import { GlobalFloatingBanner } from '@/shared/providers/global-floating-banner'
 import './globals.css'
 
 const geist = Geist({ 
@@ -47,6 +48,7 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <ScrollToTopOnRouteChange />
         {children}
+        <GlobalFloatingBanner />
         <MobileFloatingReservationCTA />
         <Toaster />
         <Analytics />

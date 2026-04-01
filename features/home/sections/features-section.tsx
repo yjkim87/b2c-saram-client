@@ -1,138 +1,198 @@
-"use client"
+﻿"use client"
 
+import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
-import { Baby, Backpack, GraduationCap, Sparkles, Users, Check } from "lucide-react"
-import { Card, CardContent } from "@/shared/ui/card"
+import { Compass, Heart, Sparkles, TrendingUp } from "lucide-react"
 
-export function FeaturesSection() {
-  const [isVisible, setIsVisible] = useState(false)
-  const sectionRef = useRef<HTMLElement>(null)
+const FRAMEWORK_DATA = [
+  {
+    stage: "발견",
+    icon: Compass,
+    counseling: "내면의 원인과 기질적 특성 발견",
+    coaching: "숨겨진 강점과 잠재 자원 발견",
+  },
+  {
+    stage: "발달",
+    icon: TrendingUp,
+    counseling: "자존감 회복 및 정서적 성숙",
+    coaching: "자기주도성 및 핵심 역량 발달",
+  },
+  {
+    stage: "발휘",
+    icon: Sparkles,
+    counseling: "안정된 마음을 바탕으로 한 자기 조절",
+    coaching: "목표 달성을 위한 폭발적인 실행력",
+  },
+] as const
+
+const AUTO_CYCLE_INTERVAL = 3500
+
+function useFadeIn(delay = 0) {
+  const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    const el = ref.current
+    if (!el) return
+
+    el.style.opacity = "0"
+    el.style.transform = "translateY(20px)"
+
+    const timer = window.setTimeout(() => {
+      el.style.transition = "opacity 0.6s ease, transform 0.6s ease"
+      el.style.opacity = "1"
+      el.style.transform = "translateY(0)"
+    }, delay)
+
+    return () => window.clearTimeout(timer)
+  }, [delay])
+
+  return ref
+}
+
+export function FeaturesSection() {
+  const headerRef = useFadeIn(0)
+  const sectionRef = useRef<HTMLElement>(null)
+  const [activeStage, setActiveStage] = useState(0)
+  const [isInView, setIsInView] = useState(false)
+  const [isPaused, setIsPaused] = useState(false)
+
+  useEffect(() => {
+    const section = sectionRef.current
+    if (!section) return
+
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-        }
+        setIsInView(entry.isIntersecting)
       },
-      { threshold: 0.1 }
+      { threshold: 0.3 }
     )
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current)
-    }
-
+    observer.observe(section)
     return () => observer.disconnect()
   }, [])
 
+  useEffect(() => {
+    if (!isInView || isPaused) return
+
+    const cycleInterval = window.setInterval(() => {
+      setActiveStage((prev) => (prev + 1) % FRAMEWORK_DATA.length)
+    }, AUTO_CYCLE_INTERVAL)
+
+    return () => window.clearInterval(cycleInterval)
+  }, [isInView, isPaused])
+
+  const handleRowClick = (index: number) => {
+    setActiveStage(index)
+    setIsPaused(true)
+  }
+
+  const handleResume = () => {
+    setIsPaused(false)
+  }
+
   return (
-    <section 
-      id="features" 
-      ref={sectionRef}
-      className="py-20 md:py-28 bg-secondary/30"
-    >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid md:grid-cols-2 gap-6 md:gap-8">
-          {/* Card 1: Point 01 */}
-          <Card 
-            className={`bg-card border-border shadow-sm transition-all duration-700 ease-out ${
-              isVisible 
-                ? "opacity-100 translate-y-0" 
-                : "opacity-0 translate-y-8"
-            }`}
-          >
-            <CardContent className="p-6 md:p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 text-primary" />
+    <section ref={sectionRef} id="features" className="bg-[#FFFFFF] px-4 py-16 sm:px-6 md:py-20 lg:px-8">
+      <div className="mx-auto max-w-5xl">
+        <div ref={headerRef} className="mb-10 text-center md:mb-12">
+          <span className="mb-4 inline-flex rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">Integrated Solution</span>
+          <h2 className="mobile-auto-phrase text-3xl font-bold text-slate-900 md:text-4xl">
+            심리상담으로 단단하게,
+            <br className="sm:hidden" /> 성장코칭으로 당당하게
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-slate-600 md:text-base">
+            전문가와 함께 아이의 현재를 진단하고,
+            <br className="hidden sm:block" /> 가장 필요한 솔루션의 조합을 찾아갑니다.
+          </p>
+        </div>
+
+        <div className="overflow-hidden rounded-2xl border border-[#E8DED3] bg-white shadow-sm">
+          <div className="grid grid-cols-[92px_1fr_1fr] sm:grid-cols-[120px_1fr_1fr]">
+            <div className="px-3 py-4" />
+
+            <div className="flex items-center justify-center gap-2 border-b border-[#E7EEF2] px-4 py-4 sm:px-6">
+              <Heart className="h-4 w-4 text-sky-600" />
+              <span className="text-sm font-semibold text-sky-800">심리상담</span>
+            </div>
+
+            <div className="flex items-center justify-center gap-2 border-b border-[#EFE8DD] px-4 py-4 sm:px-6">
+              <TrendingUp className="h-4 w-4 text-amber-600" />
+              <span className="text-sm font-semibold text-amber-800">성장코칭</span>
+            </div>
+          </div>
+
+          {FRAMEWORK_DATA.map((item, index) => {
+            const Icon = item.icon
+            const isActive = activeStage === index
+
+            return (
+              <div
+                key={item.stage}
+                onClick={() => handleRowClick(index)}
+                className="grid cursor-pointer grid-cols-[92px_1fr_1fr] transition-all duration-700 ease-out sm:grid-cols-[120px_1fr_1fr]"
+                style={{
+                  background: isActive ? "#F9F7F2" : "transparent",
+                  opacity: isActive ? 1 : 0.46,
+                }}
+              >
+                <div
+                  className="flex flex-col items-center justify-center gap-1.5 px-3 py-5 transition-all duration-700 sm:py-6"
+                  style={{ background: isActive ? "#F4EFE7" : "transparent" }}
+                >
+                  <Icon className="h-4 w-4 transition-all duration-700 sm:h-5 sm:w-5" style={{ color: isActive ? "#1F3D5D" : "#8B98A8" }} />
+                  <span className="text-xs font-semibold transition-all duration-700 sm:text-sm" style={{ color: isActive ? "#1E293B" : "#64748B" }}>
+                    {item.stage}
+                  </span>
                 </div>
-                <h3 className="text-lg md:text-xl font-bold text-primary">
-                  Point 01: 생애 주기별 데이터 기반
-                </h3>
-              </div>
-              
-              <p className="text-muted-foreground leading-relaxed mb-6">
-                아이의 발달 단계는 각기 다른 언어를 필요로 합니다. 
-                유아부터 성인까지, 사발면은 검증된 데이터를 통해 
-                연속성 있는 성장을 지원합니다.
-              </p>
 
-              <ul className="flex flex-col gap-4">
-                <li className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <Baby className="w-4 h-4 text-accent" />
-                  </div>
-                  <div>
-                    <span className="font-semibold text-foreground">영유아:</span>
-                    <span className="text-muted-foreground ml-1">기질 분석 및 맞춤형 양육 솔루션</span>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <Backpack className="w-4 h-4 text-accent" />
-                  </div>
-                  <div>
-                    <span className="font-semibold text-foreground">초등학생:</span>
-                    <span className="text-muted-foreground ml-1">자기 이해와 학습 동기 부여</span>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <GraduationCap className="w-4 h-4 text-accent" />
-                  </div>
-                  <div>
-                    <span className="font-semibold text-foreground">중고등학생:</span>
-                    <span className="text-muted-foreground ml-1">강점 기반 진로 및 커리어 설계</span>
-                  </div>
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
-
-          {/* Card 2: Point 02 */}
-          <Card 
-            className={`bg-card border-border shadow-sm transition-all duration-700 ease-out delay-150 ${
-              isVisible 
-                ? "opacity-100 translate-y-0" 
-                : "opacity-0 translate-y-8"
-            }`}
-          >
-            <CardContent className="p-6 md:p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Users className="w-5 h-5 text-primary" />
+                <div
+                  className="flex items-center px-4 py-5 transition-all duration-700 sm:px-6 sm:py-6"
+                  style={{
+                    background: isActive ? "#F1F8FC" : "transparent",
+                    boxShadow: isActive ? "inset 0 0 0 1px #DCECF7" : "none",
+                  }}
+                >
+                  <p className="text-sm leading-relaxed" style={{ color: isActive ? "#1E3A5F" : "#64748B" }}>
+                    {item.counseling}
+                  </p>
                 </div>
-                <h3 className="text-lg md:text-xl font-bold text-primary">
-                  Point 02: 세상에 단 하나뿐인 맞춤형 통합 솔루션
-                </h3>
-              </div>
 
-              <ul className="flex flex-col gap-5">
-                <li className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5 text-primary" />
-                  </div>
-                  <div>
-                    <span className="font-semibold text-foreground block mb-1">인간만의 통찰적 시각</span>
-                    <span className="text-muted-foreground leading-relaxed">
-                      AI가 흉내 낼 수 없는 깊은 교감으로 피코치와 소통하며 성장의 해답을 찾습니다.
-                    </span>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5 text-primary" />
-                  </div>
-                  <div>
-                    <span className="font-semibold text-foreground block mb-1">개인 맞춤형 최적화 솔루션</span>
-                    <span className="text-muted-foreground leading-relaxed">
-                      기질, 성적, 환경 등 복합적인 변수를 통합하여 니즈에 부합하는 솔루션을 제공합니다.
-                    </span>
-                  </div>
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
+                <div
+                  className="flex items-center px-4 py-5 transition-all duration-700 sm:px-6 sm:py-6"
+                  style={{
+                    background: isActive ? "#FFF8ED" : "transparent",
+                    boxShadow: isActive ? "inset 0 0 0 1px #F4E4CA" : "none",
+                  }}
+                >
+                  <p className="text-sm leading-relaxed" style={{ color: isActive ? "#5B3A1A" : "#64748B" }}>
+                    {item.coaching}
+                  </p>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {isPaused && (
+          <div className="mt-6 flex justify-center">
+            <button
+              type="button"
+              onClick={handleResume}
+              className="rounded-full border border-[#E8DED3] bg-white px-4 py-2 text-xs font-medium text-slate-600 transition-colors duration-200 hover:bg-[#F8F4EE]"
+            >
+              자동 재생
+            </button>
+          </div>
+        )}
+
+        <div className="mt-12 text-center">
+          <Link
+            href="/reservation"
+            className="inline-flex items-center gap-2 rounded-full bg-[#0C0C0C] px-7 py-3 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#1D1D1D]"
+          >
+            <Compass className="h-4 w-4" />
+            우리 아이 맞춤형 여정 상담하기
+          </Link>
+          <p className="mt-4 text-xs text-slate-500">상담과 코칭 중 무엇이 최선일지, 전문가와 함께 결정하세요</p>
         </div>
       </div>
     </section>

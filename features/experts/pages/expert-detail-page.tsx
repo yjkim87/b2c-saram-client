@@ -1,6 +1,6 @@
 ﻿import { notFound } from "next/navigation"
 import { getExpertById } from "@/features/experts/lib/experts"
-import { ExpertDetailPage as ExpertDetailView } from "../components/detail/expert-detail-page"
+import { ExpertDetailView } from "../components/detail/expert-detail-view"
 import { createExpertProfileData } from "../lib/profile-data"
 
 interface ExpertDetailPageProps {

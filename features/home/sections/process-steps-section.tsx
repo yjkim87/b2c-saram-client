@@ -1,15 +1,31 @@
-"use client"
+﻿"use client"
 
 import { useEffect, useRef, useState } from "react"
-import { ClipboardList, Map, Mic2, BarChart2 } from "lucide-react"
+import { BarChart2, ClipboardList, Map, Mic2 } from "lucide-react"
+import type { HomeServiceTab } from "@/features/home/model/home-tab"
 
-const steps = [
+interface ProcessStepsSectionProps {
+  tab: HomeServiceTab
+}
+
+interface ProcessStep {
+  num: string
+  icon: typeof ClipboardList
+  title: string
+  desc: string
+  detail: string
+  accent: string
+  bg: string
+  border: string
+}
+
+const COUNSELING_STEPS: ProcessStep[] = [
   {
     num: "01",
     icon: ClipboardList,
     title: "발달 평가",
-    desc: "표준화 도구를 활용한 종합적인 발달 상태 평가 및 강점·약점 분석을 진행합니다.",
-    detail: "K-WISC, CBCL 등 표준화 평가 도구 활용. 인지·언어·운동·사회정서 전 영역을 체계적으로 측정합니다.",
+    desc: "표준화 도구를 활용해 현재 발달과 정서 상태를 종합적으로 평가합니다.",
+    detail: "K-WISC, CBCL 등 기초 평가 결과를 통합해 인지·언어·행동·사회정서 영역을 체계적으로 점검합니다.",
     accent: "oklch(0.48 0.09 165)",
     bg: "oklch(0.48 0.09 165 / 0.08)",
     border: "oklch(0.48 0.09 165 / 0.25)",
@@ -17,9 +33,9 @@ const steps = [
   {
     num: "02",
     icon: Map,
-    title: "코칭 계획 수립",
-    desc: "평가 결과를 기반으로 개인화된 발달 지원 계획을 수립하고 목표를 설정합니다.",
-    detail: "강점 기반 접근으로 아이의 가능성에 집중. 보호자와 함께 단기·장기 목표를 설정하고 세션 로드맵을 구성합니다.",
+    title: "상담 계획 수립",
+    desc: "평가 결과를 바탕으로 개인화된 상담 계획과 목표를 설계합니다.",
+    detail: "정서 안정과 행동 변화를 위한 단기·중기 목표를 설정하고 보호자와 함께 실천 로드맵을 구성합니다.",
     accent: "oklch(0.62 0.09 45)",
     bg: "oklch(0.62 0.09 45 / 0.08)",
     border: "oklch(0.62 0.09 45 / 0.25)",
@@ -27,9 +43,9 @@ const steps = [
   {
     num: "03",
     icon: Mic2,
-    title: "맞춤 코칭 실행",
-    desc: "전문 코치와 함께하는 1:1 맞춤형 코칭 세션을 주 1~2회 진행합니다.",
-    detail: "50분 집중 세션 + 매 회기 후 보호자 피드백 공유. 놀이·활동 기반 개입으로 아이가 즐겁게 참여합니다.",
+    title: "맞춤 상담 실행",
+    desc: "전문가와 함께하는 1:1 맞춤 상담 세션을 주기적으로 진행합니다.",
+    detail: "놀이·대화 기반 개입과 회기별 보호자 피드백을 병행해 일상에서도 변화가 이어지도록 돕습니다.",
     accent: "oklch(0.52 0.08 290)",
     bg: "oklch(0.52 0.08 290 / 0.08)",
     border: "oklch(0.52 0.08 290 / 0.25)",
@@ -37,12 +53,55 @@ const steps = [
   {
     num: "04",
     icon: BarChart2,
-    title: "성장 모니터링",
-    desc: "정기적인 재평가를 통한 성장을 추적하고 코칭 계획을 업데이트합니다.",
-    detail: "3개월마다 공식 재평가. 성장 그래프 및 보고서 제공. 목표 달성 후 유지 프로그램으로 연계합니다.",
+    title: "변화 모니터링",
+    desc: "정기 점검을 통해 변화 흐름을 추적하고 상담 계획을 업데이트합니다.",
+    detail: "주기적 리포트로 정서·행동 지표를 확인하고, 목표 달성 이후 유지 프로그램까지 자연스럽게 연결합니다.",
     accent: "oklch(0.55 0.07 200)",
     bg: "oklch(0.55 0.07 200 / 0.08)",
     border: "oklch(0.55 0.07 200 / 0.25)",
+  },
+]
+
+const COACHING_STEPS: ProcessStep[] = [
+  {
+    num: "01",
+    icon: ClipboardList,
+    title: "강점 진단",
+    desc: "강점, 흥미, 학습 성향을 진단해 성장의 출발점을 찾습니다.",
+    detail: "활동 성향과 동기 패턴을 분석해 코칭에 활용할 핵심 강점 키워드를 도출합니다.",
+    accent: "oklch(0.58 0.11 55)",
+    bg: "oklch(0.58 0.11 55 / 0.08)",
+    border: "oklch(0.58 0.11 55 / 0.25)",
+  },
+  {
+    num: "02",
+    icon: Map,
+    title: "코칭 계획 수립",
+    desc: "진단 결과를 기반으로 실행 가능한 목표와 코칭 계획을 설계합니다.",
+    detail: "단기 성취와 장기 성장 목표를 연결해 학업·관계·진로를 아우르는 로드맵을 구성합니다.",
+    accent: "oklch(0.53 0.09 250)",
+    bg: "oklch(0.53 0.09 250 / 0.08)",
+    border: "oklch(0.53 0.09 250 / 0.25)",
+  },
+  {
+    num: "03",
+    icon: Mic2,
+    title: "맞춤 코칭 실행",
+    desc: "주기적인 1:1 코칭 세션으로 실행 습관과 자기주도성을 강화합니다.",
+    detail: "실행 점검, 피드백, 동기 강화 루프를 반복해 목표 달성률을 안정적으로 높입니다.",
+    accent: "oklch(0.52 0.1 180)",
+    bg: "oklch(0.52 0.1 180 / 0.08)",
+    border: "oklch(0.52 0.1 180 / 0.25)",
+  },
+  {
+    num: "04",
+    icon: BarChart2,
+    title: "성장 모니터링",
+    desc: "성과를 점검해 다음 성장 목표를 업데이트하고 확장합니다.",
+    detail: "월간 성과 리뷰를 통해 실행력·자기주도성·관계 역량 향상 추이를 확인하고 다음 단계로 연결합니다.",
+    accent: "oklch(0.6 0.11 35)",
+    bg: "oklch(0.6 0.11 35 / 0.08)",
+    border: "oklch(0.6 0.11 35 / 0.25)",
   },
 ]
 
@@ -50,7 +109,7 @@ function MobileTimelineItem({
   step,
   isLast,
 }: {
-  step: (typeof steps)[0]
+  step: ProcessStep
   isLast: boolean
 }) {
   const itemRef = useRef<HTMLDivElement>(null)
@@ -144,11 +203,13 @@ function MobileTimelineItem({
 function DesktopStepRow({
   step,
   index,
+  isLast,
   isActive,
   onActivate,
 }: {
-  step: (typeof steps)[0]
+  step: ProcessStep
   index: number
+  isLast: boolean
   isActive: boolean
   onActivate: (i: number) => void
 }) {
@@ -172,7 +233,7 @@ function DesktopStepRow({
     <div
       ref={rowRef}
       className="grid grid-cols-[120px_1fr] gap-10 py-14"
-      style={{ borderBottom: index < steps.length - 1 ? "1px solid var(--border)" : "none" }}
+      style={{ borderBottom: isLast ? "none" : "1px solid var(--border)" }}
     >
       <div className="flex flex-col items-end justify-start pt-1">
         <span
@@ -236,7 +297,7 @@ function DesktopStepRow({
   )
 }
 
-function DesktopTimeline() {
+function DesktopTimeline({ steps }: { steps: ProcessStep[] }) {
   const [activeIndex, setActiveIndex] = useState(0)
   const activateRef = useRef(setActiveIndex)
   activateRef.current = setActiveIndex
@@ -247,16 +308,31 @@ function DesktopTimeline() {
       <div className="absolute bottom-0 left-[119px] top-0 w-px" style={{ background: "var(--border)" }} />
       <div>
         {steps.map((step, i) => (
-          <DesktopStepRow key={step.num} step={step} index={i} isActive={activeIndex === i} onActivate={stableActivate} />
+          <DesktopStepRow
+            key={step.num}
+            step={step}
+            index={i}
+            isLast={i === steps.length - 1}
+            isActive={activeIndex === i}
+            onActivate={stableActivate}
+          />
         ))}
       </div>
     </div>
   )
 }
 
-export function ProcessStepsSection() {
+export function ProcessStepsSection({ tab }: ProcessStepsSectionProps) {
   const headerRef = useRef<HTMLDivElement>(null)
   const [headerVisible, setHeaderVisible] = useState(false)
+
+  const steps = tab === "counseling" ? COUNSELING_STEPS : COACHING_STEPS
+  const badgeLabel = tab === "counseling" ? "상담 프로세스" : "코칭 프로세스"
+  const headline = tab === "counseling" ? "체계적인 4단계 상담" : "체계적인 4단계 코칭"
+  const description =
+    tab === "counseling"
+      ? "과학적 평가에서 변화 모니터링까지, 정서 회복을 위한 전 과정을 체계적으로 진행합니다."
+      : "강점 진단에서 성장 모니터링까지, 목표 실행과 성장을 위한 전 과정을 체계적으로 진행합니다."
 
   useEffect(() => {
     const el = headerRef.current
@@ -275,7 +351,7 @@ export function ProcessStepsSection() {
   }, [])
 
   return (
-    <section id="process" className="bg-[var(--background)] px-4 py-20 font-sans sm:px-6 lg:px-8">
+    <section id="process-steps" className="bg-[var(--background)] px-4 py-20 font-sans sm:px-6 lg:px-8">
       <div className="mx-auto max-w-4xl">
         <div
           ref={headerRef}
@@ -288,26 +364,31 @@ export function ProcessStepsSection() {
         >
           <span
             className="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-widest"
-            style={{ background: "oklch(0.48 0.09 165 / 0.1)", color: "var(--primary)" }}
+            style={{
+              background: tab === "counseling" ? "oklch(0.48 0.09 165 / 0.1)" : "oklch(0.58 0.11 55 / 0.1)",
+              color: tab === "counseling" ? "oklch(0.48 0.09 165)" : "oklch(0.58 0.11 55)",
+            }}
           >
-            코칭 프로세스
+            {badgeLabel}
           </span>
           <h2 className="mb-3 text-balance text-3xl font-bold sm:text-4xl" style={{ color: "var(--foreground)" }}>
-            체계적인 4단계 코칭
+            {headline}
           </h2>
           <p className="mx-auto max-w-md text-sm leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
-            과학적 평가에서 성장 모니터링까지, 전 과정을 책임지는 전문 코칭 시스템
+            {description}
           </p>
         </div>
 
-        <div className="md:hidden">
-          {steps.map((step, i) => (
-            <MobileTimelineItem key={step.num} step={step} isLast={i === steps.length - 1} />
-          ))}
-        </div>
+        <div key={`process-${tab}`} className="animate-in fade-in duration-200">
+          <div className="md:hidden">
+            {steps.map((step, i) => (
+              <MobileTimelineItem key={`${tab}-${step.num}`} step={step} isLast={i === steps.length - 1} />
+            ))}
+          </div>
 
-        <div className="hidden md:block">
-          <DesktopTimeline />
+          <div className="hidden md:block">
+            <DesktopTimeline key={tab} steps={steps} />
+          </div>
         </div>
       </div>
     </section>

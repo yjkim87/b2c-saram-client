@@ -1,7 +1,7 @@
 ﻿"use client"
 
-import { ExpertsSection } from "@/features/experts/experts-section"
+import { ExpertList } from "@/features/experts/components/list/expert-list"
 
 export function ExpertListPage() {
-  return <ExpertsSection variant="full" />
+  return <ExpertList variant="full" />
 }

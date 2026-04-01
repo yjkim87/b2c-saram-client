@@ -163,11 +163,6 @@ export function useReservationFlow() {
           .map((item, index) => ({ ...item, order: index + 1 }))
       }
 
-      if (prev.length >= 2) {
-        setConcernLimitMessage("최대 2개까지 선택할 수 있어요.")
-        return prev
-      }
-
       setConcernLimitMessage(null)
       return [...prev, { id, order: prev.length + 1 }]
     })
@@ -220,7 +215,7 @@ export function useReservationFlow() {
     userInfo.birthdate === birthdateInput &&
     userInfo.gender
 
-  const selectedConcern = selectedConcerns.length > 0 ? selectedConcerns.map((item) => item.id).join(", ") : null
+  const selectedConcern = selectedConcerns.length > 0 ? selectedConcerns.map((item) => item.id).join(" / ") : null
 
   return {
     step,

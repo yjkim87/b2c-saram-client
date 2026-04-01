@@ -1,4 +1,4 @@
-﻿import Link from "next/link"
+import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { detailTokens } from "./design-tokens"
 import { HeaderSection } from "./sections/header-section"
@@ -7,12 +7,12 @@ import { BioSection } from "./sections/bio-section"
 import { InfoGridSection } from "./sections/info-grid-section"
 import type { ExpertProfileData } from "@/features/experts/lib/types"
 
-interface ExpertDetailPageProps {
+interface ExpertDetailViewProps {
   backHref: string
   profileData: ExpertProfileData
 }
 
-export function ExpertDetailPage({ backHref, profileData }: ExpertDetailPageProps) {
+export function ExpertDetailView({ backHref, profileData }: ExpertDetailViewProps) {
   return (
     <main className={detailTokens.page}>
       <div className={detailTokens.container}>

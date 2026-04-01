@@ -31,6 +31,8 @@ interface EditableUserMessageProps {
   onEdit: () => void
 }
 
+const STEP1_TYPING_DELAY_MS = 1200
+
 function AttendanceOptionButton({ isSelected, onClick, children }: AttendanceOptionButtonProps) {
   return (
     <button
@@ -106,8 +108,15 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
   const step4StartRef = useRef<HTMLDivElement>(null)
   const step5StartRef = useRef<HTMLDivElement>(null)
   const [showExitModal, setShowExitModal] = useState(false)
+  const [showResetModal, setShowResetModal] = useState(false)
   const [editingField, setEditingField] = useState<"name" | "relationship" | "birthdate" | "gender" | null>(null)
   const [isMobileStepCompact, setIsMobileStepCompact] = useState(false)
+  const [isRelationshipPromptReady, setIsRelationshipPromptReady] = useState(false)
+  const [isBirthdatePromptReady, setIsBirthdatePromptReady] = useState(false)
+  const [isGenderPromptReady, setIsGenderPromptReady] = useState(false)
+  const relationshipPromptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const birthdatePromptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const genderPromptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const isOnlyKoreanJamo = (value: string) => /^[\u3131-\u314e\u314f-\u3163]+$/.test(value)
   const isValidName = (value: string) => {
     const trimmed = value.trim()
@@ -160,6 +169,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
 
   const isBothSelected = attendance === "both"
   const concernAgeGroup = ageGroup === "adult" ? "high" : ageGroup
+  const totalConcernCount = concernAgeGroup ? concernData[concernAgeGroup].cards.length : 5
   const hasNameAnswer = isValidName(userInfo.name)
   const hasRelationshipAnswer = Boolean(userInfo.relationship)
   const hasBirthdateAnswer =
@@ -183,6 +193,87 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
       setEditingField(null)
     }
   }, [isEditingBirthdate, hasBirthdateAnswer])
+
+  useEffect(() => {
+    if (!canShowRelationshipQuestion) {
+      setIsRelationshipPromptReady(false)
+      if (relationshipPromptTimerRef.current) {
+        clearTimeout(relationshipPromptTimerRef.current)
+        relationshipPromptTimerRef.current = null
+      }
+      return
+    }
+
+    if (isRelationshipPromptReady) {
+      return
+    }
+
+    relationshipPromptTimerRef.current = setTimeout(() => {
+      setIsRelationshipPromptReady(true)
+      relationshipPromptTimerRef.current = null
+    }, STEP1_TYPING_DELAY_MS)
+
+    return () => {
+      if (relationshipPromptTimerRef.current) {
+        clearTimeout(relationshipPromptTimerRef.current)
+        relationshipPromptTimerRef.current = null
+      }
+    }
+  }, [canShowRelationshipQuestion, isRelationshipPromptReady])
+
+  useEffect(() => {
+    if (!canShowBirthdateQuestion) {
+      setIsBirthdatePromptReady(false)
+      if (birthdatePromptTimerRef.current) {
+        clearTimeout(birthdatePromptTimerRef.current)
+        birthdatePromptTimerRef.current = null
+      }
+      return
+    }
+
+    if (isBirthdatePromptReady) {
+      return
+    }
+
+    birthdatePromptTimerRef.current = setTimeout(() => {
+      setIsBirthdatePromptReady(true)
+      birthdatePromptTimerRef.current = null
+    }, STEP1_TYPING_DELAY_MS)
+
+    return () => {
+      if (birthdatePromptTimerRef.current) {
+        clearTimeout(birthdatePromptTimerRef.current)
+        birthdatePromptTimerRef.current = null
+      }
+    }
+  }, [canShowBirthdateQuestion, isBirthdatePromptReady])
+
+  useEffect(() => {
+    if (!canShowGenderQuestion) {
+      setIsGenderPromptReady(false)
+      if (genderPromptTimerRef.current) {
+        clearTimeout(genderPromptTimerRef.current)
+        genderPromptTimerRef.current = null
+      }
+      return
+    }
+
+    if (isGenderPromptReady) {
+      return
+    }
+
+    genderPromptTimerRef.current = setTimeout(() => {
+      setIsGenderPromptReady(true)
+      genderPromptTimerRef.current = null
+    }, STEP1_TYPING_DELAY_MS)
+
+    return () => {
+      if (genderPromptTimerRef.current) {
+        clearTimeout(genderPromptTimerRef.current)
+        genderPromptTimerRef.current = null
+      }
+    }
+  }, [canShowGenderQuestion, isGenderPromptReady])
 
   useEffect(() => {
     if (step < 2) {
@@ -231,7 +322,12 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
   }
 
   const handleResetFlow = () => {
+    setShowResetModal(true)
+  }
+
+  const handleResetConfirm = () => {
     resetAll()
+    setShowResetModal(false)
     window.scrollTo({ top: 0, behavior: "auto" })
   }
 
@@ -240,7 +336,14 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
       <header ref={headerRef} className="fixed top-0 left-0 right-0 z-[100] border-b border-[#EDE3D8] bg-[#FFF9F4]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between md:h-20">
-            <Link href="/" className="shrink-0">
+            <Link
+              href="/"
+              className="shrink-0"
+              onClick={(e) => {
+                e.preventDefault()
+                setShowExitModal(true)
+              }}
+            >
               <span className="text-2xl font-bold tracking-tight text-[#0C0C0C] md:text-[2.1rem]">{"\uC0AC\uBC1C\uBA74"}</span>
             </Link>
             <Button
@@ -291,7 +394,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                         <button
                           type="button"
                           onClick={handleResetFlow}
-                          className="absolute right-0 top-1/2 inline-flex -translate-y-1/2 items-center gap-1 text-sm font-medium text-[#6E6352] transition-colors hover:text-[#4F4537]"
+                          className="absolute right-0 top-1/2 inline-flex -translate-y-1/2 cursor-pointer items-center gap-1 text-sm font-medium text-[#6E6352] transition-colors hover:text-[#4F4537]"
                         >
                           <RotateCcw className="h-3.5 w-3.5" />
                           <span>{"\uCD08\uAE30\uD654"}</span>
@@ -410,130 +513,148 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
 
                         {canShowRelationshipQuestion && (
                           <>
-                            <BotMessage content={"\ub300\uc0c1\uc790\uc640\uc758 \uad00\uacc4\ub97c \uc120\ud0dd\ud574 \uc8fc\uc138\uc694."} />
-                            {hasRelationshipAnswer && !isEditingRelationship ? (
-                              <EditableUserMessage
-                                content={userInfo.relationship}
-                                onEdit={() => setEditingField("relationship")}
-                              />
+                            {isRelationshipPromptReady ? (
+                              <>
+                                <BotMessage content={"\ub300\uc0c1\uc790\uc640\uc758 \uad00\uacc4\ub97c \uc120\ud0dd\ud574 \uc8fc\uc138\uc694."} />
+                                {hasRelationshipAnswer && !isEditingRelationship ? (
+                                  <EditableUserMessage
+                                    content={userInfo.relationship}
+                                    onEdit={() => setEditingField("relationship")}
+                                  />
+                                ) : (
+                                  <div className="flex justify-end animate-in fade-in-0 slide-in-from-right-4 duration-300">
+                                    <div className="w-full max-w-md rounded-[20px] rounded-tr-[5px] bg-white p-3 border border-[#B1A58F] space-y-2">
+                                      {relationships.map((rel) => (
+                                        <button
+                                          key={rel}
+                                          onClick={() => {
+                                            setUserInfo((prev) => ({ ...prev, relationship: rel as Relationship }))
+                                            setEditingField(null)
+                                          }}
+                                          className={cn(
+                                            "w-full px-4 py-2.5 rounded-xl border text-left transition-all",
+                                            userInfo.relationship === rel
+                                              ? "border-[#0B6980] bg-[#0B6980] text-white"
+                                              : "border-transparent bg-[#DCD8D2] hover:bg-[#D4D0C8] text-foreground",
+                                          )}
+                                        >
+                                          {rel}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </>
                             ) : (
-                              <div className="flex justify-end animate-in fade-in-0 slide-in-from-right-4 duration-300">
-                                <div className="w-full max-w-md rounded-[20px] rounded-tr-[5px] bg-white p-3 border border-[#B1A58F] space-y-2">
-                                  {relationships.map((rel) => (
-                                    <button
-                                      key={rel}
-                                      onClick={() => {
-                                        setUserInfo((prev) => ({ ...prev, relationship: rel as Relationship }))
-                                        setEditingField(null)
-                                      }}
-                                      className={cn(
-                                        "w-full px-4 py-2.5 rounded-xl border text-left transition-all",
-                                        userInfo.relationship === rel
-                                          ? "border-[#0B6980] bg-[#0B6980] text-white"
-                                          : "border-transparent bg-[#DCD8D2] hover:bg-[#D4D0C8] text-foreground",
-                                      )}
-                                    >
-                                      {rel}
-                                    </button>
-                                  ))}
-                                </div>
-                              </div>
+                              <BotMessage content="" isTyping />
                             )}
                           </>
                         )}
 
                         {canShowBirthdateQuestion && (
                           <>
-                            <BotMessage content={"\ub300\uc0c1\uc790\uc758 \uc0dd\ub144\uc6d4\uc77c\uc744 \uc785\ub825\ud574 \uc8fc\uc138\uc694. \uc22b\uc790\ub9cc \uc785\ub825\ud558\uc138\uc694. (\uc608: 20021225)"} />
-                            {hasBirthdateAnswer && !isEditingBirthdate ? (
-                              <EditableUserMessage
-                                content={`${userInfo.birthdate}${ageGroup ? ` (${getAgeGroupLabel(ageGroup)})` : ""}`}
-                                onEdit={() => setEditingField("birthdate")}
-                              />
-                            ) : (
-                              <div className="flex justify-end animate-in fade-in-0 slide-in-from-right-4 duration-300">
-                                <div className="w-full max-w-md rounded-[20px] rounded-tr-[5px] bg-white p-4 border border-[#B1A58F]">
-                                  <div className="flex items-center gap-2">
-                                    <div className="flex-1 rounded-xl border border-[#D8CEBC] bg-white px-4 py-2.5">
-                                      <input
-                                        type="text"
-                                        value={birthdateInput}
-                                        onChange={(e) => handleBirthdateChange(e.target.value)}
-                                        onBlur={handleBirthdateBlur}
-                                        onKeyDown={(e) => {
-                                          if (e.key === "Enter") {
-                                            e.preventDefault()
-                                            handleBirthdateBlur()
-                                          }
-                                        }}
-                                        placeholder={"\uc22b\uc790\ub9cc \uc785\ub825\ud558\uc138\uc694 (\uc608: 20021225)"}
-                                        maxLength={10}
-                                        className="w-full bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none"
-                                      />
+                            {isBirthdatePromptReady ? (
+                              <>
+                                <BotMessage content={"\ub300\uc0c1\uc790\uc758 \uc0dd\ub144\uc6d4\uc77c\uc744 \uc785\ub825\ud574 \uc8fc\uc138\uc694. \uc22b\uc790\ub9cc \uc785\ub825\ud558\uc138\uc694. (\uc608: 20021225)"} />
+                                {hasBirthdateAnswer && !isEditingBirthdate ? (
+                                  <EditableUserMessage
+                                    content={`${userInfo.birthdate}${ageGroup ? ` (${getAgeGroupLabel(ageGroup)})` : ""}`}
+                                    onEdit={() => setEditingField("birthdate")}
+                                  />
+                                ) : (
+                                  <div className="flex justify-end animate-in fade-in-0 slide-in-from-right-4 duration-300">
+                                    <div className="w-full max-w-md rounded-[20px] rounded-tr-[5px] bg-white p-4 border border-[#B1A58F]">
+                                      <div className="flex items-center gap-2">
+                                        <div className="flex-1 rounded-xl border border-[#D8CEBC] bg-white px-4 py-2.5">
+                                          <input
+                                            type="text"
+                                            value={birthdateInput}
+                                            onChange={(e) => handleBirthdateChange(e.target.value)}
+                                            onBlur={handleBirthdateBlur}
+                                            onKeyDown={(e) => {
+                                              if (e.key === "Enter") {
+                                                e.preventDefault()
+                                                handleBirthdateBlur()
+                                              }
+                                            }}
+                                            placeholder={"\uc22b\uc790\ub9cc \uc785\ub825\ud558\uc138\uc694 (\uc608: 20021225)"}
+                                            maxLength={10}
+                                            className="w-full bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none"
+                                          />
+                                        </div>
+                                        <button
+                                          type="button"
+                                          onClick={handleBirthdateBlur}
+                                          disabled={birthdateInput.trim().length === 0}
+                                          className={cn(
+                                            "w-9 h-9 rounded-full border flex items-center justify-center transition-all flex-shrink-0",
+                                            birthdateInput.trim().length > 0
+                                              ? "bg-[#E7E0D3] border-[#D0C8BB] text-[#544E45] hover:brightness-95"
+                                              : "bg-muted border-transparent text-muted-foreground cursor-not-allowed",
+                                          )}
+                                          aria-label={"\uC0DD\uB144\uC6D4\uC77C \uC804\uC1A1"}
+                                        >
+                                          <ArrowUp className="w-4 h-4" />
+                                        </button>
+                                      </div>
+                                      {birthdateError && <p className="mt-1.5 text-sm text-destructive">{birthdateError}</p>}
                                     </div>
-                                    <button
-                                      type="button"
-                                      onClick={handleBirthdateBlur}
-                                      disabled={birthdateInput.trim().length === 0}
-                                      className={cn(
-                                        "w-9 h-9 rounded-full border flex items-center justify-center transition-all flex-shrink-0",
-                                        birthdateInput.trim().length > 0
-                                          ? "bg-[#E7E0D3] border-[#D0C8BB] text-[#544E45] hover:brightness-95"
-                                          : "bg-muted border-transparent text-muted-foreground cursor-not-allowed",
-                                      )}
-                                      aria-label={"\uC0DD\uB144\uC6D4\uC77C \uC804\uC1A1"}
-                                    >
-                                      <ArrowUp className="w-4 h-4" />
-                                    </button>
                                   </div>
-                                  {birthdateError && <p className="mt-1.5 text-sm text-destructive">{birthdateError}</p>}
-                                </div>
-                              </div>
+                                )}
+                              </>
+                            ) : (
+                              <BotMessage content="" isTyping />
                             )}
                           </>
                         )}
 
                         {canShowGenderQuestion && (
                           <>
-                            <BotMessage content={"\ub300\uc0c1\uc790 \uc131\ubcc4\uc744 \uc120\ud0dd\ud574 \uc8fc\uc138\uc694."} />
-                              {hasGenderAnswer && !isEditingGender ? (
+                            {isGenderPromptReady ? (
                               <>
-                                <EditableUserMessage
-                                  content={userInfo.gender}
-                                  onEdit={() => setEditingField("gender")}
-                                />
-                                <div className="w-full animate-in fade-in-0 slide-in-from-right-4 duration-300">
-                                  <Button
-                                    onClick={goToNextStep}
-                                    disabled={!isStep1Valid}
-                                    className="w-full h-[50px] text-[18px] font-semibold mt-5"
-                                  >
-                                    {"\ub2e4\uc74c\uc73c\ub85c"}
-                                  </Button>
-                                </div>
+                                <BotMessage content={"\ub300\uc0c1\uc790 \uc131\ubcc4\uc744 \uc120\ud0dd\ud574 \uc8fc\uc138\uc694."} />
+                                {hasGenderAnswer && !isEditingGender ? (
+                                  <>
+                                    <EditableUserMessage
+                                      content={userInfo.gender}
+                                      onEdit={() => setEditingField("gender")}
+                                    />
+                                    <div className="w-full animate-in fade-in-0 slide-in-from-right-4 duration-300">
+                                      <Button
+                                        onClick={goToNextStep}
+                                        disabled={!isStep1Valid}
+                                        className="w-full h-[50px] text-[18px] font-semibold mt-5"
+                                      >
+                                        {"\ub2e4\uc74c\uc73c\ub85c"}
+                                      </Button>
+                                    </div>
+                                  </>
+                                ) : (
+                                  <div className="flex justify-end animate-in fade-in-0 slide-in-from-right-4 duration-300">
+                                    <div className="w-full max-w-md rounded-[20px] rounded-tr-[5px] bg-white p-3 border border-[#B1A58F] grid grid-cols-2 gap-2">
+                                      {genders.map((gender) => (
+                                        <button
+                                          key={gender}
+                                          onClick={() => {
+                                            setUserInfo((prev) => ({ ...prev, gender: gender as Gender }))
+                                            setEditingField(null)
+                                          }}
+                                          className={cn(
+                                            "px-4 py-2.5 rounded-xl border text-center transition-all",
+                                            userInfo.gender === gender
+                                              ? "border-[#0B6980] bg-[#0B6980] text-white"
+                                              : "border-transparent bg-[#DCD8D2] hover:bg-[#D4D0C8] text-foreground",
+                                          )}
+                                        >
+                                          {gender}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
                               </>
                             ) : (
-                              <div className="flex justify-end animate-in fade-in-0 slide-in-from-right-4 duration-300">
-                                <div className="w-full max-w-md rounded-[20px] rounded-tr-[5px] bg-white p-3 border border-[#B1A58F] grid grid-cols-2 gap-2">
-                                  {genders.map((gender) => (
-                                    <button
-                                      key={gender}
-                                      onClick={() => {
-                                        setUserInfo((prev) => ({ ...prev, gender: gender as Gender }))
-                                        setEditingField(null)
-                                      }}
-                                      className={cn(
-                                        "px-4 py-2.5 rounded-xl border text-center transition-all",
-                                        userInfo.gender === gender
-                                          ? "border-[#0B6980] bg-[#0B6980] text-white"
-                                          : "border-transparent bg-[#DCD8D2] hover:bg-[#D4D0C8] text-foreground",
-                                      )}
-                                    >
-                                      {gender}
-                                    </button>
-                                  ))}
-                                </div>
-                              </div>
+                              <BotMessage content="" isTyping />
                             )}
                           </>
                         )}
@@ -584,7 +705,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                       </div>
 
                       {concernLimitMessage && <p className="text-sm text-destructive">{concernLimitMessage}</p>}
-                      <p className="text-sm text-[#5D5549]">{"\uc120\ud0dd\ub41c \uace0\ubbfc:"} {selectedConcerns.length}/2</p>
+                      <p className="text-sm text-[#5D5549]">{"\uc120\ud0dd\ub41c \uace0\ubbfc:"} {selectedConcerns.length}/{totalConcernCount}</p>
 
                       <Button
                         onClick={goToNextStep}
@@ -883,6 +1004,29 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                 {"\uacc4\uc18d \uc9c4\ud589"}              </Button>
               <Button type="button" onClick={handleExit} className="h-11 cursor-pointer rounded-xl bg-[#0B6980] text-white hover:bg-[#0B6980] hover:text-white">
                 {"\ub098\uac00\uae30"}              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showResetModal && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/45 p-4">
+          <div className="w-full max-w-sm rounded-2xl border border-[#E4DBCC] bg-white p-6 shadow-xl">
+            <p className="whitespace-pre-line text-base font-medium leading-relaxed text-[#2F2A23]">
+              {"지금까지 입력한 모든 정보가 삭제되고 처음 단계로 돌아갑니다.\n정말 초기화하시겠습니까?"}
+            </p>
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowResetModal(false)}
+                className="h-11 cursor-pointer rounded-xl border-[#D4CBB9] bg-white text-[#3D372F] hover:bg-white hover:text-[#3D372F]"
+              >
+                {"취소"}
+              </Button>
+              <Button type="button" onClick={handleResetConfirm} className="h-11 cursor-pointer rounded-xl bg-[#0B6980] text-white hover:bg-[#0B6980] hover:text-white">
+                {"확인"}
+              </Button>
             </div>
           </div>
         </div>

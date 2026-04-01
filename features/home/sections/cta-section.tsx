@@ -1,5 +1,6 @@
-"use client"
+﻿"use client"
 
+import Link from "next/link"
 import { useEffect, useRef } from "react"
 import { ArrowRight, MessageCircle } from "lucide-react"
 import { Button } from "@/shared/ui/button"
@@ -70,39 +71,27 @@ export function CTASection() {
           className="mb-5 text-balance font-sans text-[clamp(2.1rem,1.6rem+2.6vw,3.75rem)] font-bold leading-[1.16] tracking-[-0.02em]"
           style={{ color: "oklch(0.97 0.01 80)" }}
         >
-          지금 바로 무료 상담을 받아보세요</h2>
+          우리 아이에게 맞는 여정을 찾아드립니다
+        </h2>
 
         <p
-          className="mx-auto mb-10 max-w-2xl whitespace-pre-line text-base leading-[1.75] sm:text-xl"
+          className="mx-auto mb-10 max-w-2xl text-base leading-[1.75] sm:text-xl"
           style={{ color: "oklch(0.8 0.02 230)" }}
         >
-          {"아이의 발달에 대한 궁금증이나 걱정이 있으신가요?\n전문 코치가 친절하게 답변드립니다."}
+          아이의 발달에 대한 궁금증이나 걱정이 있으신가요? 전문가가 친절하게 답변드립니다.
         </p>
 
-        <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+        <div className="flex items-center justify-center">
           <Button
             size="lg"
+            asChild
             className="group h-12 min-w-[230px] cursor-pointer rounded-xl border-0 px-8 text-[1.05rem] font-semibold shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
             style={{ background: "oklch(0.69 0.13 160)", color: "oklch(0.98 0.005 85)" }}
           >
-            무료 상담 예약하기
-            <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
-          </Button>
-
-          <Button
-            size="lg"
-            variant="outline"
-            asChild
-            className="h-12 min-w-[165px] cursor-pointer rounded-xl border px-8 text-[1.05rem] font-medium transition-colors duration-200 hover:bg-[oklch(0.26_0.04_206)]"
-            style={{
-              borderColor: "oklch(0.52 0.03 214 / 0.55)",
-              color: "oklch(0.92 0.01 85)",
-              background: "transparent",
-            }}
-          >
-            <a href="tel:051-928-0944" aria-label="전화 상담 예약 051-928-0944">
-              전화 상담 예약
-            </a>
+            <Link href="/reservation">
+              우리 아이 맞춤형 여정 상담하기
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+            </Link>
           </Button>
         </div>
       </div>

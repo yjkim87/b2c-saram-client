@@ -1,78 +1,89 @@
+// v11 — useState-based sticky, no DOM manipulation, breaks stale cache
 "use client";
 
 import { useEffect, useRef, useState } from "react";
 import { Brain, TrendingUp } from "lucide-react";
 import { useTabContext } from "./tab-context";
 
+const LABEL_COUNSELING = "\uc2ec\ub9ac\uc0c1\ub2f4";
+const LABEL_COACHING = "\uc131\uc7a5\ucf54\uce6d";
+
 export default function StickyTabBar() {
   const { activeTab, setActiveTab } = useTabContext();
-  const [isSticky, setIsSticky] = useState(false);
+  const [sticky, setSticky] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const sentinel = sentinelRef.current;
-    if (!sentinel) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsSticky(!entry.isIntersecting),
+    const el = sentinelRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        setSticky(!entries[0].isIntersecting);
+      },
       { threshold: 0, rootMargin: "-64px 0px 0px 0px" }
     );
-    observer.observe(sentinel);
-    return () => observer.disconnect();
+    obs.observe(el);
+    return () => { obs.disconnect(); };
   }, []);
+
+  function pickCounseling() {
+    setActiveTab("counseling");
+  }
+  function pickCoaching() {
+    setActiveTab("coaching");
+  }
 
   return (
     <>
-      <div ref={sentinelRef} className="h-0 w-full" aria-hidden="true" />
-
-      {/* Outer wrapper — sticky when scrolled past sentinel */}
+      <div ref={sentinelRef} aria-hidden="true" style={{ height: 0 }} />
       <div
-        className="w-full z-40 transition-all duration-300"
+        className="w-full z-40"
         style={{
-          position: isSticky ? "sticky" : "relative",
-          top: isSticky ? "64px" : "auto",
+          position: sticky ? "sticky" : "relative",
+          top: sticky ? 64 : "auto",
+          transition: "box-shadow 0.2s",
         }}
       >
-        {/* Floating pill — always centered */}
         <div className="flex justify-center py-3 px-4">
           <div
-            className="flex gap-1 rounded-full p-1 transition-all duration-300"
+            className="flex gap-1 rounded-full p-1"
             style={{
-              background: isSticky
-                ? "oklch(0.98 0.006 85 / 0.95)"
-                : "var(--secondary)",
-              boxShadow: isSticky
-                ? "0 4px 24px oklch(0 0 0 / 0.10), 0 1px 4px oklch(0 0 0 / 0.06)"
+              background: sticky ? "rgba(255,255,255,0.95)" : "var(--secondary)",
+              boxShadow: sticky
+                ? "0 4px 24px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06)"
                 : "none",
-              backdropFilter: isSticky ? "blur(14px)" : "none",
-              border: isSticky ? "1px solid var(--border)" : "none",
+              backdropFilter: sticky ? "blur(14px)" : "none",
+              border: sticky ? "1px solid var(--border)" : "none",
+              transition: "background 0.3s, box-shadow 0.3s",
             }}
           >
             <button
-              onClick={() => setActiveTab("counseling")}
-              className="flex items-center gap-1.5 rounded-full font-semibold transition-all duration-200 px-5 py-2 text-sm hover:opacity-90"
+              type="button"
+              onClick={pickCounseling}
+              aria-pressed={activeTab === "counseling"}
+              className="flex items-center gap-1.5 rounded-full font-semibold px-5 py-2 text-sm"
               style={
                 activeTab === "counseling"
-                  ? { background: "var(--primary)", color: "var(--primary-foreground)" }
-                  : { color: "var(--muted-foreground)", background: "transparent" }
+                  ? { background: "oklch(0.48 0.09 165)", color: "white", transition: "all 0.2s" }
+                  : { background: "transparent", color: "var(--muted-foreground)", transition: "all 0.2s" }
               }
-              aria-pressed={activeTab === "counseling"}
             >
-              <Brain className="w-3.5 h-3.5 flex-shrink-0" />
-              상담심리
+              <Brain className="w-4 h-4" />
+              {LABEL_COUNSELING}
             </button>
-
             <button
-              onClick={() => setActiveTab("coaching")}
-              className="flex items-center gap-1.5 rounded-full font-semibold transition-all duration-200 px-5 py-2 text-sm hover:opacity-90"
+              type="button"
+              onClick={pickCoaching}
+              aria-pressed={activeTab === "coaching"}
+              className="flex items-center gap-1.5 rounded-full font-semibold px-5 py-2 text-sm"
               style={
                 activeTab === "coaching"
-                  ? { background: "var(--accent)", color: "var(--accent-foreground)" }
-                  : { color: "var(--muted-foreground)", background: "transparent" }
+                  ? { background: "oklch(0.62 0.09 45)", color: "white", transition: "all 0.2s" }
+                  : { background: "transparent", color: "var(--muted-foreground)", transition: "all 0.2s" }
               }
-              aria-pressed={activeTab === "coaching"}
             >
-              <TrendingUp className="w-3.5 h-3.5 flex-shrink-0" />
-              코칭심리
+              <TrendingUp className="w-4 h-4" />
+              {LABEL_COACHING}
             </button>
           </div>
         </div>
