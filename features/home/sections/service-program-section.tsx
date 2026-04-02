@@ -1,11 +1,20 @@
-﻿"use client"
+"use client"
 
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { ArrowRight } from "lucide-react"
+import { Swiper, SwiperSlide } from "swiper/react"
+import type { Swiper as SwiperType } from "swiper"
 import { cn } from "@/shared/lib/utils"
 import type { HomeServiceTab } from "@/features/home/model/home-tab"
 import { COACHING_PROGRAM_DATA, COUNSELING_PROGRAM_DATA } from "@/features/home/data/program-summary"
+import {
+  landingLayoutTokens,
+  landingRadiusTokens,
+  landingSectionTokens,
+  landingSpaceTokens,
+  landingTypeTokens,
+} from "@/features/home/styles/landing-tokens"
 
 interface ServiceProgramSectionProps {
   tab: HomeServiceTab
@@ -13,11 +22,20 @@ interface ServiceProgramSectionProps {
 
 export function ServiceProgramSection({ tab }: ServiceProgramSectionProps) {
   const sectionRef = useRef<HTMLElement>(null)
+  const mobileSwiperRef = useRef<SwiperType | null>(null)
   const [isInView, setIsInView] = useState(false)
   const [animateCards, setAnimateCards] = useState(false)
+  const [mobileActiveIndex, setMobileActiveIndex] = useState(0)
 
   const data = tab === "counseling" ? COUNSELING_PROGRAM_DATA : COACHING_PROGRAM_DATA
-  const headingTone = tab === "counseling" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+  const counselingDetailNoteByType: Record<string, string> = {
+    "emotion-care":
+      "* K-WISC, CBCL, BSID 등 국제 표준 도구 활용. 인지·언어·사회정서 전 영역 커버",
+    "behavior-support":
+      "* CBT, DBT, 놀이치료 등 근거 기반 접근. 아이 속도에 맞춰 안전하게 진행",
+    "family-bridge":
+      "* ABA, PCIT 등 행동 개입 프로토콜 적용. 보호자 교육을 병행해 가정에서도 일관성 유지",
+  }
 
   useEffect(() => {
     const section = sectionRef.current
@@ -41,6 +59,7 @@ export function ServiceProgramSection({ tab }: ServiceProgramSectionProps) {
 
   useEffect(() => {
     setAnimateCards(false)
+    setMobileActiveIndex(0)
 
     const frame = window.requestAnimationFrame(() => {
       if (isInView) {
@@ -52,60 +71,172 @@ export function ServiceProgramSection({ tab }: ServiceProgramSectionProps) {
   }, [tab, isInView])
 
   return (
-    <section ref={sectionRef} id="service-program" className="bg-white px-4 py-16 sm:px-6 md:py-20 lg:px-8">
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-10 text-center md:mb-12">
-          <span className={cn("mb-4 inline-flex rounded-full px-3 py-1 text-xs font-semibold", headingTone)}>
-            전문 서비스
-          </span>
-          <h2 className="mobile-auto-phrase text-3xl font-bold text-slate-900 md:text-4xl">과학적 접근, 따뜻한 마음으로</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-slate-600 md:text-base">
-            발달심리학 이론을 바탕으로 아이 개개인의 특성을 존중하는 맞춤형 코칭을 제공합니다
+    <section
+      ref={sectionRef}
+      id="service-program"
+      className={cn("relative overflow-hidden bg-white", landingSectionTokens.base)}
+    >
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-[320px] overflow-hidden md:hidden">
+        <div
+          className="absolute"
+          style={{
+            width: 931,
+            height: 684,
+            left: -650,
+            top: -400,
+            background:
+              "radial-gradient(50% 50%, rgb(188, 219, 255) 0%, rgba(255, 255, 255, 0) 100%)",
+          }}
+        />
+      </div>
+
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute hidden md:block"
+        style={{
+          width: 1420,
+          height: 1240,
+          left: -920,
+          top: -470,
+          background:
+            "radial-gradient(50% 50% at 50% 50%, #BCDBFF 0%, rgba(255, 255, 255, 0) 100%)",
+        }}
+      />
+
+      <div className={cn("relative z-10", landingLayoutTokens.containerWide)}>
+        <div className={cn("text-center", landingLayoutTokens.sectionHeaderGap)}>
+          <span className={cn("mb-4 inline-flex", landingTypeTokens.eyebrow)}>전문 상담 가이드</span>
+          <h2 className={cn("mobile-auto-phrase", landingTypeTokens.sectionTitle)}>
+            과학적 접근, 따뜻한 마음으로
+          </h2>
+          <p className={cn("mx-auto mt-5 max-w-2xl text-[#111827]", landingTypeTokens.body)}>
+            발달심리학 이론을 바탕으로 아이 개개인의 특성을 존중하는 맞춤형 서비스를 제공합니다.
           </p>
         </div>
 
-        <div key={`program-${tab}`} className="animate-in fade-in duration-200">
-          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {data.map((card, index) => {
-              const Icon = card.icon
+        <div className="md:hidden">
+          <div className="relative">
+            <Swiper
+              key={`program-mobile-${tab}`}
+              slidesPerView={1.03}
+              spaceBetween={14}
+              onSwiper={(swiper) => {
+                mobileSwiperRef.current = swiper
+                setMobileActiveIndex(swiper.realIndex ?? 0)
+              }}
+              onSlideChange={(swiper) => {
+                setMobileActiveIndex(swiper.realIndex ?? 0)
+              }}
+            >
+              {data.map((card) => {
+                const detailNote = counselingDetailNoteByType[card.type]
 
-              return (
-                <Link
-                  key={`${tab}-${card.type}`}
-                  href={`/program/${card.type}`}
-                  className={cn(
-                    "group flex h-full flex-col rounded-2xl border bg-white p-6 shadow-sm transition-all duration-500 ease-out",
-                    "hover:-translate-y-0.5 hover:shadow-md",
-                    card.tone.border
-                  )}
-                  style={{
-                    opacity: animateCards && isInView ? 1 : 0,
-                    transform: animateCards && isInView ? "translateY(0px)" : "translateY(24px)",
-                    transitionDelay: `${index * 90}ms`,
-                  }}
-                >
-                  <div className="mb-4 flex items-start justify-between gap-3">
-                    <div>
-                      <span className={cn("inline-flex rounded-full px-2.5 py-1 text-xs font-semibold", card.tone.badgeBg, card.tone.badgeText)}>
+                return (
+                  <SwiperSlide key={`${tab}-${card.type}`}>
+                    <article
+                      className={cn(
+                        "block transform-gpu will-change-transform transition-[background-color,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[#DCEBFF] hover:scale-[1.02]",
+                        "bg-[#F4FAFF]",
+                        landingRadiusTokens.card,
+                        landingSpaceTokens.cardPadding
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "inline-flex border",
+                          landingRadiusTokens.pill,
+                          landingSpaceTokens.chipPadding,
+                          landingTypeTokens.chip,
+                          card.tone.badgeText,
+                          card.tone.badgeBg,
+                          card.tone.border
+                        )}
+                      >
                         {card.tag}
                       </span>
-                      <h3 className="mt-3 text-xl font-bold text-slate-900">{card.title}</h3>
-                    </div>
-                    <div className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-xl", card.tone.iconBg)}>
-                      <Icon className={cn("h-5 w-5", card.tone.iconText)} />
-                    </div>
-                  </div>
 
-                  <p className="mb-5 text-sm leading-relaxed text-slate-600">{card.description}</p>
+                      <h3 className={cn("mt-4 text-[#0C0C0C]", landingTypeTokens.serviceCardTitle)}>{card.title}</h3>
 
-                  <div className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-slate-700 transition-colors group-hover:text-slate-900">
-                    프로그램 보기
-                    <ArrowRight className="h-4 w-4" />
-                  </div>
-                </Link>
-              )
-            })}
+                      <p className={cn("mt-4 text-[#111827]", landingTypeTokens.body)}>{card.description}</p>
+
+                      {detailNote ? <p className={cn("mt-5", landingTypeTokens.serviceCardNote)}>{detailNote}</p> : null}
+                    </article>
+                  </SwiperSlide>
+                )
+              })}
+            </Swiper>
+
+            <div className="absolute right-6 top-6 z-20 inline-flex items-center gap-2">
+              {data.map((_, dotIndex) => (
+                <button
+                  key={`fixed-dot-${dotIndex}`}
+                  type="button"
+                  aria-label={`${dotIndex + 1}번 카드로 이동`}
+                  onClick={() => mobileSwiperRef.current?.slideToLoop(dotIndex)}
+                  className={cn(
+                    "h-2.5 w-2.5 rounded-full transition-colors duration-200",
+                    mobileActiveIndex === dotIndex ? "bg-[#2B66F6]" : "bg-[#B8C8DA]"
+                  )}
+                />
+              ))}
+            </div>
           </div>
+        </div>
+
+        <div key={`program-pc-${tab}`} className="hidden md:grid md:grid-cols-3 md:gap-5">
+          {data.map((card, index) => {
+            const detailNote = counselingDetailNoteByType[card.type]
+
+            return (
+              <div
+                key={`${tab}-${card.type}`}
+                style={{
+                  opacity: animateCards && isInView ? 1 : 0,
+                  transform: animateCards && isInView ? "translateY(0px)" : "translateY(24px)",
+                  transition: "opacity 0.5s ease, transform 0.5s ease",
+                  transitionDelay: `${index * 90}ms`,
+                }}
+              >
+                <article
+                  className={cn(
+                    "group flex h-full flex-col transform-gpu will-change-transform bg-[#F4FAFF] transition-[background-color,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[#DCEBFF] hover:scale-[1.02]",
+                    landingRadiusTokens.card,
+                    landingSpaceTokens.cardPadding
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "inline-flex w-fit border",
+                      landingRadiusTokens.pill,
+                      landingSpaceTokens.chipPadding,
+                      landingTypeTokens.chip,
+                      card.tone.badgeText,
+                      card.tone.badgeBg,
+                      card.tone.border
+                    )}
+                  >
+                    {card.tag}
+                  </span>
+
+                  <h3 className={cn("mt-4 text-[#0C0C0C]", landingTypeTokens.serviceCardTitle)}>{card.title}</h3>
+
+                  <p className={cn("mt-4 text-[#111827]", landingTypeTokens.body)}>{card.description}</p>
+
+                  {detailNote ? <p className={cn("mt-5", landingTypeTokens.serviceCardNote)}>{detailNote}</p> : null}
+                </article>
+              </div>
+            )
+          })}
+        </div>
+
+        <div className="mt-8 flex justify-center">
+          <Link
+            href="/program"
+            className="inline-flex h-10 items-center gap-2 rounded-full border border-[#0C0C0C] bg-white px-7 text-base font-semibold text-[#0C0C0C] transition-colors hover:bg-[#0C0C0C] hover:text-white"
+          >
+            상담/코칭 프로그램 보러가기
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       </div>
     </section>

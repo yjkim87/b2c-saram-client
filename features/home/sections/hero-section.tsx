@@ -1,8 +1,15 @@
-﻿"use client"
+"use client"
 
 import Link from "next/link"
 import { useEffect, useRef } from "react"
-import { ArrowRight, Brain, Compass, ChevronDown } from "lucide-react"
+import { cn } from "@/shared/lib/utils"
+import {
+  landingLayoutTokens,
+  landingRadiusTokens,
+  landingSectionTokens,
+  landingSpaceTokens,
+  landingTypeTokens,
+} from "@/features/home/styles/landing-tokens"
 
 function useFadeInUp(delay = 0) {
   const ref = useRef<HTMLDivElement>(null)
@@ -27,55 +34,57 @@ function useFadeInUp(delay = 0) {
 }
 
 export function HeroSection() {
-  const badgeRef = useFadeInUp(80)
-  const headingRef = useFadeInUp(180)
-  const descRef = useFadeInUp(280)
-  const ctaRef = useFadeInUp(380)
+  const headingRef = useFadeInUp(140)
+  const descRef = useFadeInUp(240)
+  const ctaRef = useFadeInUp(340)
 
   return (
-    <section className="relative min-h-screen bg-[#FFF9F4] pt-20">
-      <div className="relative mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-[1520px] flex-col justify-center px-4 py-10 sm:px-6 md:py-14 lg:px-8">
-        <div className="mx-auto w-full max-w-[1080px]">
-          <div ref={badgeRef} className="text-center md:text-left">
-            <span className="inline-flex items-center gap-2 rounded-full border border-[#FFD8B0] bg-[#FFF2E6] px-4 py-1.5 text-sm font-semibold text-[#FF741D]">
-              <Brain className="h-4 w-4" />
-              발달심리 전문 상담·코칭
-            </span>
-          </div>
-
-          <div ref={headingRef} className="text-center md:text-left">
-            <h1 className="mt-6 text-[clamp(2.1rem,1.6rem+2.6vw,3.75rem)] font-bold leading-[1.16] tracking-[-0.02em] text-[#0C0C0C]">
+    <section
+      className="relative overflow-hidden pt-20"
+      style={{
+        background:
+          "linear-gradient(180deg, #bfd4e7 0%, #c7d7e8 28%, #d9ccdc 58%, #d5e9e3 100%)",
+      }}
+    >
+      <div
+        className={cn(
+          "relative flex min-h-[calc(100vh-5rem)] w-full items-center justify-center",
+          landingLayoutTokens.containerWide,
+          landingSectionTokens.base
+        )}
+      >
+        <div className="mx-auto w-full max-w-[760px] text-center">
+          <div ref={headingRef}>
+            <h1 className={cn(landingTypeTokens.heroTitle, "text-[#080A11]")}>
               아이의 성장,
               <br />
-              <span className="text-[#FF741D]">마음부터</span> 시작합니다
+              마음부터 시작합니다
             </h1>
           </div>
 
-          <div ref={descRef} className="text-center md:text-left">
-            <p className="mt-8 text-[clamp(1rem,0.9rem+0.5vw,1.375rem)] font-normal leading-[1.6] text-[#0C0C0C] md:mt-10">
+          <div ref={descRef}>
+            <p className={cn("mx-auto mt-8 max-w-[640px] text-[#0E1726] md:mt-9", landingTypeTokens.body)}>
               0세부터 18세까지, 발달심리학을 기반으로 한 맞춤 상담·성장코칭으로
-              <br className="hidden md:block" />
+              <br />
               아이의 잠재력을 발견하고 안정적인 변화를 함께 만듭니다.
             </p>
           </div>
 
-          <div ref={ctaRef} className="mt-10 flex justify-center md:justify-start">
+          <div ref={ctaRef} className="mt-12 flex justify-center">
             <Link
               href="/reservation"
-              className="group inline-flex items-center gap-2 rounded-full bg-[#0C0C0C] px-7 py-3 text-base font-semibold text-white shadow-[0_10px_24px_rgba(12,12,12,0.2)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#1D1D1D]"
+              className={cn(
+                "inline-flex min-w-[260px] items-center justify-center bg-[#05070D] text-white shadow-[0_14px_30px_rgba(5,7,13,0.26)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#0f1119]",
+                landingRadiusTokens.pill,
+                landingSpaceTokens.buttonPaddingLg,
+                landingTypeTokens.buttonLg
+              )}
             >
-              <Compass className="h-4 w-4" />
-              우리 아이 맞춤 첫 상담하기
-              <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+              무료 상담 시작하기
             </Link>
           </div>
         </div>
-
       </div>
-
-      <a href="#features" className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce" aria-label="아래로 스크롤">
-        <ChevronDown className="h-8 w-8 text-muted-foreground md:h-10 md:w-10" />
-      </a>
     </section>
   )
 }

@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
@@ -6,6 +6,13 @@ import { ArrowRight } from "lucide-react"
 import { cn } from "@/shared/lib/utils"
 import type { HomeServiceTab } from "@/features/home/model/home-tab"
 import { COACHING_AGE_DATA, COUNSELING_AGE_DATA } from "@/features/home/data/age-summary"
+import {
+  landingLayoutTokens,
+  landingRadiusTokens,
+  landingSectionTokens,
+  landingSpaceTokens,
+  landingTypeTokens,
+} from "@/features/home/styles/landing-tokens"
 
 interface AgeGuideSectionProps {
   tab: HomeServiceTab
@@ -17,11 +24,11 @@ export function AgeGuideSection({ tab }: AgeGuideSectionProps) {
   const [animateCards, setAnimateCards] = useState(false)
 
   const data = tab === "counseling" ? COUNSELING_AGE_DATA : COACHING_AGE_DATA
-  const headingTone = tab === "counseling" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+  const sectionBgClassName = tab === "counseling" ? "bg-[#F4FAFF]" : "bg-[#FFF7EF]"
   const description =
     tab === "counseling"
-      ? "연령마다 다른 심리 신호를 먼저 읽고, 안정적으로 회복하는 상담 경로를 제안합니다."
-      : "연령별 성장 과제를 기준으로 실행 가능한 코칭 루틴을 설계합니다."
+      ? "연령별 발달 특성에 맞는 심리 평가와 상담을 제공합니다."
+      : "연령별 발달 특성에 맞는 성장 루틴과 실행 코칭을 제공합니다."
 
   useEffect(() => {
     const section = sectionRef.current
@@ -36,7 +43,7 @@ export function AgeGuideSection({ tab }: AgeGuideSectionProps) {
           setAnimateCards(true)
         }
       },
-      { threshold: 0.25 }
+      { threshold: 0.24 }
     )
 
     observer.observe(section)
@@ -56,73 +63,68 @@ export function AgeGuideSection({ tab }: AgeGuideSectionProps) {
   }, [tab, isInView])
 
   return (
-    <section ref={sectionRef} id="age-guide" className="bg-[#F7F2EB] px-4 py-16 sm:px-6 md:py-20 lg:px-8">
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-10 text-center md:mb-12">
-          <span className={cn("mb-4 inline-flex rounded-full px-3 py-1 text-xs font-semibold", headingTone)}>
-            연령별 발달 가이드
-          </span>
-          <h2 className="mobile-auto-phrase text-3xl font-bold text-slate-900 md:text-4xl">아이의 발달 단계에 맞춘 요약 가이드</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-slate-600 md:text-base">{description}</p>
-          <div className="mt-6">
-            <Link
-              href="/program/age-guide"
-              className="inline-flex items-center gap-1 text-sm font-semibold text-slate-700 transition-colors hover:text-slate-900"
-            >
-              더보기
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
+    <section ref={sectionRef} id="age-guide" className={cn(sectionBgClassName, landingSectionTokens.base)}>
+      <div className={landingLayoutTokens.containerWide}>
+        <div className={cn("text-center", landingLayoutTokens.sectionHeaderGap)}>
+          <span className={cn("mb-4 inline-flex", landingTypeTokens.eyebrow)}>연령별 발달 가이드</span>
+          <h2 className={cn("mobile-auto-phrase", landingTypeTokens.sectionTitle)}>
+            우리 아이, 몇 살인가요?
+          </h2>
+          <p className={cn("mx-auto mt-5 max-w-2xl text-[#111827]", landingTypeTokens.body)}>{description}</p>
         </div>
 
         <div key={`age-${tab}`} className="animate-in fade-in duration-200">
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {data.map((card, index) => {
-              const Icon = card.icon
+          <div className={cn("grid grid-cols-2 md:grid-cols-4", landingSpaceTokens.gridGapSmToMd)}>
+            {data.map((card, index) => (
+              <Link
+                key={`${tab}-${card.type}`}
+                href={`/age/${card.type}`}
+                className={cn(
+                  "group flex h-full flex-col bg-[#FFFFFF]",
+                  landingRadiusTokens.card,
+                  landingSpaceTokens.cardPaddingResponsive
+                )}
+                style={{
+                  opacity: animateCards && isInView ? 1 : 0,
+                  transform: animateCards && isInView ? "translateY(0px)" : "translateY(24px)",
+                  transition: "all 0.5s ease",
+                  transitionDelay: `${index * 90}ms`,
+                }}
+              >
+                <div className="mb-3">
+                  <span
+                    className={cn(
+                      "inline-flex bg-[#E6F4FF] text-[#2b66f6]",
+                      landingRadiusTokens.pill,
+                      landingSpaceTokens.chipPadding,
+                      landingTypeTokens.ageRangeLabel
+                    )}
+                  >
+                    {card.range.replace("~", " - ")}
+                  </span>
+                </div>
 
-              return (
-                <Link
-                  key={`${tab}-${card.type}`}
-                  href={`/age/${card.type}`}
-                  className={cn(
-                    "group flex h-full flex-col rounded-2xl border bg-white p-6 shadow-sm transition-all duration-500 ease-out",
-                    "hover:-translate-y-0.5 hover:shadow-md",
-                    card.tone.ring
-                  )}
-                  style={{
-                    opacity: animateCards && isInView ? 1 : 0,
-                    transform: animateCards && isInView ? "translateY(0px)" : "translateY(24px)",
-                    transitionDelay: `${index * 90}ms`,
-                  }}
-                >
-                  <div className="mb-4 flex items-center gap-3">
-                    <div className={cn("flex h-11 w-11 items-center justify-center rounded-xl", card.tone.iconBg)}>
-                      <Icon className={cn("h-5 w-5", card.tone.iconText)} />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-slate-500">{card.range}</p>
-                      <h3 className="text-lg font-bold text-slate-900">{card.title}</h3>
-                    </div>
-                  </div>
+                <h3 className={cn("text-[#05070d]", landingTypeTokens.ageCardTitle)}>{card.title}</h3>
 
-                  <p className="mb-4 text-sm leading-relaxed text-slate-600">{card.description}</p>
+                <ul className="mt-3 space-y-1.5">
+                  {card.highlights.slice(0, 3).map((highlight) => (
+                    <li key={highlight} className={cn("font-medium text-[#111827]", landingTypeTokens.bodySm)}>
+                      • {highlight}
+                    </li>
+                  ))}
+                </ul>
+              </Link>
+            ))}
+          </div>
 
-                  <ul className="mb-5 space-y-2">
-                    {card.highlights.map((highlight) => (
-                      <li key={highlight} className="flex items-start gap-2 text-xs leading-relaxed text-slate-600">
-                        <span className={cn("mt-0.5 h-1.5 w-1.5 rounded-full", card.tone.bullet)} />
-                        <span>{highlight}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <div className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-slate-700 transition-colors group-hover:text-slate-900">
-                    자세히 보기
-                    <ArrowRight className="h-4 w-4" />
-                  </div>
-                </Link>
-              )
-            })}
+          <div className="mt-8 flex justify-center">
+            <Link
+              href="/program/age-guide"
+              className="inline-flex h-10 items-center gap-2 rounded-full border border-[#0C0C0C] bg-white px-7 text-base font-semibold text-[#0C0C0C] transition-colors hover:bg-[#0C0C0C] hover:text-white"
+            >
+              전체 연령 가이드 보기
+              <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
       </div>

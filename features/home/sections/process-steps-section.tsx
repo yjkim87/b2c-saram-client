@@ -1,8 +1,17 @@
-﻿"use client"
+"use client"
 
+import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
-import { BarChart2, ClipboardList, Map, Mic2 } from "lucide-react"
+import { ArrowRight } from "lucide-react"
+import { cn } from "@/shared/lib/utils"
 import type { HomeServiceTab } from "@/features/home/model/home-tab"
+import {
+  landingLayoutTokens,
+  landingRadiusTokens,
+  landingSectionTokens,
+  landingSpaceTokens,
+  landingTypeTokens,
+} from "@/features/home/styles/landing-tokens"
 
 interface ProcessStepsSectionProps {
   tab: HomeServiceTab
@@ -10,385 +19,227 @@ interface ProcessStepsSectionProps {
 
 interface ProcessStep {
   num: string
-  icon: typeof ClipboardList
   title: string
   desc: string
-  detail: string
-  accent: string
-  bg: string
-  border: string
 }
 
 const COUNSELING_STEPS: ProcessStep[] = [
   {
-    num: "01",
-    icon: ClipboardList,
-    title: "발달 평가",
-    desc: "표준화 도구를 활용해 현재 발달과 정서 상태를 종합적으로 평가합니다.",
-    detail: "K-WISC, CBCL 등 기초 평가 결과를 통합해 인지·언어·행동·사회정서 영역을 체계적으로 점검합니다.",
-    accent: "oklch(0.48 0.09 165)",
-    bg: "oklch(0.48 0.09 165 / 0.08)",
-    border: "oklch(0.48 0.09 165 / 0.25)",
+    num: "1",
+    title: "마음 진단",
+    desc: "다각적 심리검사를 통한 내면 기질 및 현재 상태 파악",
   },
   {
-    num: "02",
-    icon: Map,
-    title: "상담 계획 수립",
-    desc: "평가 결과를 바탕으로 개인화된 상담 계획과 목표를 설계합니다.",
-    detail: "정서 안정과 행동 변화를 위한 단기·중기 목표를 설정하고 보호자와 함께 실천 로드맵을 구성합니다.",
-    accent: "oklch(0.62 0.09 45)",
-    bg: "oklch(0.62 0.09 45 / 0.08)",
-    border: "oklch(0.62 0.09 45 / 0.25)",
+    num: "2",
+    title: "상담 목표 설정",
+    desc: "호소 문제의 근본 원인 탐색 및 맞춤형 치료 방향 수립",
   },
   {
-    num: "03",
-    icon: Mic2,
-    title: "맞춤 상담 실행",
-    desc: "전문가와 함께하는 1:1 맞춤 상담 세션을 주기적으로 진행합니다.",
-    detail: "놀이·대화 기반 개입과 회기별 보호자 피드백을 병행해 일상에서도 변화가 이어지도록 돕습니다.",
-    accent: "oklch(0.52 0.08 290)",
-    bg: "oklch(0.52 0.08 290 / 0.08)",
-    border: "oklch(0.52 0.08 290 / 0.25)",
+    num: "3",
+    title: "심층 상담 진행",
+    desc: "증상 완화 및 심리적 회복을 위한 전문적 개입 실행",
   },
   {
-    num: "04",
-    icon: BarChart2,
-    title: "변화 모니터링",
-    desc: "정기 점검을 통해 변화 흐름을 추적하고 상담 계획을 업데이트합니다.",
-    detail: "주기적 리포트로 정서·행동 지표를 확인하고, 목표 달성 이후 유지 프로그램까지 자연스럽게 연결합니다.",
-    accent: "oklch(0.55 0.07 200)",
-    bg: "oklch(0.55 0.07 200 / 0.08)",
-    border: "oklch(0.55 0.07 200 / 0.25)",
+    num: "4",
+    title: "종결 및 사후 관리",
+    desc: "변화된 마음의 안정성 확인 및 일상 적응력 유지 지원",
   },
 ]
 
 const COACHING_STEPS: ProcessStep[] = [
   {
-    num: "01",
-    icon: ClipboardList,
+    num: "1",
     title: "강점 진단",
-    desc: "강점, 흥미, 학습 성향을 진단해 성장의 출발점을 찾습니다.",
-    detail: "활동 성향과 동기 패턴을 분석해 코칭에 활용할 핵심 강점 키워드를 도출합니다.",
-    accent: "oklch(0.58 0.11 55)",
-    bg: "oklch(0.58 0.11 55 / 0.08)",
-    border: "oklch(0.58 0.11 55 / 0.25)",
+    desc: "강점·흥미·학습 성향을 진단해 성장의 출발점을 찾습니다.",
   },
   {
-    num: "02",
-    icon: Map,
-    title: "코칭 계획 수립",
-    desc: "진단 결과를 기반으로 실행 가능한 목표와 코칭 계획을 설계합니다.",
-    detail: "단기 성취와 장기 성장 목표를 연결해 학업·관계·진로를 아우르는 로드맵을 구성합니다.",
-    accent: "oklch(0.53 0.09 250)",
-    bg: "oklch(0.53 0.09 250 / 0.08)",
-    border: "oklch(0.53 0.09 250 / 0.25)",
+    num: "2",
+    title: "코칭 목표 설정",
+    desc: "진단 결과를 바탕으로 실행 가능한 목표와 계획을 설계합니다.",
   },
   {
-    num: "03",
-    icon: Mic2,
-    title: "맞춤 코칭 실행",
-    desc: "주기적인 1:1 코칭 세션으로 실행 습관과 자기주도성을 강화합니다.",
-    detail: "실행 점검, 피드백, 동기 강화 루프를 반복해 목표 달성률을 안정적으로 높입니다.",
-    accent: "oklch(0.52 0.1 180)",
-    bg: "oklch(0.52 0.1 180 / 0.08)",
-    border: "oklch(0.52 0.1 180 / 0.25)",
+    num: "3",
+    title: "맞춤 코칭 진행",
+    desc: "주기적인 1:1 코칭으로 실행 습관과 자기주도성을 강화합니다.",
   },
   {
-    num: "04",
-    icon: BarChart2,
-    title: "성장 모니터링",
-    desc: "성과를 점검해 다음 성장 목표를 업데이트하고 확장합니다.",
-    detail: "월간 성과 리뷰를 통해 실행력·자기주도성·관계 역량 향상 추이를 확인하고 다음 단계로 연결합니다.",
-    accent: "oklch(0.6 0.11 35)",
-    bg: "oklch(0.6 0.11 35 / 0.08)",
-    border: "oklch(0.6 0.11 35 / 0.25)",
+    num: "4",
+    title: "성과 점검 및 확장",
+    desc: "성과를 모니터링하고 다음 성장 목표까지 연결합니다.",
   },
 ]
 
-function MobileTimelineItem({
+function MobileStepItem({
   step,
-  isLast,
-}: {
-  step: ProcessStep
-  isLast: boolean
-}) {
-  const itemRef = useRef<HTMLDivElement>(null)
-  const lineRef = useRef<HTMLDivElement>(null)
-  const [active, setActive] = useState(false)
-  const Icon = step.icon
-
-  useEffect(() => {
-    const el = itemRef.current
-    if (!el) return
-    const obs = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) setActive(true)
-    }, { threshold: 0.5 })
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [])
-
-  useEffect(() => {
-    const line = lineRef.current
-    if (!line) return
-    line.style.transition = active ? "transform 0.6s ease 0.2s" : "none"
-    line.style.transform = active ? "scaleY(1)" : "scaleY(0)"
-  }, [active])
-
-  return (
-    <div ref={itemRef} className="flex gap-4">
-      <div className="flex w-10 flex-shrink-0 flex-col items-center">
-        <div
-          className="z-10 flex h-10 w-10 items-center justify-center rounded-full"
-          style={{
-            background: active ? step.bg : "var(--secondary)",
-            border: `2px solid ${active ? step.accent : "var(--border)"}`,
-            boxShadow: active ? `0 0 0 4px ${step.bg}` : "none",
-            transform: active ? "scale(1.12)" : "scale(1)",
-            transition: "all 0.4s ease",
-          }}
-        >
-          <Icon
-            className="h-4 w-4"
-            style={{
-              color: active ? step.accent : "var(--muted-foreground)",
-              transition: "color 0.3s ease",
-            }}
-          />
-        </div>
-
-        {!isLast && (
-          <div className="relative my-1 min-h-10 flex-1 overflow-hidden" style={{ width: 2 }}>
-            <div
-              className="absolute inset-0"
-              style={{
-                background: "repeating-linear-gradient(to bottom, var(--border) 0px, var(--border) 4px, transparent 4px, transparent 9px)",
-              }}
-            />
-            <div
-              ref={lineRef}
-              className="absolute inset-0 origin-top"
-              style={{
-                transform: "scaleY(0)",
-                background: `repeating-linear-gradient(to bottom, ${step.accent} 0px, ${step.accent} 4px, transparent 4px, transparent 9px)`,
-              }}
-            />
-          </div>
-        )}
-      </div>
-
-      <div
-        className={`flex-1 rounded-xl p-3 ${isLast ? "mb-0" : "mb-4"}`}
-        style={{
-          background: active ? step.bg : "transparent",
-          border: `1px solid ${active ? step.border : "transparent"}`,
-          transition: "all 0.4s ease",
-        }}
-      >
-        <div className="mb-1 flex items-center gap-2">
-          <span className="rounded px-2 py-0.5 text-xs font-bold" style={{ background: step.bg, color: step.accent }}>
-            {step.num}
-          </span>
-          <h3 className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>
-            {step.title}
-          </h3>
-        </div>
-        <p className="text-xs leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
-          {step.desc}
-        </p>
-      </div>
-    </div>
-  )
-}
-
-function DesktopStepRow({
-  step,
-  index,
   isLast,
   isActive,
-  onActivate,
 }: {
   step: ProcessStep
-  index: number
   isLast: boolean
   isActive: boolean
-  onActivate: (i: number) => void
 }) {
-  const rowRef = useRef<HTMLDivElement>(null)
-  const Icon = step.icon
-
-  useEffect(() => {
-    const el = rowRef.current
-    if (!el) return
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) onActivate(index)
-      },
-      { rootMargin: "-35% 0px -35% 0px", threshold: 0 }
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [index, onActivate])
-
   return (
-    <div
-      ref={rowRef}
-      className="grid grid-cols-[120px_1fr] gap-10 py-14"
-      style={{ borderBottom: isLast ? "none" : "1px solid var(--border)" }}
-    >
-      <div className="flex flex-col items-end justify-start pt-1">
+    <div className="grid grid-cols-[44px_1fr] items-start gap-3.5">
+      <div className="relative flex flex-col items-center self-stretch">
         <span
-          className="select-none text-[clamp(3.5rem,6vw,5rem)] font-bold leading-none"
+          className={cn(
+            "relative z-[1] flex h-8 w-8 items-center justify-center transition-all duration-300",
+            landingRadiusTokens.circle,
+            landingTypeTokens.stepNumberSm
+          )}
           style={{
-            color: isActive ? step.accent : "var(--border)",
-            opacity: isActive ? 1 : 0.5,
-            transform: isActive ? "scale(1)" : "scale(0.93)",
-            transition: "all 0.4s ease",
+            background: isActive ? "#05070d" : "#c6ccd5",
+            color: isActive ? "#ffffff" : "#596171",
+            transform: isActive ? "scale(1.08)" : "scale(1)",
+            boxShadow: isActive ? "0 8px 18px rgba(5,7,13,0.24)" : "none",
           }}
         >
           {step.num}
         </span>
-        <div
-          className="mt-2 h-0.5 w-8 rounded"
-          style={{
-            background: isActive ? step.accent : "var(--border)",
-            opacity: isActive ? 1 : 0.3,
-            transition: "all 0.4s ease",
-          }}
-        />
+
+        {!isLast && (
+          <span
+            className="pointer-events-none absolute left-1/2 top-8 block w-px -translate-x-1/2"
+            style={{
+              bottom: "-1rem",
+              background: "repeating-linear-gradient(to bottom, #c5ccd5 0px, #c5ccd5 4px, transparent 4px, transparent 8px)",
+            }}
+          />
+        )}
       </div>
 
-      <div
-        className="rounded-2xl border p-6"
+      <article
+        className={cn("mb-4 border transition-all duration-300", landingRadiusTokens.card, landingSpaceTokens.cardPaddingResponsive)}
         style={{
-          background: isActive ? step.bg : "var(--card)",
-          borderColor: isActive ? step.border : "var(--border)",
-          opacity: isActive ? 1 : 0.45,
-          transform: isActive ? "translateY(0)" : "translateY(4px)",
-          transition: "all 0.4s ease",
+          background: isActive ? "#FFFFFF" : "transparent",
+          borderColor: isActive ? "#d5deea" : "transparent",
+          transform: isActive ? "translateY(-2px)" : "translateY(0)",
+          opacity: isActive ? 1 : 0.75,
         }}
       >
-        <div className="mb-3 flex items-center gap-3">
-          <div
-            className="flex h-10 w-10 items-center justify-center rounded-xl"
-            style={{ background: step.bg, border: `1px solid ${step.border}` }}
-          >
-            <Icon className="h-5 w-5" style={{ color: step.accent }} />
-          </div>
-          <h3 className="text-lg font-bold" style={{ color: "var(--foreground)" }}>
-            {step.title}
-          </h3>
-        </div>
-        <p className="mb-3 text-sm leading-relaxed" style={{ color: "var(--foreground)", opacity: 0.8 }}>
-          {step.desc}
-        </p>
-        <p
-          className="pl-3 text-xs leading-relaxed"
-          style={{
-            color: "var(--muted-foreground)",
-            borderLeft: `2px solid ${step.accent}`,
-            opacity: isActive ? 1 : 0,
-            transition: "opacity 0.3s ease 0.15s",
-          }}
-        >
-          {step.detail}
-        </p>
-      </div>
+        <h3 className={cn("text-[#05070d]", landingTypeTokens.serviceCardTitle)}>{step.title}</h3>
+        <p className={cn("mt-2 text-[#111827]", landingTypeTokens.stepDescription)}>{step.desc}</p>
+      </article>
     </div>
   )
 }
 
-function DesktopTimeline({ steps }: { steps: ProcessStep[] }) {
-  const [activeIndex, setActiveIndex] = useState(0)
-  const activateRef = useRef(setActiveIndex)
-  activateRef.current = setActiveIndex
-  const stableActivate = useRef((i: number) => activateRef.current(i)).current
-
+function DesktopStepItem({ step, isActive }: { step: ProcessStep; isActive: boolean }) {
   return (
-    <div className="relative">
-      <div className="absolute bottom-0 left-[119px] top-0 w-px" style={{ background: "var(--border)" }} />
-      <div>
-        {steps.map((step, i) => (
-          <DesktopStepRow
-            key={step.num}
-            step={step}
-            index={i}
-            isLast={i === steps.length - 1}
-            isActive={activeIndex === i}
-            onActivate={stableActivate}
-          />
-        ))}
+    <article
+      className={cn(
+        "grid grid-cols-[84px_1fr] items-start gap-4 border transition-all duration-300",
+        landingRadiusTokens.card,
+        landingSpaceTokens.cardPadding
+      )}
+      style={{
+        background: isActive ? "#FFFFFF" : "#e8edf3",
+        borderColor: isActive ? "#d2dce8" : "#dce3ea",
+        boxShadow: isActive ? "0 18px 36px rgba(15,23,42,0.11)" : "none",
+        transform: isActive ? "translateY(-4px)" : "translateY(0)",
+      }}
+    >
+      <div className="flex justify-center">
+        <span
+          className={cn(
+            "flex h-12 w-12 items-center justify-center",
+            landingRadiusTokens.circle,
+            landingTypeTokens.stepNumberLg
+          )}
+          style={{
+            background: isActive ? "#05070d" : "#c9d0da",
+            color: isActive ? "#ffffff" : "#5b6472",
+            transition: "all 0.3s ease",
+          }}
+        >
+          {step.num}
+        </span>
       </div>
-    </div>
+
+      <div>
+        <h3 className={cn("text-[#05070d]", landingTypeTokens.serviceCardTitle)}>{step.title}</h3>
+        <p className={cn("mt-2 text-[#111827]", landingTypeTokens.stepDescription)}>{step.desc}</p>
+      </div>
+    </article>
   )
 }
 
 export function ProcessStepsSection({ tab }: ProcessStepsSectionProps) {
-  const headerRef = useRef<HTMLDivElement>(null)
-  const [headerVisible, setHeaderVisible] = useState(false)
+  const sectionRef = useRef<HTMLElement>(null)
+  const [activeIndex, setActiveIndex] = useState(0)
+  const [isInView, setIsInView] = useState(false)
 
   const steps = tab === "counseling" ? COUNSELING_STEPS : COACHING_STEPS
-  const badgeLabel = tab === "counseling" ? "상담 프로세스" : "코칭 프로세스"
+  const badgeLabel = tab === "counseling" ? "심리상담 프로세스" : "성장코칭 프로세스"
   const headline = tab === "counseling" ? "체계적인 4단계 상담" : "체계적인 4단계 코칭"
   const description =
     tab === "counseling"
-      ? "과학적 평가에서 변화 모니터링까지, 정서 회복을 위한 전 과정을 체계적으로 진행합니다."
-      : "강점 진단에서 성장 모니터링까지, 목표 실행과 성장을 위한 전 과정을 체계적으로 진행합니다."
+      ? "심리 진단에서 사후 관리까지, 전 과정을 책임지는 전문 상담 시스템"
+      : "진단부터 성장 모니터링까지, 전 과정을 책임지는 전문 코칭 시스템"
 
   useEffect(() => {
-    const el = headerRef.current
-    if (!el) return
-    const obs = new IntersectionObserver(
+    const section = sectionRef.current
+    if (!section) return
+
+    const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setHeaderVisible(true)
-          obs.disconnect()
-        }
+        setIsInView(entry.isIntersecting)
       },
-      { threshold: 0.1 }
+      { threshold: 0.3 }
     )
-    obs.observe(el)
-    return () => obs.disconnect()
+
+    observer.observe(section)
+    return () => observer.disconnect()
   }, [])
 
+  useEffect(() => {
+    setActiveIndex(0)
+  }, [tab])
+
+  useEffect(() => {
+    if (!isInView) return
+
+    const timer = window.setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % steps.length)
+    }, 1700)
+
+    return () => window.clearInterval(timer)
+  }, [isInView, steps.length])
+
   return (
-    <section id="process-steps" className="bg-[var(--background)] px-4 py-20 font-sans sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-4xl">
-        <div
-          ref={headerRef}
-          className="mb-14 text-center"
-          style={{
-            opacity: headerVisible ? 1 : 0,
-            transform: headerVisible ? "translateY(0)" : "translateY(20px)",
-            transition: "opacity 0.6s ease, transform 0.6s ease",
-          }}
-        >
-          <span
-            className="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-widest"
-            style={{
-              background: tab === "counseling" ? "oklch(0.48 0.09 165 / 0.1)" : "oklch(0.58 0.11 55 / 0.1)",
-              color: tab === "counseling" ? "oklch(0.48 0.09 165)" : "oklch(0.58 0.11 55)",
-            }}
-          >
-            {badgeLabel}
-          </span>
-          <h2 className="mb-3 text-balance text-3xl font-bold sm:text-4xl" style={{ color: "var(--foreground)" }}>
-            {headline}
-          </h2>
-          <p className="mx-auto max-w-md text-sm leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
-            {description}
-          </p>
+    <section ref={sectionRef} id="process-steps" className={cn("bg-[#F4FAFF]", landingSectionTokens.base)}>
+      <div className={landingLayoutTokens.containerMedium}>
+        <div className={cn("text-center", landingLayoutTokens.sectionHeaderGap)}>
+          <span className={cn("mb-4 inline-flex", landingTypeTokens.eyebrow)}>{badgeLabel}</span>
+          <h2 className={landingTypeTokens.sectionTitle}>{headline}</h2>
+          <p className={cn("mx-auto mt-5 max-w-2xl text-[#111827]", landingTypeTokens.body)}>{description}</p>
         </div>
 
-        <div key={`process-${tab}`} className="animate-in fade-in duration-200">
-          <div className="md:hidden">
-            {steps.map((step, i) => (
-              <MobileTimelineItem key={`${tab}-${step.num}`} step={step} isLast={i === steps.length - 1} />
-            ))}
-          </div>
+        <div className="md:hidden">
+          {steps.map((step, index) => (
+            <MobileStepItem
+              key={`${tab}-${step.num}`}
+              step={step}
+              isLast={index === steps.length - 1}
+              isActive={index === activeIndex}
+            />
+          ))}
+        </div>
 
-          <div className="hidden md:block">
-            <DesktopTimeline key={tab} steps={steps} />
-          </div>
+        <div className="hidden grid-cols-2 gap-4 md:grid">
+          {steps.map((step, index) => (
+            <DesktopStepItem key={`${tab}-pc-${step.num}`} step={step} isActive={index === activeIndex} />
+          ))}
+        </div>
+
+        <div className="mt-8 flex justify-center">
+          <Link
+            href="/about"
+            className="inline-flex h-10 items-center gap-2 rounded-full border border-[#0C0C0C] bg-white px-7 text-base font-semibold text-[#0C0C0C] transition-colors hover:bg-[#0C0C0C] hover:text-white"
+          >
+            사발면 소개 보러가기
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       </div>
     </section>

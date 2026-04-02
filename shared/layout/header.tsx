@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import Link from "next/link"
 import { useEffect, useState } from "react"
@@ -68,7 +68,7 @@ export function Header() {
                 return next
               })
             }}
-            aria-label={mobileMenuOpen ? "메뉴 닫기" : "메뉴 열기"}
+            aria-label={mobileMenuOpen ? "硫붾돱 ?リ린" : "硫붾돱 ?닿린"}
           >
             {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
@@ -125,10 +125,9 @@ export function Header() {
 
             <Link href="/reservation">
               <Button
-                variant="outline"
-                className="cursor-pointer h-10 rounded-full border-[#0C0C0C] bg-white px-7 text-base font-semibold text-[#0C0C0C] shadow-none hover:bg-[#0C0C0C] hover:text-white"
+                className="cursor-pointer h-10 rounded-full border-0 bg-[#3391FF] px-7 text-base font-semibold text-[#FFF] shadow-none hover:bg-[#2b7de0]"
               >
-                예약하기
+                무료 상담 예약
               </Button>
             </Link>
           </div>
@@ -202,10 +201,9 @@ export function Header() {
             }}
           >
             <Button
-              variant="outline"
-              className="cursor-pointer mt-2 w-full rounded-full border-[#0C0C0C] bg-white text-[#0C0C0C] hover:bg-[#0C0C0C] hover:text-white"
+              className="cursor-pointer mt-2 w-full rounded-full border-0 bg-[#3391FF] text-[#FFF] hover:bg-[#2b7de0] hover:text-[#FFF]"
             >
-              예약하기
+              무료 상담 예약
             </Button>
           </Link>
         </nav>
@@ -213,3 +211,4 @@ export function Header() {
     </header>
   )
 }
+

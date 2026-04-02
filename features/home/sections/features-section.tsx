@@ -1,31 +1,40 @@
-﻿"use client"
+"use client"
 
-import Link from "next/link"
-import { useEffect, useRef, useState } from "react"
-import { Compass, Heart, Sparkles, TrendingUp } from "lucide-react"
+import { useEffect, useRef } from "react"
+import { Check } from "lucide-react"
+import { cn } from "@/shared/lib/utils"
+import {
+  landingLayoutTokens,
+  landingRadiusTokens,
+  landingSectionTokens,
+  landingSpaceTokens,
+  landingTypeTokens,
+} from "@/features/home/styles/landing-tokens"
 
-const FRAMEWORK_DATA = [
+const FEATURE_CARDS = [
   {
-    stage: "발견",
-    icon: Compass,
-    counseling: "내면의 원인과 기질적 특성 발견",
-    coaching: "숨겨진 강점과 잠재 자원 발견",
+    key: "counseling",
+    eyebrow: "마음의 어려움을 믿고 치유하는 과정",
+    title: "심리상담",
+    description:
+      "심리적 문제나 감정적 어려움을 전문가와 함께 탐색하고 해결하는 치료적 접근법입니다. 아이의 현재 심리 상태를 이해하고 정서적 안정을 회복하는 데 초점을 맞춥니다.",
+    chips: ["문제 진단 및 평가", "감정 표현과 이해", "행동 변화 지원", "정서적 안정화"],
+    cardClassName: "bg-[#EFF6FF]",
+    eyebrowClassName: "text-[#2b66f6]",
+    iconClassName: "text-[#2b66f6]",
   },
   {
-    stage: "발달",
-    icon: TrendingUp,
-    counseling: "자존감 회복 및 정서적 성숙",
-    coaching: "자기주도성 및 핵심 역량 발달",
-  },
-  {
-    stage: "발휘",
-    icon: Sparkles,
-    counseling: "안정된 마음을 바탕으로 한 자기 조절",
-    coaching: "목표 달성을 위한 폭발적인 실행력",
+    key: "coaching",
+    eyebrow: "아이의 강점을 깨우고 미래를 설계하는 과정",
+    title: "성장코칭",
+    description:
+      "아이의 잠재력과 강점에 집중하여 자율성과 성장을 이끌어내는 미래지향적 접근법입니다. 아이 스스로 목표를 세우고 달성하는 과정을 지원합니다.",
+    chips: ["문제 진단 및 평가", "감정 표현과 이해", "행동 변화 지원", "정서적 안정화"],
+    cardClassName: "bg-[#FFF7EF]",
+    eyebrowClassName: "text-[#ff7f32]",
+    iconClassName: "text-[#ff7f32]",
   },
 ] as const
-
-const AUTO_CYCLE_INTERVAL = 3500
 
 function useFadeIn(delay = 0) {
   const ref = useRef<HTMLDivElement>(null)
@@ -38,7 +47,7 @@ function useFadeIn(delay = 0) {
     el.style.transform = "translateY(20px)"
 
     const timer = window.setTimeout(() => {
-      el.style.transition = "opacity 0.6s ease, transform 0.6s ease"
+      el.style.transition = "opacity 0.55s ease, transform 0.55s ease"
       el.style.opacity = "1"
       el.style.transform = "translateY(0)"
     }, delay)
@@ -51,148 +60,59 @@ function useFadeIn(delay = 0) {
 
 export function FeaturesSection() {
   const headerRef = useFadeIn(0)
-  const sectionRef = useRef<HTMLElement>(null)
-  const [activeStage, setActiveStage] = useState(0)
-  const [isInView, setIsInView] = useState(false)
-  const [isPaused, setIsPaused] = useState(false)
-
-  useEffect(() => {
-    const section = sectionRef.current
-    if (!section) return
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsInView(entry.isIntersecting)
-      },
-      { threshold: 0.3 }
-    )
-
-    observer.observe(section)
-    return () => observer.disconnect()
-  }, [])
-
-  useEffect(() => {
-    if (!isInView || isPaused) return
-
-    const cycleInterval = window.setInterval(() => {
-      setActiveStage((prev) => (prev + 1) % FRAMEWORK_DATA.length)
-    }, AUTO_CYCLE_INTERVAL)
-
-    return () => window.clearInterval(cycleInterval)
-  }, [isInView, isPaused])
-
-  const handleRowClick = (index: number) => {
-    setActiveStage(index)
-    setIsPaused(true)
-  }
-
-  const handleResume = () => {
-    setIsPaused(false)
-  }
+  const cardsRef = useFadeIn(100)
 
   return (
-    <section ref={sectionRef} id="features" className="bg-[#FFFFFF] px-4 py-16 sm:px-6 md:py-20 lg:px-8">
-      <div className="mx-auto max-w-5xl">
-        <div ref={headerRef} className="mb-10 text-center md:mb-12">
-          <span className="mb-4 inline-flex rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">Integrated Solution</span>
-          <h2 className="mobile-auto-phrase text-3xl font-bold text-slate-900 md:text-4xl">
+    <section id="features" className={cn("bg-[#FFFFFF]", landingSectionTokens.base)}>
+      <div className={landingLayoutTokens.containerWide}>
+        <div ref={headerRef} className={cn("text-center", landingLayoutTokens.sectionHeaderGap)}>
+          <span className={cn("mb-4 inline-flex uppercase", landingTypeTokens.eyebrow)}>
+            INTEGRATED SOLUTION
+          </span>
+          <h2 className={cn("mobile-auto-phrase", landingTypeTokens.sectionTitle)}>
             심리상담으로 단단하게,
-            <br className="sm:hidden" /> 성장코칭으로 당당하게
+            <br />
+            성장코칭으로 당당하게
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-slate-600 md:text-base">
-            전문가와 함께 아이의 현재를 진단하고,
-            <br className="hidden sm:block" /> 가장 필요한 솔루션의 조합을 찾아갑니다.
+          <p className={cn("mx-auto mt-5 max-w-2xl text-[#131a27]", landingTypeTokens.body)}>
+            아이의 성장 단계와 필요에 따라 심리상담과 성장코칭의 차이를 확인해보세요.
+            <br className="hidden sm:block" />
+            아래 탭에서 원하는 항목을 선택하면 자세한 내용을 확인할 수 있습니다.
           </p>
         </div>
 
-        <div className="overflow-hidden rounded-2xl border border-[#E8DED3] bg-white shadow-sm">
-          <div className="grid grid-cols-[92px_1fr_1fr] sm:grid-cols-[120px_1fr_1fr]">
-            <div className="px-3 py-4" />
-
-            <div className="flex items-center justify-center gap-2 border-b border-[#E7EEF2] px-4 py-4 sm:px-6">
-              <Heart className="h-4 w-4 text-sky-600" />
-              <span className="text-sm font-semibold text-sky-800">심리상담</span>
-            </div>
-
-            <div className="flex items-center justify-center gap-2 border-b border-[#EFE8DD] px-4 py-4 sm:px-6">
-              <TrendingUp className="h-4 w-4 text-amber-600" />
-              <span className="text-sm font-semibold text-amber-800">성장코칭</span>
-            </div>
-          </div>
-
-          {FRAMEWORK_DATA.map((item, index) => {
-            const Icon = item.icon
-            const isActive = activeStage === index
-
-            return (
-              <div
-                key={item.stage}
-                onClick={() => handleRowClick(index)}
-                className="grid cursor-pointer grid-cols-[92px_1fr_1fr] transition-all duration-700 ease-out sm:grid-cols-[120px_1fr_1fr]"
-                style={{
-                  background: isActive ? "#F9F7F2" : "transparent",
-                  opacity: isActive ? 1 : 0.46,
-                }}
-              >
-                <div
-                  className="flex flex-col items-center justify-center gap-1.5 px-3 py-5 transition-all duration-700 sm:py-6"
-                  style={{ background: isActive ? "#F4EFE7" : "transparent" }}
-                >
-                  <Icon className="h-4 w-4 transition-all duration-700 sm:h-5 sm:w-5" style={{ color: isActive ? "#1F3D5D" : "#8B98A8" }} />
-                  <span className="text-xs font-semibold transition-all duration-700 sm:text-sm" style={{ color: isActive ? "#1E293B" : "#64748B" }}>
-                    {item.stage}
-                  </span>
-                </div>
-
-                <div
-                  className="flex items-center px-4 py-5 transition-all duration-700 sm:px-6 sm:py-6"
-                  style={{
-                    background: isActive ? "#F1F8FC" : "transparent",
-                    boxShadow: isActive ? "inset 0 0 0 1px #DCECF7" : "none",
-                  }}
-                >
-                  <p className="text-sm leading-relaxed" style={{ color: isActive ? "#1E3A5F" : "#64748B" }}>
-                    {item.counseling}
-                  </p>
-                </div>
-
-                <div
-                  className="flex items-center px-4 py-5 transition-all duration-700 sm:px-6 sm:py-6"
-                  style={{
-                    background: isActive ? "#FFF8ED" : "transparent",
-                    boxShadow: isActive ? "inset 0 0 0 1px #F4E4CA" : "none",
-                  }}
-                >
-                  <p className="text-sm leading-relaxed" style={{ color: isActive ? "#5B3A1A" : "#64748B" }}>
-                    {item.coaching}
-                  </p>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-
-        {isPaused && (
-          <div className="mt-6 flex justify-center">
-            <button
-              type="button"
-              onClick={handleResume}
-              className="rounded-full border border-[#E8DED3] bg-white px-4 py-2 text-xs font-medium text-slate-600 transition-colors duration-200 hover:bg-[#F8F4EE]"
+        <div ref={cardsRef} className={cn("grid md:grid-cols-2", landingSpaceTokens.gridGap)}>
+          {FEATURE_CARDS.map((card) => (
+            <article
+              key={card.key}
+              className={cn(
+                landingRadiusTokens.card,
+                landingSpaceTokens.cardPaddingResponsive,
+                card.cardClassName
+              )}
             >
-              자동 재생
-            </button>
-          </div>
-        )}
+              <p className={cn("text-sm font-bold", card.eyebrowClassName)}>{card.eyebrow}</p>
+              <h3 className={cn("mt-2 text-[#05070d]", landingTypeTokens.cardTitle)}>{card.title}</h3>
+              <p className={cn("mt-5 font-medium text-[#05070d]", landingTypeTokens.body)}>{card.description}</p>
 
-        <div className="mt-12 text-center">
-          <Link
-            href="/reservation"
-            className="inline-flex items-center gap-2 rounded-full bg-[#0C0C0C] px-7 py-3 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#1D1D1D]"
-          >
-            <Compass className="h-4 w-4" />
-            우리 아이 맞춤형 여정 상담하기
-          </Link>
-          <p className="mt-4 text-xs text-slate-500">상담과 코칭 중 무엇이 최선일지, 전문가와 함께 결정하세요</p>
+              <ul className="mt-6 grid grid-cols-2 gap-2.5">
+                {card.chips.map((chip) => (
+                  <li
+                    key={chip}
+                    className={cn(
+                      "inline-flex min-h-[42px] items-center gap-1.5 bg-white/88 text-[#141a25]",
+                      landingRadiusTokens.pill,
+                      landingSpaceTokens.chipPadding,
+                      landingTypeTokens.chip
+                    )}
+                  >
+                    <Check className={cn("h-4 w-4", card.iconClassName)} />
+                    <span>{chip}</span>
+                  </li>
+                ))}
+              </ul>
+            </article>
+          ))}
         </div>
       </div>
     </section>

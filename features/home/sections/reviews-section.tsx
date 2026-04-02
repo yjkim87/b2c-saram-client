@@ -1,56 +1,133 @@
-import Link from "next/link"
-import { ArrowRight, Quote } from "lucide-react"
+﻿"use client"
 
-const REVIEW_SUMMARY = [
+import { Autoplay } from "swiper/modules"
+import { Swiper, SwiperSlide } from "swiper/react"
+import { cn } from "@/shared/lib/utils"
+import {
+  landingLayoutTokens,
+  landingRadiusTokens,
+  landingSectionTokens,
+  landingSpaceTokens,
+  landingTypeTokens,
+} from "@/features/home/styles/landing-tokens"
+
+interface ReviewItem {
+  category: string
+  guardian: string
+  child: string
+  leadPrefix: string
+  emphasis: string
+  leadSuffix: string
+  tail: string
+}
+
+const REVIEW_SUMMARY: ReviewItem[] = [
   {
-    name: "김OO 보호자",
-    summary: "아이가 감정을 표현하는 방식이 달라졌고, 집에서도 대화가 훨씬 부드러워졌어요.",
+    category: "사회성 발달 코칭",
+    guardian: "김OO 어머니",
+    child: "7세 자녀",
+    leadPrefix: "7살 아이가 친구 사귀기를 너무 어려워했는데, 6개월 코칭 후 반에서 ",
+    emphasis: "리더 역할",
+    leadSuffix: "을 하게 되었어요.",
+    tail: "아이가 스스로 달라졌다는 게 느껴집니다.",
   },
   {
-    name: "박OO 보호자",
-    summary: "목표를 세우고 실행하는 습관이 생기면서 아이가 스스로 해보려는 힘이 커졌습니다.",
+    category: "정서 안정 상담",
+    guardian: "박OO 보호자",
+    child: "9세 자녀",
+    leadPrefix: "감정 기복이 큰 편이었지만 4개월 상담 이후 학교에서 ",
+    emphasis: "자기표현",
+    leadSuffix: "을 차분히 하게 되었어요.",
+    tail: "집에서도 대화가 부드러워지고 갈등이 줄었습니다.",
   },
   {
-    name: "최OO 보호자",
-    summary: "상담 이후 아이뿐 아니라 보호자인 저도 대응 방식이 정리돼서 마음이 한결 편해졌어요.",
+    category: "학습 태도 코칭",
+    guardian: "최OO 아버지",
+    child: "12세 자녀",
+    leadPrefix: "목표를 세우고 실천하는 습관이 생기면서 스스로 ",
+    emphasis: "시간 관리",
+    leadSuffix: "를 하기 시작했어요.",
+    tail: "성적보다 아이의 자신감이 먼저 올라온 점이 가장 만족스럽습니다.",
   },
 ]
 
+function ReviewCard({ item }: { item: ReviewItem }) {
+  return (
+    <article
+      className={cn(
+        "h-full bg-[#FFFFFF]",
+        landingRadiusTokens.cardLg,
+        landingSpaceTokens.cardPaddingLarge
+      )}
+    >
+      <span
+        className={cn(
+          "inline-flex w-fit bg-[#E5E5E5] text-[#777777]",
+          landingRadiusTokens.pill,
+          landingSpaceTokens.notePadding,
+          landingTypeTokens.noteText
+        )}
+      >
+        {item.category}
+      </span>
+
+      <p className={cn("mt-[var(--landing-space-grid-sm)] flex flex-wrap items-center gap-[var(--landing-space-chip-y)] text-[#0C0C0C]") }>
+        <strong className={landingTypeTokens.serviceCardTitle}>{item.guardian}</strong>
+        <span className={cn("text-[#9CA3AF]", landingTypeTokens.stepDescription)}>|</span>
+        <strong className={cn("text-[#3391FF]", landingTypeTokens.stepDescription)}>{item.child}</strong>
+      </p>
+
+      <p className={cn("mt-[var(--landing-space-grid-md)] text-[#1F2937]", landingTypeTokens.body)}>
+        {item.leadPrefix}
+        <strong className="font-bold text-[#0C0C0C]">{item.emphasis}</strong>
+        {item.leadSuffix}
+        <br />
+        {item.tail}
+      </p>
+    </article>
+  )
+}
+
 export function ReviewsSection() {
   return (
-    <section id="reviews" className="bg-[#F8F4EE] px-4 py-16 sm:px-6 md:py-20 lg:px-8">
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-10 text-center md:mb-12">
-          <span className="mb-4 inline-flex rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-            보호자 후기
-          </span>
-          <h2 className="text-3xl font-bold text-slate-900 md:text-4xl">실제 변화 경험을 확인해보세요</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-slate-600 md:text-base">
-            랜딩에서는 핵심 후기만 요약해 보여드리고, 전체 후기는 상세 페이지에서 확인할 수 있습니다.
+    <section id="reviews" className={cn("bg-[#F4FAFF]", landingSectionTokens.base)}>
+      <div className={landingLayoutTokens.containerWide}>
+        <div className={cn("text-center", landingLayoutTokens.sectionHeaderGap)}>
+          <span className={cn("mb-4 inline-flex", landingTypeTokens.eyebrow)}>부모님 후기</span>
+          <h2 className={landingTypeTokens.reviewTitle}>실제 변화를 경험하셨습니다</h2>
+          <p className={cn("mx-auto mt-5 max-w-2xl text-[#111827]", landingTypeTokens.body)}>
+            심리 진단에서 사후 관리까지,
+            <br />
+            전 과정을 책임지는 전문 상담 시스템
           </p>
         </div>
 
-        <div className="grid gap-5 md:grid-cols-3">
+        <div className="md:hidden">
+          <Swiper
+            modules={[Autoplay]}
+            slidesPerView={1.08}
+            spaceBetween={14}
+            autoplay={{
+              delay: 3000,
+              disableOnInteraction: false,
+              pauseOnMouseEnter: false,
+            }}
+          >
+            {REVIEW_SUMMARY.map((item) => (
+              <SwiperSlide key={`${item.guardian}-${item.child}`}>
+                <ReviewCard item={item} />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
+
+        <div className="hidden gap-5 md:grid md:grid-cols-3">
           {REVIEW_SUMMARY.map((item) => (
-            <article key={item.name} className="rounded-2xl border border-[#E7DDD2] bg-white p-6 shadow-sm">
-              <Quote className="h-5 w-5 text-slate-300" />
-              <p className="mt-3 text-sm leading-relaxed text-slate-700">{item.summary}</p>
-              <p className="mt-4 text-sm font-semibold text-slate-900">{item.name}</p>
-            </article>
+            <ReviewCard key={`${item.guardian}-${item.child}-desktop`} item={item} />
           ))}
         </div>
 
-        <div className="mt-8 flex justify-center">
-          <Link
-            href="/community/reviews"
-            className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-800 transition-colors hover:border-slate-400 hover:bg-slate-50"
-          >
-            후기 전체 보기
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
       </div>
     </section>
   )
 }
-

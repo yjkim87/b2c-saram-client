@@ -1,4 +1,4 @@
-﻿import { Baby, BookOpen, Smile, Sparkles } from "lucide-react"
+import { Baby, BookOpen, Smile, Sparkles } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
 export interface AgeSummaryItem {
@@ -19,10 +19,10 @@ export interface AgeSummaryItem {
 export const COUNSELING_AGE_DATA: AgeSummaryItem[] = [
   {
     type: "infant",
-    range: "0~2세",
-    title: "애착과 정서 안정",
-    description: "분리 불안, 수면, 양육 스트레스처럼 초기 정서 과제를 상담 중심으로 다룹니다.",
-    highlights: ["양육자-영아 상호작용 관찰", "수면/생활 루틴 안정화", "초기 발달 신호 체크"],
+    range: "0-2세",
+    title: "영아기",
+    description: "초기 발달 신호를 점검하고 안정적인 애착 형성을 돕습니다.",
+    highlights: ["발달 지연 조기 발견", "부모 상담 및 교육", "정서적 안정 지원"],
     icon: Baby,
     tone: {
       ring: "border-cyan-200",
@@ -33,10 +33,10 @@ export const COUNSELING_AGE_DATA: AgeSummaryItem[] = [
   },
   {
     type: "preschool",
-    range: "3~6세",
-    title: "감정 표현과 사회성",
-    description: "떼쓰기, 위축, 또래 갈등 등 유아기 행동·정서 이슈를 상담으로 조율합니다.",
-    highlights: ["감정 인식 놀이상담", "가정 내 행동 지도 코칭", "또래 관계 어려움 상담"],
+    range: "3-5세",
+    title: "유아기",
+    description: "감정 표현과 사회성 이슈를 안정적으로 다루는 시기입니다.",
+    highlights: ["분리 불안 상담", "언어 발달 치료 연계", "행동 문제 평가"],
     icon: Smile,
     tone: {
       ring: "border-orange-200",
@@ -47,10 +47,10 @@ export const COUNSELING_AGE_DATA: AgeSummaryItem[] = [
   },
   {
     type: "school-age",
-    range: "7~12세",
-    title: "학교 적응과 학습 정서",
-    description: "학습 불안, 자존감 저하, 집중 어려움을 상담으로 점검하고 회복합니다.",
-    highlights: ["학습 스트레스 상담", "자존감 회복 세션", "부모-자녀 갈등 중재"],
+    range: "6-12세",
+    title: "아동기",
+    description: "학습 및 또래 관계의 어려움을 객관적으로 평가하고 개입합니다.",
+    highlights: ["학습 장애 평가", "ADHD 행동 코칭", "또래 갈등 중재"],
     icon: BookOpen,
     tone: {
       ring: "border-emerald-200",
@@ -61,10 +61,10 @@ export const COUNSELING_AGE_DATA: AgeSummaryItem[] = [
   },
   {
     type: "teen",
-    range: "13~18세",
-    title: "불안·우울 정서 지원",
-    description: "청소년기의 정체성 혼란과 정서 기복을 전문 심리상담으로 지원합니다.",
-    highlights: ["정서 위험 신호 조기 점검", "진로·관계 스트레스 상담", "자기이해 심층 인터뷰"],
+    range: "13-18세",
+    title: "청소년기",
+    description: "정체성 변화와 정서 기복을 전문적으로 지원합니다.",
+    highlights: ["불안·우울 상담", "자해·자살 위험 평가", "가족 관계 회복"],
     icon: Sparkles,
     tone: {
       ring: "border-indigo-200",
@@ -78,10 +78,10 @@ export const COUNSELING_AGE_DATA: AgeSummaryItem[] = [
 export const COACHING_AGE_DATA: AgeSummaryItem[] = [
   {
     type: "infant",
-    range: "0~2세",
-    title: "자극 반응 코칭",
-    description: "영아기 감각 반응과 생활 리듬을 기반으로 성장 자극 루틴을 설계합니다.",
-    highlights: ["감각 자극 놀이 플랜", "양육자 실습 피드백", "성장 루틴 코칭"],
+    range: "0-2세",
+    title: "영아기",
+    description: "생활 리듬과 감각 반응을 기반으로 초기 성장 루틴을 만듭니다.",
+    highlights: ["감각 자극 놀이 코칭", "부모-영아 상호작용 코칭", "두뇌 발달 자극"],
     icon: Baby,
     tone: {
       ring: "border-cyan-200",
@@ -92,10 +92,10 @@ export const COACHING_AGE_DATA: AgeSummaryItem[] = [
   },
   {
     type: "preschool",
-    range: "3~6세",
-    title: "기초 습관 코칭",
-    description: "유아기의 자율성, 표현력, 기본 생활 습관을 성장 코칭으로 만들어갑니다.",
-    highlights: ["자기표현 놀이 코칭", "기초 루틴 정착 훈련", "부모 실천 체크리스트"],
+    range: "3-5세",
+    title: "유아기",
+    description: "자율성과 표현력을 키우는 기초 성장 루틴을 설계합니다.",
+    highlights: ["강점 기반 놀이 코칭", "창의·상상력 코칭", "사회성 향상 코칭"],
     icon: Smile,
     tone: {
       ring: "border-orange-200",
@@ -106,10 +106,10 @@ export const COACHING_AGE_DATA: AgeSummaryItem[] = [
   },
   {
     type: "school-age",
-    range: "7~12세",
-    title: "학습 동기 코칭",
-    description: "초등기 강점을 발견하고 목표를 작게 쪼개 실행하는 코칭을 제공합니다.",
-    highlights: ["학습 습관 루틴 설계", "강점 기반 과제 설계", "자기주도 목표 점검"],
+    range: "6-12세",
+    title: "아동기",
+    description: "학습 동기와 자기주도 실행력을 키우는 시기입니다.",
+    highlights: ["학습 동기 강화 코칭", "리더십·자존감 코칭", "진로 흥미 탐색"],
     icon: BookOpen,
     tone: {
       ring: "border-emerald-200",
@@ -120,10 +120,10 @@ export const COACHING_AGE_DATA: AgeSummaryItem[] = [
   },
   {
     type: "teen",
-    range: "13~18세",
-    title: "진로 실행 코칭",
-    description: "관심 분야를 탐색하고 학업·진로 목표를 실행 가능한 단위로 코칭합니다.",
-    highlights: ["진로 탐색 로드맵", "실행 습관 트래킹", "자기주도 의사결정 코칭"],
+    range: "13-18세",
+    title: "청소년기",
+    description: "진로 탐색과 실행 목표를 구조화해 성장의 방향을 잡습니다.",
+    highlights: ["자기 효능감 코칭", "진로 목표 설정", "스트레스 관리 코칭"],
     icon: Sparkles,
     tone: {
       ring: "border-indigo-200",

@@ -1,8 +1,8 @@
-﻿"use client"
+"use client"
 
-import { Brain, TrendingUp } from "lucide-react"
 import { cn } from "@/shared/lib/utils"
 import type { HomeServiceTab } from "@/features/home/model/home-tab"
+import { landingRadiusTokens, landingSpaceTokens, landingTypeTokens } from "@/features/home/styles/landing-tokens"
 
 interface StickyTabsProps {
   tab: HomeServiceTab
@@ -12,30 +12,17 @@ interface StickyTabsProps {
 const TAB_ITEMS: Array<{
   id: HomeServiceTab
   label: string
-  icon: typeof Brain
-  activeClassName: string
 }> = [
-  {
-    id: "counseling",
-    label: "심리상담",
-    icon: Brain,
-    activeClassName: "bg-emerald-600 text-white shadow-[0_8px_20px_rgba(5,150,105,0.25)]",
-  },
-  {
-    id: "coaching",
-    label: "성장코칭",
-    icon: TrendingUp,
-    activeClassName: "bg-amber-500 text-white shadow-[0_8px_20px_rgba(245,158,11,0.25)]",
-  },
+  { id: "counseling", label: "심리상담" },
+  { id: "coaching", label: "성장코칭" },
 ]
 
 export function StickyTabs({ tab, setTab }: StickyTabsProps) {
   return (
-    <section id="home-sticky-tabs" className="sticky top-16 z-[90] border-b border-[#EDE3D8] bg-[#FFF9F4]/95 backdrop-blur md:top-20">
-      <div className="mx-auto flex max-w-6xl items-center justify-center px-4 py-3 sm:px-6 lg:px-8">
-        <div className="inline-flex w-full max-w-[360px] items-center gap-2 rounded-full border border-[#E4D7CB] bg-white p-1.5 shadow-sm">
+    <section id="home-sticky-tabs" className="sticky top-16 z-[90] border-b border-[#e2e4e8] bg-[#ededee]/95 backdrop-blur md:top-20">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div className={cn("flex h-16 items-end justify-center", landingSpaceTokens.tabGap)}>
           {TAB_ITEMS.map((item) => {
-            const Icon = item.icon
             const active = tab === item.id
 
             return (
@@ -44,13 +31,21 @@ export function StickyTabs({ tab, setTab }: StickyTabsProps) {
                 type="button"
                 onClick={() => setTab(item.id)}
                 className={cn(
-                  "inline-flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold transition-all duration-200",
-                  active ? item.activeClassName : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                  "relative transition-colors duration-200",
+                  landingSpaceTokens.tabButtonSpacing,
+                  landingTypeTokens.tabLabel,
+                  active ? "text-[#05070d]" : "text-[#8d939d] hover:text-[#232937]"
                 )}
                 aria-pressed={active}
               >
-                <Icon className="h-4 w-4" />
-                <span>{item.label}</span>
+                {item.label}
+                <span
+                  className={cn(
+                    "absolute inset-x-0 -bottom-0.5 h-[3px] transition-opacity duration-200",
+                    landingRadiusTokens.pill,
+                    active ? "bg-[#05070d] opacity-100" : "bg-transparent opacity-0"
+                  )}
+                />
               </button>
             )
           })}
