@@ -3,13 +3,34 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useRef, useState, type ReactNode } from "react"
-import { ArrowUp, Check, Phone, RotateCcw, X } from "lucide-react"
+import {
+  ArrowUp,
+  Baby,
+  Check,
+  GraduationCap,
+  Heart,
+  MessageCircle,
+  Phone,
+  RotateCcw,
+  School,
+  Users,
+  X,
+  type LucideIcon,
+} from "lucide-react"
 import { Button } from "@/shared/ui/button"
 import { FieldLabel } from "@/shared/ui/field-label"
 import { cn } from "@/shared/lib/utils"
 import { Footer } from "@/shared/layout/footer"
 import type { UseReservationFlowReturn } from "../../hooks/use-reservation-flow"
 import { concernData, genders, relationships } from "../../data/reservation.constants"
+import {
+  QUICK_TOPICS,
+  QUICK_TOPIC_ORDER,
+  normalizeQuickTopicActions,
+  type QuickTopicAction,
+  type QuickTopicId,
+  type QuickTopicItem,
+} from "../../data/quick-topics"
 import type { Gender, Relationship } from "../../model/reservation.types"
 import { BotMessage, CalendarPicker, ConcernCard, UserMessage } from "../shared/reservation-primitives"
 import { Step1Service } from "./step1-service"
@@ -31,15 +52,53 @@ interface EditableUserMessageProps {
   onEdit: () => void
 }
 
+interface QuickTopicChatEntry {
+  id: string
+  topicId?: QuickTopicId
+  userMessage: string
+  botMessage: string
+  tips?: string[]
+  actions?: QuickTopicAction[]
+}
+
+interface QuickIntroAgeOption {
+  id: "age_0_2" | "age_3_6" | "age_7_12" | "age_13_18"
+  label: string
+}
+
+const QUICK_TOPIC_ICON_MAP: Record<QuickTopicItem["icon"], LucideIcon> = {
+  baby: Baby,
+  speech: MessageCircle,
+  school: School,
+  teen: GraduationCap,
+  heart: Heart,
+  users: Users,
+}
+
 const STEP1_TYPING_DELAY_MS = 1200
+const QUICK_TOPIC_GUIDE_MESSAGE =
+  "\uC548\uB155\uD558\uC138\uC694! \uD83C\uDF31\n\n\uC544\uC774\uC758 \uBC1C\uB2EC\uACFC \uAD00\uB828\uB41C \uAD81\uAE08\uC99D\uC774\uB098 \uAC71\uC815\uC744 \uD3B8\uD558\uAC8C \uB9D0\uC500\uD574 \uC8FC\uC138\uC694.\n\uBC1C\uB2EC\uC2EC\uB9AC\uD559\uC744 \uAE30\uBC18\uC73C\uB85C \uB3C4\uC6C0\uC774 \uB418\uB294 \uC815\uBCF4\uC640 \uBC29\uD5A5\uC744 \uC548\uB0B4\uD574 \uB4DC\uB9AC\uACA0\uC2B5\uB2C8\uB2E4.\n\n\uBA3C\uC800, \uC544\uC774\uAC00 \uBA87 \uC0B4\uC778\uC9C0 \uC54C\uB824\uC8FC\uC2E4 \uC218 \uC788\uC744\uAE4C\uC694?"
+const QUICK_INTRO_AGE_OPTIONS: QuickIntroAgeOption[] = [
+  { id: "age_0_2", label: "0-2\uC138 (\uC601\uC544\uAE30)" },
+  { id: "age_3_6", label: "3-6\uC138 (\uC720\uC544\uAE30)" },
+  { id: "age_7_12", label: "7-12\uC138 (\uC544\uB3D9\uAE30)" },
+  { id: "age_13_18", label: "13-18\uC138 (\uCCAD\uC18C\uB144\uAE30)" },
+]
+const QUICK_INTRO_RESERVATION_LABEL = "\uC804\uBB38\uAC00 \uC0C1\uB2F4 \uBC14\uB85C \uC2DC\uC791\uD558\uAE30"
+const QUICK_TOPIC_TYPING_DELAY_MS = 900
+const RIGHT_BUBBLE_GRADIENT_CLASS = "bg-[linear-gradient(144.37deg,#5CCDFF_7.06%,#3E72FF_90.82%)]"
+const RIGHT_INTERACTIVE_PANEL_CLASS = "w-full max-w-md rounded-[20px] rounded-tr-[5px] border border-[#DFDFDF] bg-white"
+const WIDE_INTERACTIVE_PANEL_CLASS = "w-full rounded-[20px] border border-[#DFDFDF] bg-white"
 
 function AttendanceOptionButton({ isSelected, onClick, children }: AttendanceOptionButtonProps) {
   return (
     <button
       onClick={onClick}
       className={cn(
-        "w-full p-4 rounded-xl border-2 text-left transition-all",
-        isSelected ? "border-primary bg-primary/5" : "border-border hover:border-primary/50",
+        "w-full rounded-[18px] border px-4 py-5 text-left transition-all duration-200",
+        isSelected
+          ? "border-[#8FB3E8] bg-[#F4FAFF]"
+          : "border-[#DFDFDF] bg-[#F4FAFF] hover:border-[#C9D7EE] hover:bg-[#F4FAFF]",
       )}
     >
       {children}
@@ -53,7 +112,7 @@ function EditableUserMessage({ content, onEdit }: EditableUserMessageProps) {
       <button type="button" onClick={onEdit} className="px-1 text-sm text-[#6E6352] hover:text-[#4F4537]">
         {"\uc218\uc815"}
       </button>
-      <div className="bg-[#B1A58F] text-white rounded-[20px] rounded-tr-[5px] px-4 py-3 max-w-[85%]">
+      <div className={cn(RIGHT_BUBBLE_GRADIENT_CLASS, "text-white rounded-[20px] rounded-tr-[5px] px-4 py-3 max-w-[85%]")}>
         <p className="text-sm md:text-base leading-relaxed">{content}</p>
       </div>
     </div>
@@ -102,21 +161,27 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
 
   const [nameDraft, setNameDraft] = useState(userInfo.name)
   const headerRef = useRef<HTMLElement>(null)
-  const mobileStepUiRef = useRef<HTMLDivElement>(null)
+  const mobileQuickTopicsRef = useRef<HTMLDivElement>(null)
+  const reservationFlowStartRef = useRef<HTMLDivElement>(null)
   const step2StartRef = useRef<HTMLDivElement>(null)
   const step3StartRef = useRef<HTMLDivElement>(null)
   const step4StartRef = useRef<HTMLDivElement>(null)
   const step5StartRef = useRef<HTMLDivElement>(null)
   const [showExitModal, setShowExitModal] = useState(false)
-  const [showResetModal, setShowResetModal] = useState(false)
+  const [quickTopicHistory, setQuickTopicHistory] = useState<QuickTopicChatEntry[]>([])
+  const [activeQuickTopicId, setActiveQuickTopicId] = useState<QuickTopicId | null>(null)
+  const [selectedQuickAgeId, setSelectedQuickAgeId] = useState<QuickIntroAgeOption["id"] | null>(null)
+  const [isReservationFlowStarted, setIsReservationFlowStarted] = useState(false)
   const [editingField, setEditingField] = useState<"name" | "relationship" | "birthdate" | "gender" | null>(null)
   const [isMobileStepCompact, setIsMobileStepCompact] = useState(false)
   const [isRelationshipPromptReady, setIsRelationshipPromptReady] = useState(false)
   const [isBirthdatePromptReady, setIsBirthdatePromptReady] = useState(false)
   const [isGenderPromptReady, setIsGenderPromptReady] = useState(false)
+  const [quickTopicTypingEntryIds, setQuickTopicTypingEntryIds] = useState<string[]>([])
   const relationshipPromptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const birthdatePromptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const genderPromptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const quickTopicTypingTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
   const isOnlyKoreanJamo = (value: string) => /^[\u3131-\u314e\u314f-\u3163]+$/.test(value)
   const isValidName = (value: string) => {
     const trimmed = value.trim()
@@ -175,11 +240,6 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
   const hasBirthdateAnswer =
     userInfo.birthdate.length === 10 && birthdateError === null && userInfo.birthdate === birthdateInput
   const hasGenderAnswer = Boolean(userInfo.gender)
-  const stepLabels = ["\uC815\uBCF4\uC785\uB825", "\uACE0\uBBFC\uC120\uD0DD", "\uCC38\uC11D\uC790", "\uC77C\uC815", "\uC5F0\uB77D\uCC98"]
-  const totalSteps = stepLabels.length
-  const currentStep = Math.min(step, totalSteps)
-  const currentStepLabel = stepLabels[currentStep - 1] ?? stepLabels[0]
-  const progressPercent = (currentStep / totalSteps) * 100
   const isEditingName = editingField === "name"
   const isEditingRelationship = editingField === "relationship"
   const isEditingBirthdate = editingField === "birthdate"
@@ -276,7 +336,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
   }, [canShowGenderQuestion, isGenderPromptReady])
 
   useEffect(() => {
-    if (step < 2) {
+    if (!isReservationFlowStarted || step < 2) {
       return
     }
 
@@ -299,13 +359,13 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
     const frameId = window.requestAnimationFrame(() => {
       const headerHeight = headerRef.current?.offsetHeight ?? (window.innerWidth >= 768 ? 80 : 64)
       const isMobileView = window.innerWidth < 1024
-      const mobileStepHeight = isMobileView ? (mobileStepUiRef.current?.offsetHeight ?? 0) : 0
+      const mobileQuickTopicsHeight = isMobileView ? (mobileQuickTopicsRef.current?.offsetHeight ?? 0) : 0
       const spacing = isMobileView ? 16 : 24
       const contextPeekOffset = isMobileView ? 56 : 72
       const top =
         target.getBoundingClientRect().top +
         window.scrollY -
-        (headerHeight + mobileStepHeight + spacing + contextPeekOffset)
+        (headerHeight + mobileQuickTopicsHeight + spacing + contextPeekOffset)
 
       window.scrollTo({ top: Math.max(0, top), behavior: "smooth" })
     })
@@ -313,22 +373,219 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
     return () => {
       window.cancelAnimationFrame(frameId)
     }
-  }, [step, showContent])
+  }, [isReservationFlowStarted, step, showContent])
+
+  useEffect(() => {
+    if (!isReservationFlowStarted || !reservationFlowStartRef.current) {
+      return
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      const target = reservationFlowStartRef.current
+      if (!target) {
+        return
+      }
+
+      const headerHeight = headerRef.current?.offsetHeight ?? (window.innerWidth >= 768 ? 80 : 64)
+      const isMobileView = window.innerWidth < 1024
+      const mobileQuickTopicsHeight = isMobileView ? (mobileQuickTopicsRef.current?.offsetHeight ?? 0) : 0
+      const spacing = isMobileView ? 16 : 24
+      const top = target.getBoundingClientRect().top + window.scrollY - (headerHeight + mobileQuickTopicsHeight + spacing)
+
+      window.scrollTo({ top: Math.max(0, top), behavior: "smooth" })
+    })
+
+    return () => {
+      window.cancelAnimationFrame(frameId)
+    }
+  }, [isReservationFlowStarted])
+
+  useEffect(() => {
+    if (quickTopicHistory.length === 0 && !isReservationFlowStarted) {
+      return
+    }
+
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [quickTopicHistory, isReservationFlowStarted, messagesEndRef])
+
+  useEffect(() => {
+    return () => {
+      Object.values(quickTopicTypingTimersRef.current).forEach((timerId) => {
+        clearTimeout(timerId)
+      })
+      quickTopicTypingTimersRef.current = {}
+    }
+  }, [])
+
+  const enqueueQuickTopicReplyWithTyping = (entry: QuickTopicChatEntry) => {
+    if (quickTopicTypingTimersRef.current[entry.id] || quickTopicHistory.some((item) => item.id === entry.id)) {
+      return
+    }
+
+    const { botMessage, tips, actions, ...baseEntry } = entry
+
+    setQuickTopicHistory((previous) => [
+      ...previous,
+      {
+        ...baseEntry,
+        botMessage: "",
+      },
+    ])
+    setQuickTopicTypingEntryIds((previous) => (previous.includes(entry.id) ? previous : [...previous, entry.id]))
+
+    quickTopicTypingTimersRef.current[entry.id] = setTimeout(() => {
+      setQuickTopicHistory((previous) =>
+        previous.map((item) =>
+          item.id === entry.id
+            ? {
+                ...item,
+                botMessage,
+                tips,
+                actions,
+              }
+            : item,
+        ),
+      )
+      setQuickTopicTypingEntryIds((previous) => previous.filter((itemId) => itemId !== entry.id))
+      delete quickTopicTypingTimersRef.current[entry.id]
+    }, QUICK_TOPIC_TYPING_DELAY_MS)
+  }
+
+  const handleQuickIntroAgeSelect = (option: QuickIntroAgeOption) => {
+    setSelectedQuickAgeId(option.id)
+    const ageEntryId = `quick-intro:${option.id}`
+    enqueueQuickTopicReplyWithTyping({
+      id: ageEntryId,
+      userMessage: option.label,
+      botMessage:
+        "\uC88B\uC544\uC694. \uD574\uB2F9 \uC5F0\uB839\uB300\uC5D0 \uB9DE\uB294 \uAD00\uC810\uC73C\uB85C \uC548\uB0B4\uD574 \uB4DC\uB9B4\uAC8C\uC694.\n\uBE60\uB978 \uC0C1\uB2F4 \uC8FC\uC81C\uB97C \uC120\uD0DD\uD574 \uC9C8\uBB38\uC744 \uC774\uC5B4\uAC00 \uBCF4\uC138\uC694.",
+    })
+  }
+
+  const handleQuickIntroReservationStart = () => {
+    setQuickTopicHistory((previous) => {
+      const entryId = "quick-intro:reservation-start"
+      if (previous.some((entry) => entry.id === entryId)) {
+        return previous
+      }
+
+      return [
+        ...previous,
+        {
+          id: entryId,
+          userMessage: QUICK_INTRO_RESERVATION_LABEL,
+          botMessage: "\uC88B\uC544\uC694. \uC608\uC57D \uD50C\uB85C\uC6B0\uB97C \uBC14\uB85C \uC2DC\uC791\uD560\uAC8C\uC694.",
+        },
+      ]
+    })
+    setIsReservationFlowStarted(true)
+  }
+
+  const handleQuickTopicSelect = (topicId: QuickTopicId) => {
+    setActiveQuickTopicId(topicId)
+    const topic = QUICK_TOPICS[topicId]
+    enqueueQuickTopicReplyWithTyping({
+      id: topic.id,
+      topicId: topic.id,
+      userMessage: topic.userMessage,
+      botMessage: topic.botMessage,
+      tips: topic.tips,
+      actions: normalizeQuickTopicActions(topic.actions),
+    })
+  }
+
+  const handleQuickTopicActionClick = (topicId: QuickTopicId, action: QuickTopicAction) => {
+    setActiveQuickTopicId(topicId)
+
+    if (action.type === "reservation") {
+      setQuickTopicHistory((previous) => {
+        const reservationIntroId = `${topicId}:reservation-intro`
+        if (previous.some((entry) => entry.id === reservationIntroId)) {
+          return previous
+        }
+
+        return [
+          ...previous,
+          {
+            id: reservationIntroId,
+            topicId,
+            userMessage: "\uC804\uBB38\uAC00 \uC0C1\uB2F4 \uC608\uC57D\uC744 \uC9C4\uD589\uD558\uACE0 \uC2F6\uC5B4\uC694",
+            botMessage: "\uC88B\uC544\uC694. \uC9C0\uAE08\uBD80\uD130 \uC608\uC57D \uD50C\uB85C\uC6B0\uB97C \uC774\uC5B4\uC11C \uC9C4\uD589\uD560\uAC8C\uC694.",
+          },
+        ]
+      })
+      setIsReservationFlowStarted(true)
+      return
+    }
+
+    if (!action.botReply) {
+      return
+    }
+
+    const normalizedTopicActions = normalizeQuickTopicActions(QUICK_TOPICS[topicId].actions)
+    const reservationAction = normalizedTopicActions[normalizedTopicActions.length - 1]
+    const followUpEntryId = `${topicId}:${action.id}`
+
+    setQuickTopicHistory((previous) => {
+      if (previous.some((entry) => entry.id === followUpEntryId)) {
+        return previous
+      }
+
+      return [
+        ...previous,
+        {
+          id: followUpEntryId,
+          topicId,
+          userMessage: action.label,
+          botMessage: action.botReply ?? "",
+          actions: reservationAction ? [reservationAction] : [],
+        },
+      ]
+    })
+  }
+
+  const handleQuickTopicReset = () => {
+    resetAll()
+    Object.values(quickTopicTypingTimersRef.current).forEach((timerId) => {
+      clearTimeout(timerId)
+    })
+    quickTopicTypingTimersRef.current = {}
+    setQuickTopicHistory([])
+    setQuickTopicTypingEntryIds([])
+    setActiveQuickTopicId(null)
+    setSelectedQuickAgeId(null)
+    setIsReservationFlowStarted(false)
+    setEditingField(null)
+    setIsRelationshipPromptReady(false)
+    setIsBirthdatePromptReady(false)
+    setIsGenderPromptReady(false)
+
+    if (relationshipPromptTimerRef.current) {
+      clearTimeout(relationshipPromptTimerRef.current)
+      relationshipPromptTimerRef.current = null
+    }
+
+    if (birthdatePromptTimerRef.current) {
+      clearTimeout(birthdatePromptTimerRef.current)
+      birthdatePromptTimerRef.current = null
+    }
+
+    if (genderPromptTimerRef.current) {
+      clearTimeout(genderPromptTimerRef.current)
+      genderPromptTimerRef.current = null
+    }
+  }
+
+  const selectedQuickTopicSet = new Set(
+    quickTopicHistory.flatMap((entry) => (entry.topicId ? [entry.topicId] : [])),
+  )
+  const hasQuickTopicActivity =
+    quickTopicHistory.length > 0 || selectedQuickAgeId !== null || isReservationFlowStarted || activeQuickTopicId !== null
 
   const handleExit = () => {
     resetAll()
     setShowExitModal(false)
     router.push("/")
-  }
-
-  const handleResetFlow = () => {
-    setShowResetModal(true)
-  }
-
-  const handleResetConfirm = () => {
-    resetAll()
-    setShowResetModal(false)
-    window.scrollTo({ top: 0, behavior: "auto" })
   }
 
   return (
@@ -367,90 +624,217 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
             </p>
           </section>
 
-          <div className="grid gap-10 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-16">
+          <div className="grid gap-10 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-16">
             <aside className="hidden self-start lg:block lg:sticky lg:top-28">
-              <ol className="space-y-8">
-                {stepLabels.map((label, index) => {
-                  const stepNumber = index + 1
-                  const isActiveStep = step === stepNumber
-
-                  return (
-                    <li key={label} className={cn("relative pl-8", index === 0 && "pr-24")}>
-                      <span
-                        className={cn(
-                          "absolute left-0 top-0 h-5 w-5 rounded-full border border-[#D6CDBD] bg-white",
-                          isActiveStep && "border-[#B1A58F] bg-[#F8F5EF]",
-                        )}
-                      >
-                        {isActiveStep && <span className="absolute left-1.5 top-1.5 h-2 w-2 rounded-full bg-[#B1A58F]" />}
-                      </span>
-                      {index < stepLabels.length - 1 && (
-                        <span className="absolute left-[10px] top-5 h-8 w-px bg-[#E4DBCC]" aria-hidden />
-                      )}
-                      <span className={cn("text-[18px] leading-none", isActiveStep ? "font-bold text-[#1F1F1F]" : "font-medium text-[#5D5549]")}>
-                        {label}
-                      </span>
-                      {index === 0 && (
-                        <button
-                          type="button"
-                          onClick={handleResetFlow}
-                          className="absolute right-0 top-1/2 inline-flex -translate-y-1/2 cursor-pointer items-center gap-1 text-sm font-medium text-[#6E6352] transition-colors hover:text-[#4F4537]"
-                        >
-                          <RotateCcw className="h-3.5 w-3.5" />
-                          <span>{"\uCD08\uAE30\uD654"}</span>
-
-                        </button>
-                      )}
-                    </li>
-                  )
-                })}
-              </ol>
-            </aside>
-
-            <div className="space-y-4">
-              <div
-                ref={mobileStepUiRef}
-                className={cn(
-                  "sticky top-[74px] z-30 rounded-[15px] border border-[#B1A58F] bg-[#FFF9F4] transition-all duration-300 md:top-[90px] lg:hidden",
-                  isMobileStepCompact ? "space-y-[6px] p-[10px]" : "space-y-2 p-[15px]",
-                )}
-              >
-                <div className={cn("flex justify-between gap-3", isMobileStepCompact ? "items-center" : "items-start")}>
-                  <p
-                    className={cn(
-                      "truncate font-semibold leading-none text-[#2F2A23] transition-all duration-300",
-                      isMobileStepCompact ? "text-[17px]" : "text-[22px]",
-                    )}
-                  >
-                    {currentStepLabel}
-                  </p>
+              <div className="rounded-2xl border border-[#D6D9F3] bg-white p-5">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-lg font-bold text-[#6570A5]">{"\uBE60\uB978 \uC0C1\uB2F4 \uC8FC\uC81C"}</p>
                   <button
                     type="button"
-                    onClick={handleResetFlow}
-                    className="inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-[#2F2A23] transition-opacity hover:opacity-70"
+                    onClick={handleQuickTopicReset}
+                    disabled={!hasQuickTopicActivity}
+                    className={cn(
+                      "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold transition-colors",
+                      hasQuickTopicActivity
+                        ? "text-[#6570A5] hover:bg-[#EEF3FF] hover:text-primary"
+                        : "cursor-not-allowed text-[#B4BCD9]",
+                    )}
                   >
                     <RotateCcw className="h-3.5 w-3.5" />
                     <span>{"\uCD08\uAE30\uD654"}</span>
                   </button>
                 </div>
+                <div className="mt-4 space-y-2">
+                  {QUICK_TOPIC_ORDER.map((topicId) => {
+                    const topic = QUICK_TOPICS[topicId]
+                    const Icon = QUICK_TOPIC_ICON_MAP[topic.icon]
+                    const isActive = activeQuickTopicId === topicId
+                    const isSelected = selectedQuickTopicSet.has(topicId)
 
-                <span className="inline-flex h-7 items-center rounded-full bg-[#978C79] px-3 text-[14px] font-semibold leading-none text-white">
-                  {currentStep}/{totalSteps}
-                </span>
-
-                <div
-                  className={cn(
-                    "w-full overflow-hidden rounded-full bg-[#D4D1CB] transition-all duration-300",
-                    isMobileStepCompact ? "h-1.5" : "h-3",
-                  )}
-                >
-                  <div
-                    className="h-full rounded-full bg-[#AAA08A] transition-all duration-300"
-                    style={{ width: `${progressPercent}%` }}
-                  />
+                    return (
+                      <button
+                        key={topicId}
+                        type="button"
+                        onClick={() => handleQuickTopicSelect(topicId)}
+                        className={cn(
+                          "flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors",
+                          isActive
+                            ? "bg-[#EEF3FF] text-primary"
+                            : isSelected
+                              ? "bg-[#F4F7FF] text-[#4E5D90]"
+                              : "text-[#4E5D90] hover:bg-[#F6F8FF]",
+                        )}
+                      >
+                        <Icon className="h-5 w-5 shrink-0" />
+                        <span className="text-lg font-medium leading-none">{topic.label}</span>
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
-          {/* Step 1: Service */}
+            </aside>
+
+            <div className="space-y-4">
+              <div
+                ref={mobileQuickTopicsRef}
+                className={cn(
+                  "sticky top-[74px] z-30 rounded-2xl border border-[#D6D9F3] bg-white transition-all duration-300 md:top-[90px] lg:hidden",
+                  isMobileStepCompact ? "p-2.5" : "p-3.5",
+                )}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <p
+                    className={cn(
+                      "font-semibold leading-none text-[#6570A5] transition-all duration-300",
+                      isMobileStepCompact ? "text-sm" : "text-base",
+                    )}
+                  >
+                    {"\uBE60\uB978 \uC0C1\uB2F4 \uC8FC\uC81C"}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleQuickTopicReset}
+                    disabled={!hasQuickTopicActivity}
+                    className={cn(
+                      "inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-semibold transition-colors",
+                      hasQuickTopicActivity
+                        ? "text-[#6570A5] hover:bg-[#EEF3FF] hover:text-primary"
+                        : "cursor-not-allowed text-[#B4BCD9]",
+                    )}
+                  >
+                    <RotateCcw className="h-3 w-3" />
+                    <span>{"\uCD08\uAE30\uD654"}</span>
+                  </button>
+                </div>
+                <div className="mt-2 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                  {QUICK_TOPIC_ORDER.map((topicId) => {
+                    const topic = QUICK_TOPICS[topicId]
+                    const Icon = QUICK_TOPIC_ICON_MAP[topic.icon]
+                    const isActive = activeQuickTopicId === topicId
+                    const isSelected = selectedQuickTopicSet.has(topicId)
+
+                    return (
+                      <button
+                        key={topicId}
+                        type="button"
+                        onClick={() => handleQuickTopicSelect(topicId)}
+                        className={cn(
+                          "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 font-semibold transition-colors",
+                          isActive
+                            ? "border-primary bg-[#EEF3FF] text-primary"
+                            : isSelected
+                              ? "border-[#D6D9F3] bg-[#F4F7FF] text-[#4E5D90]"
+                              : "border-[#D6D9F3] bg-white text-[#4E5D90]",
+                        )}
+                      >
+                        <Icon className="h-4 w-4 shrink-0" />
+                        <span className="text-lg leading-none">{topic.label}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              <BotMessage
+                content={
+                  <div className="space-y-3">
+                    <p className="text-sm leading-relaxed whitespace-pre-line text-foreground md:text-base">
+                      {QUICK_TOPIC_GUIDE_MESSAGE}
+                    </p>
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {QUICK_INTRO_AGE_OPTIONS.map((option) => (
+                        <button
+                          key={option.id}
+                          type="button"
+                          onClick={() => handleQuickIntroAgeSelect(option)}
+                          className={cn(
+                            "inline-flex items-center rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors",
+                            selectedQuickAgeId === option.id
+                              ? "border-primary bg-[#EEF3FF] text-primary"
+                              : "border-[#D8CEBC] bg-white text-[#2F2A23] hover:bg-[#F4F0E7]",
+                          )}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={handleQuickIntroReservationStart}
+                        className="inline-flex items-center rounded-full bg-primary px-3 py-1.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                      >
+                        {QUICK_INTRO_RESERVATION_LABEL}
+                      </button>
+                    </div>
+                  </div>
+                }
+              />
+
+              {quickTopicHistory.map((entry) => {
+                const normalizedActions = entry.actions ? normalizeQuickTopicActions(entry.actions) : []
+                const isQuickEntryTyping = quickTopicTypingEntryIds.includes(entry.id)
+
+                return (
+                  <div key={entry.id} className="space-y-3">
+                    <UserMessage content={entry.userMessage} />
+                    {isQuickEntryTyping ? (
+                      <BotMessage content="" isTyping />
+                    ) : (
+                      entry.botMessage && (
+                        <BotMessage
+                          content={
+                            <div className="space-y-3">
+                              <p className="text-sm leading-relaxed whitespace-pre-line text-foreground md:text-base">
+                                {entry.botMessage}
+                              </p>
+                              {entry.tips && entry.tips.length > 0 && (
+                                <div className="space-y-1.5">
+                                  <p className="text-sm font-semibold text-[#2F2A23]">{"\uD574\uB2F9 \uC5F0\uB839\uC5D0 \uB300\uD55C \uAD6C\uCCB4\uC801\uC778 \uD301:"}</p>
+                                  <ul className="space-y-1">
+                                    {entry.tips.map((tip) => (
+                                      <li key={tip} className="text-sm leading-relaxed text-foreground md:text-base">
+                                        {"\u2022"} {tip}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                              {normalizedActions.length > 0 && (
+                                <div className="flex flex-wrap gap-2 pt-1">
+                                  {normalizedActions.map((action) => (
+                                    <button
+                                      key={`${entry.id}-${action.id}`}
+                                      type="button"
+                                      onClick={() => {
+                                        if (!entry.topicId) {
+                                          return
+                                        }
+                                        handleQuickTopicActionClick(entry.topicId, action)
+                                      }}
+                                      className={cn(
+                                        "inline-flex items-center rounded-full px-3 py-1.5 text-sm font-semibold transition-colors",
+                                        action.type === "reservation"
+                                          ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                                          : "border border-[#D8CEBC] bg-white text-[#2F2A23] hover:bg-[#F4F0E7]",
+                                      )}
+                                    >
+                                      {action.label}
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          }
+                        />
+                      )
+                    )}
+                  </div>
+                )
+              })}
+
+              {isReservationFlowStarted && (
+                <>
+                  <div ref={reservationFlowStartRef} />
+                  {/* Step 1: Service */}
           <Step1Service flow={flow}>
             {step >= 1 && (
               <>
@@ -474,7 +858,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                           />
                         ) : (
                           <div className="flex justify-end animate-in fade-in-0 slide-in-from-right-4 duration-300">
-                            <div className="w-full max-w-md rounded-[20px] rounded-tr-[5px] bg-white px-4 py-3 border border-[#B1A58F]">
+                            <div className={cn(RIGHT_INTERACTIVE_PANEL_CLASS, "px-4 py-3")}>
                               <div className="flex items-center gap-2">
                                 <div className="flex-1 rounded-xl border border-[#D8CEBC] bg-white px-4 py-2.5">
                                   <input
@@ -499,7 +883,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                                   className={cn(
                                     "w-9 h-9 rounded-full border flex items-center justify-center transition-all flex-shrink-0",
                                     isValidName(nameDraft)
-                                      ? "bg-[#E7E0D3] border-[#D0C8BB] text-[#544E45] hover:brightness-95"
+                                      ? "border-transparent bg-[#F4FAFF] text-[#2E5FD7] hover:bg-[#EAF4FF]"
                                       : "bg-muted border-transparent text-muted-foreground cursor-not-allowed",
                                   )}
                                   aria-label={"\uC774\uB984 \uC804\uC1A1"}
@@ -523,7 +907,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                                   />
                                 ) : (
                                   <div className="flex justify-end animate-in fade-in-0 slide-in-from-right-4 duration-300">
-                                    <div className="w-full max-w-md rounded-[20px] rounded-tr-[5px] bg-white p-3 border border-[#B1A58F] space-y-2">
+                                    <div className={cn(RIGHT_INTERACTIVE_PANEL_CLASS, "p-3 space-y-2")}>
                                       {relationships.map((rel) => (
                                         <button
                                           key={rel}
@@ -534,8 +918,8 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                                           className={cn(
                                             "w-full px-4 py-2.5 rounded-xl border text-left transition-all",
                                             userInfo.relationship === rel
-                                              ? "border-[#0B6980] bg-[#0B6980] text-white"
-                                              : "border-transparent bg-[#DCD8D2] hover:bg-[#D4D0C8] text-foreground",
+                                              ? "border-[#7FC6FF] bg-[#F4FAFF] text-[#235FD7] font-semibold"
+                                              : "border-transparent bg-[#F4FAFF] hover:bg-[#EAF4FF] text-[#1F2B3D]",
                                           )}
                                         >
                                           {rel}
@@ -563,7 +947,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                                   />
                                 ) : (
                                   <div className="flex justify-end animate-in fade-in-0 slide-in-from-right-4 duration-300">
-                                    <div className="w-full max-w-md rounded-[20px] rounded-tr-[5px] bg-white p-4 border border-[#B1A58F]">
+                                    <div className={cn(RIGHT_INTERACTIVE_PANEL_CLASS, "p-4")}>
                                       <div className="flex items-center gap-2">
                                         <div className="flex-1 rounded-xl border border-[#D8CEBC] bg-white px-4 py-2.5">
                                           <input
@@ -589,7 +973,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                                           className={cn(
                                             "w-9 h-9 rounded-full border flex items-center justify-center transition-all flex-shrink-0",
                                             birthdateInput.trim().length > 0
-                                              ? "bg-[#E7E0D3] border-[#D0C8BB] text-[#544E45] hover:brightness-95"
+                                              ? "border-transparent bg-[#F4FAFF] text-[#2E5FD7] hover:bg-[#EAF4FF]"
                                               : "bg-muted border-transparent text-muted-foreground cursor-not-allowed",
                                           )}
                                           aria-label={"\uC0DD\uB144\uC6D4\uC77C \uC804\uC1A1"}
@@ -623,7 +1007,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                                       <Button
                                         onClick={goToNextStep}
                                         disabled={!isStep1Valid}
-                                        className="w-full h-[50px] text-[18px] font-semibold mt-5"
+                                        className="mt-5 h-[50px] w-full bg-[#4A83D8] text-[18px] font-semibold text-white hover:bg-[#3F73C2] disabled:bg-[#4A83D8] disabled:text-white"
                                       >
                                         {"\ub2e4\uc74c\uc73c\ub85c"}
                                       </Button>
@@ -631,7 +1015,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                                   </>
                                 ) : (
                                   <div className="flex justify-end animate-in fade-in-0 slide-in-from-right-4 duration-300">
-                                    <div className="w-full max-w-md rounded-[20px] rounded-tr-[5px] bg-white p-3 border border-[#B1A58F] grid grid-cols-2 gap-2">
+                                    <div className={cn(RIGHT_INTERACTIVE_PANEL_CLASS, "p-3 grid grid-cols-2 gap-2")}>
                                       {genders.map((gender) => (
                                         <button
                                           key={gender}
@@ -642,8 +1026,8 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                                           className={cn(
                                             "px-4 py-2.5 rounded-xl border text-center transition-all",
                                             userInfo.gender === gender
-                                              ? "border-[#0B6980] bg-[#0B6980] text-white"
-                                              : "border-transparent bg-[#DCD8D2] hover:bg-[#D4D0C8] text-foreground",
+                                              ? "border-[#7FC6FF] bg-[#F4FAFF] text-[#235FD7] font-semibold"
+                                              : "border-transparent bg-[#F4FAFF] hover:bg-[#EAF4FF] text-[#1F2B3D]",
                                           )}
                                         >
                                           {gender}
@@ -683,34 +1067,36 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
 
                   {showContent && step === 2 && (
                     <div className="space-y-4 animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
-                      {/* Slogan Card */}
-                      <div className="rounded-xl border border-[#B1A58F] bg-[#F8F6F1] p-4">
-                        <p className="text-sm text-center font-medium leading-relaxed text-[#2F2A23]">
-                          {concernData[concernAgeGroup].slogan}
-                        </p>
-                        <p className="mt-2 text-xs text-center text-[#6B6256]">{concernData[concernAgeGroup].intro}</p>
-                      </div>
+                      <div className={cn(WIDE_INTERACTIVE_PANEL_CLASS, "space-y-4 p-4")}>
+                        {/* Slogan Card */}
+                        <div className="rounded-xl border border-[#DFDFDF] bg-[#FAF8F4] p-4">
+                          <p className="text-center text-sm font-medium leading-relaxed text-[#2F2A23]">
+                            {concernData[concernAgeGroup].slogan}
+                          </p>
+                          <p className="mt-2 text-center text-xs text-[#6B6256]">{concernData[concernAgeGroup].intro}</p>
+                        </div>
 
-                      {/* Concern Cards */}
-                      <div className="space-y-3">
-                        {concernData[concernAgeGroup].cards.map((card) => (
-                          <ConcernCard
-                            key={card.title}
-                            card={card}
-                            isSelected={selectedConcerns.some((item) => item.id === card.title)}
-                            selectionOrder={selectedConcerns.find((item) => item.id === card.title)?.order}
-                            onSelect={() => toggleConcernSelection(card.title)}
-                          />
-                        ))}
-                      </div>
+                        {/* Concern Cards */}
+                        <div className="space-y-3">
+                          {concernData[concernAgeGroup].cards.map((card) => (
+                            <ConcernCard
+                              key={card.title}
+                              card={card}
+                              isSelected={selectedConcerns.some((item) => item.id === card.title)}
+                              selectionOrder={selectedConcerns.find((item) => item.id === card.title)?.order}
+                              onSelect={() => toggleConcernSelection(card.title)}
+                            />
+                          ))}
+                        </div>
 
-                      {concernLimitMessage && <p className="text-sm text-destructive">{concernLimitMessage}</p>}
-                      <p className="text-sm text-[#5D5549]">{"\uc120\ud0dd\ub41c \uace0\ubbfc:"} {selectedConcerns.length}/{totalConcernCount}</p>
+                        {concernLimitMessage && <p className="text-sm text-destructive">{concernLimitMessage}</p>}
+                        <p className="text-sm text-[#5D5549]">{"\uc120\ud0dd\ub41c \uace0\ubbfc:"} {selectedConcerns.length}/{totalConcernCount}</p>
+                      </div>
 
                       <Button
                         onClick={goToNextStep}
                         disabled={selectedConcerns.length === 0}
-                        className="w-full h-[50px] text-[18px] font-semibold mt-5"
+                        className="mt-5 h-[50px] w-full bg-[#4A83D8] text-[18px] font-semibold text-white hover:bg-[#3F73C2] disabled:bg-[#4A83D8] disabled:text-white"
                       >
                         {"\ub2e4\uc74c\uc73c\ub85c"}
                       </Button>
@@ -735,18 +1121,22 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
 
                   {showContent && step === 3 && !showNudge && attendance !== "both" && (
                     <div className="space-y-3 animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
-                      <AttendanceOptionButton isSelected={isBothSelected} onClick={() => handleAttendanceSelect("both")}>
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium">{"\uBD80\uBAA8\uC640 \uC790\uB140 \uBAA8\uB450 \uCC38\uC11D"}</span>
-                          <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full">{"\uAC15\uB825 \uCD94\uCC9C"}</span>
-                        </div>
-                      </AttendanceOptionButton>
-                      <AttendanceOptionButton isSelected={attendance === "child"} onClick={() => handleAttendanceSelect("child")}>
-                        <span className="font-medium">{"\uC790\uB140\uB9CC \uCC38\uC11D"}</span>
-                      </AttendanceOptionButton>
-                      <AttendanceOptionButton isSelected={attendance === "parent"} onClick={() => handleAttendanceSelect("parent")}>
-                        <span className="font-medium">{"\uBD80\uBAA8\uB9CC \uCC38\uC11D"}</span>
-                      </AttendanceOptionButton>
+                      <div className={cn(WIDE_INTERACTIVE_PANEL_CLASS, "space-y-3 p-3")}>
+                        <AttendanceOptionButton isSelected={isBothSelected} onClick={() => handleAttendanceSelect("both")}>
+                          <div className="flex items-center justify-between">
+                            <span className="font-semibold">{"\uBD80\uBAA8\uC640 \uC790\uB140 \uBAA8\uB450 \uCC38\uC11D"}</span>
+                            <span className="rounded-full bg-[#E6F4FF] px-3 py-1 text-xs font-semibold text-[#4A83D8]">
+                              {"\uAC15\uB825 \uCD94\uCC9C"}
+                            </span>
+                          </div>
+                        </AttendanceOptionButton>
+                        <AttendanceOptionButton isSelected={attendance === "child"} onClick={() => handleAttendanceSelect("child")}>
+                          <span className="font-semibold">{"\uC790\uB140\uB9CC \uCC38\uC11D"}</span>
+                        </AttendanceOptionButton>
+                        <AttendanceOptionButton isSelected={attendance === "parent"} onClick={() => handleAttendanceSelect("parent")}>
+                          <span className="font-semibold">{"\uBD80\uBAA8\uB9CC \uCC38\uC11D"}</span>
+                        </AttendanceOptionButton>
+                      </div>
                     </div>
                   )}
 
@@ -840,7 +1230,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                       <Button
                         onClick={goToNextStep}
                         disabled={selectedSchedules.length < 2}
-                        className="w-full h-[50px] text-[18px] font-semibold mt-5"
+                        className="mt-5 h-[50px] w-full bg-[#4A83D8] text-[18px] font-semibold text-white hover:bg-[#3F73C2] disabled:bg-[#4A83D8] disabled:text-white"
                       >
                         {"\ub2e4\uc74c\uc73c\ub85c"} {selectedSchedules.length < 2 && `(${2 - selectedSchedules.length}\uac1c \ub354 \uc120\ud0dd)`}
                       </Button>
@@ -981,6 +1371,8 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
             </>
             )}
           </Step3Schedule>
+                </>
+              )}
 
               <div ref={messagesEndRef} />
             </div>
@@ -1009,30 +1401,10 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
         </div>
       )}
 
-      {showResetModal && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/45 p-4">
-          <div className="w-full max-w-sm rounded-2xl border border-[#E4DBCC] bg-white p-6 shadow-xl">
-            <p className="whitespace-pre-line text-base font-medium leading-relaxed text-[#2F2A23]">
-              {"지금까지 입력한 모든 정보가 삭제되고 처음 단계로 돌아갑니다.\n정말 초기화하시겠습니까?"}
-            </p>
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setShowResetModal(false)}
-                className="h-11 cursor-pointer rounded-xl border-[#D4CBB9] bg-white text-[#3D372F] hover:bg-white hover:text-[#3D372F]"
-              >
-                {"취소"}
-              </Button>
-              <Button type="button" onClick={handleResetConfirm} className="h-11 cursor-pointer rounded-xl bg-[#0B6980] text-white hover:bg-[#0B6980] hover:text-white">
-                {"확인"}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-
       <Footer />
     </div>
   )
 }
+
+
+
