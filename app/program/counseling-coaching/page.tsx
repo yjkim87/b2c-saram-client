@@ -1,5 +1,5 @@
-import { ProgramPage } from "@/features/program/pages/program-page"
+import { CounselingCoachingProgramPage } from "@/features/program/pages/counseling-coaching-page"
 
 export default function CounselingCoachingPage() {
-  return <ProgramPage />
+  return <CounselingCoachingProgramPage />
 }
