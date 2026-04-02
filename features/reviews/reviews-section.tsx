@@ -238,7 +238,7 @@ function ReviewsSectionPreview() {
 
         <div className="mt-8 flex justify-center">
           <Link
-            href="/reviews"
+            href="/community/reviews"
             className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-800 transition-colors hover:border-slate-400 hover:bg-slate-50"
           >
             후기 전체 보기

@@ -1,4 +1,4 @@
-﻿import Link from "next/link"
+import Link from "next/link"
 import { ArrowRight, MapPin, Navigation } from "lucide-react"
 
 export function CenterSection() {
@@ -26,14 +26,14 @@ export function CenterSection() {
 
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
-                href="/center"
+                href="/about/location"
                 className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
               >
                 센터 상세 보기
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                href="/story"
+                href="/about/intro"
                 className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
               >
                 스토리 보기
@@ -67,3 +67,4 @@ export function CenterSection() {
     </section>
   )
 }
+

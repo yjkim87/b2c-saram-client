@@ -1,5 +1,5 @@
-﻿import { CenterPage } from "@/features/center/pages/center-page"
+import { redirect } from "next/navigation"
 
 export default function CenterRoutePage() {
-  return <CenterPage />
+  redirect("/about/location")
 }

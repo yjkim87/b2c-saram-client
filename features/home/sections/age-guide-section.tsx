@@ -64,6 +64,15 @@ export function AgeGuideSection({ tab }: AgeGuideSectionProps) {
           </span>
           <h2 className="mobile-auto-phrase text-3xl font-bold text-slate-900 md:text-4xl">아이의 발달 단계에 맞춘 요약 가이드</h2>
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-slate-600 md:text-base">{description}</p>
+          <div className="mt-6">
+            <Link
+              href="/program/age-guide"
+              className="inline-flex items-center gap-1 text-sm font-semibold text-slate-700 transition-colors hover:text-slate-900"
+            >
+              더보기
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
 
         <div key={`age-${tab}`} className="animate-in fade-in duration-200">

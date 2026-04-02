@@ -1,5 +1,5 @@
-﻿import { FaqPage } from "@/features/faq/pages/faq-page"
+import { redirect } from "next/navigation"
 
 export default function FaqRoutePage() {
-  return <FaqPage />
+  redirect("/community/faq")
 }

@@ -1,52 +1,53 @@
-﻿"use client"
+"use client"
 
 import Link from "next/link"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { usePathname } from "next/navigation"
 import { ChevronDown, Menu, X } from "lucide-react"
 import { Button } from "@/shared/ui/button"
 import { cn } from "@/shared/lib/utils"
+import { NAVIGATION } from "@/shared/navigation"
 
-type HeaderGroup = {
-  label: string
-  items: Array<{ label: string; href: string }>
+function isPathActive(pathname: string, href: string) {
+  return pathname === href || pathname.startsWith(`${href}/`)
 }
 
-const NAV_GROUPS: HeaderGroup[] = [
-  {
-    label: "맞춤형 프로그램",
-    items: [
-      { label: "연령별 발달 가이드", href: "/age" },
-      { label: "상담/코칭 프로그램", href: "/program" },
-    ],
-  },
-  {
-    label: "사발면 스토리",
-    items: [
-      { label: "사발면 소개", href: "/story" },
-      { label: "전문가 소개", href: "/experts" },
-    ],
-  },
-  {
-    label: "이용 가이드",
-    items: [
-      { label: "오시는길", href: "/center" },
-      { label: "FAQ", href: "/faq" },
-    ],
-  },
-]
+function getGroupBasePath(href: string) {
+  const [, segment] = href.split("/")
+  return segment ? `/${segment}` : "/"
+}
 
 export function Header() {
+  const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mobileOpenGroup, setMobileOpenGroup] = useState<string | null>(null)
 
-  const toggleMobileGroup = (label: string) => {
-    setMobileOpenGroup((prev) => (prev === label ? null : label))
+  const toggleMobileGroup = (title: string) => {
+    setMobileOpenGroup((prev) => (prev === title ? null : title))
   }
 
-  const closeMobileMenu = () => {
+  const isChildActive = (href: string) => {
+    return isPathActive(pathname, href)
+  }
+
+  const isGroupActive = (children: Array<{ href: string }>) => {
+    if (children.some((item) => isPathActive(pathname, item.href))) {
+      return true
+    }
+
+    const firstChild = children[0]
+    if (!firstChild) {
+      return false
+    }
+
+    const basePath = getGroupBasePath(firstChild.href)
+    return pathname === basePath || pathname.startsWith(`${basePath}/`)
+  }
+
+  useEffect(() => {
     setMobileMenuOpen(false)
     setMobileOpenGroup(null)
-  }
+  }, [pathname])
 
   return (
     <header className="fixed left-0 right-0 top-0 z-[100] border-b border-[#EDE3D8] bg-[#FFF9F4]">
@@ -67,7 +68,7 @@ export function Header() {
                 return next
               })
             }}
-            aria-label="메뉴 열기"
+            aria-label={mobileMenuOpen ? "메뉴 닫기" : "메뉴 열기"}
           >
             {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
@@ -80,33 +81,46 @@ export function Header() {
 
           <div className="ml-auto flex items-center gap-8">
             <nav className="flex items-center gap-6">
-              {NAV_GROUPS.map((group) => (
-                <div key={group.label} className="group relative">
-                  <button
-                    type="button"
-                    className="inline-flex items-center gap-1 text-[1.05rem] font-semibold text-[#0C0C0C] transition-opacity hover:opacity-70"
-                    aria-haspopup="menu"
-                  >
-                    <span>{group.label}</span>
-                    <ChevronDown className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180" />
-                  </button>
+              {NAVIGATION.map((group) => {
+                const groupActive = isGroupActive(group.children)
 
-                  <div className="pointer-events-none absolute left-1/2 top-full z-[120] w-56 -translate-x-1/2 translate-y-2 rounded-xl border border-[#EDE3D8] bg-white p-2 opacity-0 shadow-[0_16px_36px_rgba(12,12,12,0.12)] transition-all duration-200 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:opacity-100">
-                    <ul className="space-y-1">
-                      {group.items.map((item) => (
-                        <li key={item.href}>
-                          <Link
-                            href={item.href}
-                            className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-[#FFF4EA] hover:text-slate-900"
-                          >
-                            {item.label}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
+                return (
+                  <div key={group.title} className="group relative">
+                    <button
+                      type="button"
+                      className={cn(
+                        "inline-flex items-center gap-1 text-[1.05rem] font-semibold transition-colors",
+                        groupActive ? "text-primary" : "text-[#0C0C0C] hover:opacity-70"
+                      )}
+                      aria-haspopup="menu"
+                      aria-expanded={groupActive}
+                    >
+                      <span>{group.title}</span>
+                      <ChevronDown className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180" />
+                    </button>
+
+                    <div className="pointer-events-none absolute left-1/2 top-full z-[120] w-56 -translate-x-1/2 translate-y-2 scale-[0.98] rounded-xl border border-[#EDE3D8] bg-white p-2 opacity-0 shadow-[0_16px_36px_rgba(12,12,12,0.12)] transition-[opacity,transform] duration-200 ease-out group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:scale-100 group-focus-within:opacity-100">
+                      <ul className="space-y-1">
+                        {group.children.map((item) => (
+                          <li key={item.href}>
+                            <Link
+                              href={item.href}
+                              className={cn(
+                                "block rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                                isChildActive(item.href)
+                                  ? "bg-[#FFF4EA] text-slate-900"
+                                  : "text-slate-700 hover:bg-[#FFF4EA] hover:text-slate-900"
+                              )}
+                            >
+                              {item.title}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </nav>
 
             <Link href="/reservation">
@@ -128,31 +142,49 @@ export function Header() {
         )}
       >
         <nav className="flex flex-col gap-2 p-4">
-          {NAV_GROUPS.map((group) => {
-            const isOpen = mobileOpenGroup === group.label
+          {NAVIGATION.map((group) => {
+            const isOpen = mobileOpenGroup === group.title
+            const groupActive = isGroupActive(group.children)
 
             return (
-              <div key={group.label} className="rounded-xl border border-[#EEE2D6] bg-white">
+              <div
+                key={group.title}
+                className={cn(
+                  "rounded-xl border bg-white transition-colors",
+                  groupActive ? "border-[#E9D7C4]" : "border-[#EEE2D6]"
+                )}
+              >
                 <button
                   type="button"
-                  className="flex w-full items-center justify-between px-4 py-3 text-left text-base font-semibold text-[#0C0C0C]"
-                  onClick={() => toggleMobileGroup(group.label)}
+                  className={cn(
+                    "flex w-full items-center justify-between px-4 py-3 text-left text-base font-semibold",
+                    groupActive ? "text-primary" : "text-[#0C0C0C]"
+                  )}
+                  onClick={() => toggleMobileGroup(group.title)}
                   aria-expanded={isOpen}
                 >
-                  <span>{group.label}</span>
+                  <span>{group.title}</span>
                   <ChevronDown className={cn("h-4 w-4 transition-transform", isOpen ? "rotate-180" : "rotate-0")} />
                 </button>
 
                 <div className={cn("overflow-hidden transition-all duration-200", isOpen ? "max-h-64 pb-2" : "max-h-0")}>
                   <ul className="space-y-1 px-3">
-                    {group.items.map((item) => (
+                    {group.children.map((item) => (
                       <li key={item.href}>
                         <Link
                           href={item.href}
-                          className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-[#FFF4EA]"
-                          onClick={closeMobileMenu}
+                          className={cn(
+                            "block rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                            isChildActive(item.href)
+                              ? "bg-[#FFF4EA] text-slate-900"
+                              : "text-slate-700 hover:bg-[#FFF4EA]"
+                          )}
+                          onClick={() => {
+                            setMobileMenuOpen(false)
+                            setMobileOpenGroup(null)
+                          }}
                         >
-                          {item.label}
+                          {item.title}
                         </Link>
                       </li>
                     ))}
@@ -162,7 +194,13 @@ export function Header() {
             )
           })}
 
-          <Link href="/reservation" onClick={closeMobileMenu}>
+          <Link
+            href="/reservation"
+            onClick={() => {
+              setMobileMenuOpen(false)
+              setMobileOpenGroup(null)
+            }}
+          >
             <Button
               variant="outline"
               className="cursor-pointer mt-2 w-full rounded-full border-[#0C0C0C] bg-white text-[#0C0C0C] hover:bg-[#0C0C0C] hover:text-white"

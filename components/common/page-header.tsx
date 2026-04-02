@@ -30,9 +30,7 @@ export function PageHeader({ label, title, description }: PageHeaderProps) {
         <span className="mb-4 inline-flex items-center rounded-full bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary">
           {label}
         </span>
-        <h1 className="mobile-auto-phrase text-3xl font-bold leading-tight text-slate-900 md:text-4xl">
-          {title}
-        </h1>
+        <h1 className="mobile-auto-phrase text-3xl font-bold leading-tight text-slate-900 md:text-4xl">{title}</h1>
         <p className="mt-4 max-w-3xl text-base leading-relaxed text-slate-600 md:text-lg">{description}</p>
       </div>
     </section>
