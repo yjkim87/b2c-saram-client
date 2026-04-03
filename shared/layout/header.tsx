@@ -54,7 +54,7 @@ export function Header() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between md:hidden">
           <Link href="/" className="flex items-center">
-            <span className="text-2xl font-bold tracking-tight text-[#0C0C0C]">사발면</span>
+            <span className="text-2xl font-bold tracking-tight text-[#0C0C0C]">LOGO</span>
           </Link>
 
           <button
@@ -76,7 +76,7 @@ export function Header() {
 
         <div className="hidden h-20 items-center md:flex">
           <Link href="/" className="shrink-0">
-            <span className="text-[2.1rem] font-bold tracking-tight text-[#0C0C0C]">사발면</span>
+            <span className="text-[2.1rem] font-bold tracking-tight text-[#0C0C0C]">LOGO</span>
           </Link>
 
           <div className="ml-auto flex items-center gap-8">
@@ -211,4 +211,3 @@ export function Header() {
     </header>
   )
 }
-
