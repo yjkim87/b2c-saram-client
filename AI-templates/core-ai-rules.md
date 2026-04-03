@@ -83,3 +83,5 @@ Before generating code:
 3. Reuse existing components
 
 Avoid generating random patterns or styles.
+
+1.
