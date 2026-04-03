@@ -56,17 +56,15 @@ export function HeroSection() {
         <div className="mx-auto w-full max-w-[760px] text-center">
           <div ref={headingRef}>
             <h1 className={cn(landingTypeTokens.heroTitle, "text-[#080A11]")}>
-              아이의 성장,
+              부모의 고민에서,
               <br />
-              마음부터 시작합니다
+              아이의 발견으로
             </h1>
           </div>
 
           <div ref={descRef}>
             <p className={cn("mx-auto mt-8 max-w-[640px] text-[#0E1726] md:mt-9", landingTypeTokens.body)}>
-              0세부터 18세까지, 발달심리학을 기반으로 한 맞춤 상담·성장코칭으로
-              <br />
-              아이의 잠재력을 발견하고 안정적인 변화를 함께 만듭니다.
+              0세부터 18세까지, 발달 단계에 맞춘 맞춤형 성장 코칭
             </p>
           </div>
 

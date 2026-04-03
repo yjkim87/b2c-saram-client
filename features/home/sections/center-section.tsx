@@ -46,11 +46,12 @@ function MapButtons({ className }: { className?: string }) {
         target="_blank"
         rel="noreferrer"
         className={cn(
-          "inline-flex min-w-0 w-full items-center justify-center bg-[#53C67C] text-[#ffffff] transition-colors hover:bg-[#46b36e]",
+          "inline-flex min-w-0 w-full items-center justify-center bg-[#03C75A] text-[#ffffff] transition-colors hover:bg-[#03C75A]",
           landingRadiusTokens.mapButton,
           landingSpaceTokens.mapButtonHeight,
           landingSpaceTokens.mapButtonPadding,
-          landingTypeTokens.mapButton
+          landingTypeTokens.mapButton,
+          "text-[16px] md:text-[16px]"
         )}
       >
         네이버 지도
@@ -60,14 +61,15 @@ function MapButtons({ className }: { className?: string }) {
         target="_blank"
         rel="noreferrer"
         className={cn(
-          "inline-flex min-w-0 w-full items-center justify-center bg-[#E8E64A] text-[#181818] transition-colors hover:bg-[#dbd93f]",
+          "inline-flex min-w-0 w-full items-center justify-center bg-[#fee500] text-[#181818] transition-colors hover:bg-[#fee500]",
           landingRadiusTokens.mapButton,
           landingSpaceTokens.mapButtonHeight,
           landingSpaceTokens.mapButtonPadding,
-          landingTypeTokens.mapButton
+          landingTypeTokens.mapButton,
+          "text-[16px] md:text-[16px]"
         )}
       >
-        카카오 맵
+        카카오맵
       </a>
     </div>
   )

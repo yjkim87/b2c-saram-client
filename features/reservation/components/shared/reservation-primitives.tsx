@@ -62,9 +62,9 @@ export function BotMessage({ content, isTyping }: BotMessageProps) {
     <div className="animate-in fade-in-0 slide-in-from-left-4 duration-300">
       <div className="flex items-start gap-2.5">
         <BotAvatar />
-        <div className="w-fit bg-[#F4FAFF] rounded-[20px] rounded-tl-[5px] px-4 py-3 max-w-[85%]">
+        <div className="w-fit max-w-[calc(100%-3.25rem)] rounded-[20px] rounded-tl-[5px] bg-[#F4FAFF] px-4 py-3 sm:max-w-[85%]">
           {typeof content === "string" ? (
-            <p className="text-foreground text-sm md:text-base leading-relaxed whitespace-pre-line">{content}</p>
+            <p className="text-foreground text-sm leading-relaxed whitespace-pre-wrap break-words md:text-base">{content}</p>
           ) : (
             content
           )}
@@ -78,7 +78,7 @@ export function UserMessage({ content }: UserMessageProps) {
   return (
     <div className="flex justify-end animate-in fade-in-0 slide-in-from-right-4 duration-300">
       <div className="bg-[linear-gradient(144.37deg,#5CCDFF_7.06%,#3E72FF_90.82%)] text-white rounded-[20px] rounded-tr-[5px] px-4 py-3 max-w-[85%]">
-        <p className="text-sm md:text-base leading-relaxed">{content}</p>
+        <p className="text-sm leading-relaxed whitespace-pre-wrap break-words md:text-base">{content}</p>
       </div>
     </div>
   )

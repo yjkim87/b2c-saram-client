@@ -24,7 +24,7 @@ export function HomePage() {
       <section className="relative">
         <AgeGuideSection tab={tab} />
         <ServiceProgramSection tab={tab} />
-        <ProcessStepsSection tab={tab} />
+        <ProcessStepsSection tab="coaching" />
       </section>
       {false && <ExpertsSection variant="preview" />}
       <CenterSection />

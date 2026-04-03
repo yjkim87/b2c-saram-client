@@ -1,5 +1,5 @@
 import { AgePage } from "@/features/age/pages/age-page"
 
 export default function ProgramAgeGuidePage() {
-  return <AgePage />
+  return <AgePage mode="program" />
 }

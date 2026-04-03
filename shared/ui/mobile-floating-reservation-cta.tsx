@@ -85,9 +85,66 @@ export function MobileFloatingReservationCTA() {
   const config = useMemo(() => getMobileCTAConfig(pathname), [pathname])
   const [scrollProgress, setScrollProgress] = useState(0)
   const [isBlockedByDirectionSheet, setIsBlockedByDirectionSheet] = useState(false)
+  const [isCTASectionInView, setIsCTASectionInView] = useState(false)
 
   useEffect(() => {
     setScrollProgress(0)
+  }, [pathname])
+
+  useEffect(() => {
+    setIsCTASectionInView(false)
+
+    if (pathname !== "/") {
+      return
+    }
+
+    let intersectionObserver: IntersectionObserver | null = null
+    let mutationObserver: MutationObserver | null = null
+
+    const connectObserver = () => {
+      if (intersectionObserver) {
+        return true
+      }
+
+      const target = document.getElementById("reservation")
+      if (!target) {
+        return false
+      }
+
+      intersectionObserver = new IntersectionObserver(
+        ([entry]) => {
+          setIsCTASectionInView(entry.isIntersecting)
+        },
+        { threshold: 0.12 }
+      )
+
+      intersectionObserver.observe(target)
+      return true
+    }
+
+    if (!connectObserver()) {
+      mutationObserver = new MutationObserver(() => {
+        if (connectObserver() && mutationObserver) {
+          mutationObserver.disconnect()
+          mutationObserver = null
+        }
+      })
+
+      mutationObserver.observe(document.body, {
+        childList: true,
+        subtree: true,
+      })
+    }
+
+    return () => {
+      if (intersectionObserver) {
+        intersectionObserver.disconnect()
+      }
+
+      if (mutationObserver) {
+        mutationObserver.disconnect()
+      }
+    }
   }, [pathname])
 
   useEffect(() => {
@@ -146,14 +203,14 @@ export function MobileFloatingReservationCTA() {
     return null
   }
 
-  const isVisible = scrollProgress >= config.threshold
+  const isVisible = scrollProgress >= config.threshold && !isCTASectionInView
 
   return (
     <div
       className={cn(
         "pointer-events-none fixed inset-x-0 bottom-3 z-[110] flex justify-center px-4 md:hidden",
-        "transition-[opacity,transform] duration-300 ease-out motion-reduce:transition-none",
-        isVisible ? "translate-y-0 opacity-100" : "translate-y-5 opacity-0"
+        "transition-transform duration-300 ease-out motion-reduce:transition-none",
+        isVisible ? "translate-y-0" : "translate-y-[140%]"
       )}
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       aria-hidden={!isVisible}

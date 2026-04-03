@@ -138,11 +138,13 @@ export function CounselingCoachingProgramPage() {
         description="맞춤형 코칭으로 우리 아이의 성장을 지원합니다"
       />
 
-      <div className="relative overflow-hidden bg-gray-50/50 pb-20 text-gray-900 selection:bg-blue-100 selection:text-blue-900">
+      <div className="relative overflow-hidden bg-[#fbfbfb] pb-20 text-gray-900 selection:bg-blue-100 selection:text-blue-900">
+        {/*
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]"
         />
+        */}
 
         <section className="relative mx-auto max-w-5xl px-4 pb-16 pt-12 sm:px-6 lg:px-8">
 

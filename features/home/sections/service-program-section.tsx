@@ -30,11 +30,11 @@ export function ServiceProgramSection({ tab }: ServiceProgramSectionProps) {
   const data = tab === "counseling" ? COUNSELING_PROGRAM_DATA : COACHING_PROGRAM_DATA
   const counselingDetailNoteByType: Record<string, string> = {
     "emotion-care":
-      "* K-WISC, CBCL, BSID 등 국제 표준 도구 활용. 인지·언어·사회정서 전 영역 커버",
+      "* VIA 강점 검사 기반. 강점을 일상·학습에 연결하는 실전 액션플랜 제공",
     "behavior-support":
-      "* CBT, DBT, 놀이치료 등 근거 기반 접근. 아이 속도에 맞춰 안전하게 진행",
+      "* Holland 직업흥미 검사 + 실전 직업 체험 연계. 단계별 포트폴리오 구성",
     "family-bridge":
-      "* ABA, PCIT 등 행동 개입 프로토콜 적용. 보호자 교육을 병행해 가정에서도 일관성 유지",
+      "* 소그룹 세션 병행. 역할극·피드백 루프로 실제 상황 적용력을 키웁니다",
   }
 
   useEffect(() => {

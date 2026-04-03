@@ -85,6 +85,7 @@ const QUICK_INTRO_AGE_OPTIONS: QuickIntroAgeOption[] = [
   { id: "age_13_18", label: "13-18\uC138 (\uCCAD\uC18C\uB144\uAE30)" },
 ]
 const QUICK_INTRO_RESERVATION_LABEL = "\uC804\uBB38\uAC00 \uC0C1\uB2F4 \uBC14\uB85C \uC2DC\uC791\uD558\uAE30"
+const QUICK_INTRO_TYPING_DELAY_MS = 900
 const QUICK_TOPIC_TYPING_DELAY_MS = 900
 const RIGHT_BUBBLE_GRADIENT_CLASS = "bg-[linear-gradient(144.37deg,#5CCDFF_7.06%,#3E72FF_90.82%)]"
 const RIGHT_INTERACTIVE_PANEL_CLASS = "w-full max-w-md rounded-[20px] rounded-tr-[5px] border border-[#DFDFDF] bg-white"
@@ -112,11 +113,24 @@ function EditableUserMessage({ content, onEdit }: EditableUserMessageProps) {
       <button type="button" onClick={onEdit} className="px-1 text-sm text-[#6E6352] hover:text-[#4F4537]">
         {"\uc218\uc815"}
       </button>
-      <div className={cn(RIGHT_BUBBLE_GRADIENT_CLASS, "text-white rounded-[20px] rounded-tr-[5px] px-4 py-3 max-w-[85%]")}>
-        <p className="text-sm md:text-base leading-relaxed">{content}</p>
+      <div
+        className={cn(
+          RIGHT_BUBBLE_GRADIENT_CLASS,
+          "text-white rounded-[20px] rounded-tr-[5px] px-4 py-3 max-w-[calc(100%-2.5rem)] sm:max-w-[85%]",
+        )}
+      >
+        <p className="text-sm md:text-base leading-relaxed whitespace-pre-wrap break-words">{content}</p>
       </div>
     </div>
   )
+}
+
+function isQuickIntroAgeEntryId(id: string) {
+  return id.startsWith("quick-intro:age_")
+}
+
+function isQuickTopicRootEntryId(id: string): id is QuickTopicId {
+  return QUICK_TOPIC_ORDER.includes(id as QuickTopicId)
 }
 
 export function ReservationFlow({ flow }: ReservationFlowProps) {
@@ -162,6 +176,8 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
   const [nameDraft, setNameDraft] = useState(userInfo.name)
   const headerRef = useRef<HTMLElement>(null)
   const mobileQuickTopicsRef = useRef<HTMLDivElement>(null)
+  const quickIntroMessageRef = useRef<HTMLDivElement>(null)
+  const latestQuickTopicEntryRef = useRef<HTMLDivElement>(null)
   const reservationFlowStartRef = useRef<HTMLDivElement>(null)
   const step2StartRef = useRef<HTMLDivElement>(null)
   const step3StartRef = useRef<HTMLDivElement>(null)
@@ -171,17 +187,23 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
   const [quickTopicHistory, setQuickTopicHistory] = useState<QuickTopicChatEntry[]>([])
   const [activeQuickTopicId, setActiveQuickTopicId] = useState<QuickTopicId | null>(null)
   const [selectedQuickAgeId, setSelectedQuickAgeId] = useState<QuickIntroAgeOption["id"] | null>(null)
+  const [isQuickIntroReady, setIsQuickIntroReady] = useState(false)
+  const [quickIntroSeed, setQuickIntroSeed] = useState(0)
   const [isReservationFlowStarted, setIsReservationFlowStarted] = useState(false)
   const [editingField, setEditingField] = useState<"name" | "relationship" | "birthdate" | "gender" | null>(null)
   const [isMobileStepCompact, setIsMobileStepCompact] = useState(false)
   const [isRelationshipPromptReady, setIsRelationshipPromptReady] = useState(false)
   const [isBirthdatePromptReady, setIsBirthdatePromptReady] = useState(false)
   const [isGenderPromptReady, setIsGenderPromptReady] = useState(false)
+  const [isNudgePromptReady, setIsNudgePromptReady] = useState(false)
   const [quickTopicTypingEntryIds, setQuickTopicTypingEntryIds] = useState<string[]>([])
   const relationshipPromptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const birthdatePromptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const genderPromptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const nudgePromptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const quickTopicTypingTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
+  const quickIntroTypingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const reservationStartTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const isOnlyKoreanJamo = (value: string) => /^[\u3131-\u314e\u314f-\u3163]+$/.test(value)
   const isValidName = (value: string) => {
     const trimmed = value.trim()
@@ -336,6 +358,51 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
   }, [canShowGenderQuestion, isGenderPromptReady])
 
   useEffect(() => {
+    if (!showNudge) {
+      setIsNudgePromptReady(false)
+      if (nudgePromptTimerRef.current) {
+        clearTimeout(nudgePromptTimerRef.current)
+        nudgePromptTimerRef.current = null
+      }
+      return
+    }
+
+    setIsNudgePromptReady(false)
+    nudgePromptTimerRef.current = setTimeout(() => {
+      setIsNudgePromptReady(true)
+      nudgePromptTimerRef.current = null
+    }, STEP1_TYPING_DELAY_MS)
+
+    return () => {
+      if (nudgePromptTimerRef.current) {
+        clearTimeout(nudgePromptTimerRef.current)
+        nudgePromptTimerRef.current = null
+      }
+    }
+  }, [showNudge])
+
+  useEffect(() => {
+    setIsQuickIntroReady(false)
+
+    if (quickIntroTypingTimerRef.current) {
+      clearTimeout(quickIntroTypingTimerRef.current)
+      quickIntroTypingTimerRef.current = null
+    }
+
+    quickIntroTypingTimerRef.current = setTimeout(() => {
+      setIsQuickIntroReady(true)
+      quickIntroTypingTimerRef.current = null
+    }, QUICK_INTRO_TYPING_DELAY_MS)
+
+    return () => {
+      if (quickIntroTypingTimerRef.current) {
+        clearTimeout(quickIntroTypingTimerRef.current)
+        quickIntroTypingTimerRef.current = null
+      }
+    }
+  }, [quickIntroSeed])
+
+  useEffect(() => {
     if (!isReservationFlowStarted || step < 2) {
       return
     }
@@ -381,7 +448,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
     }
 
     const frameId = window.requestAnimationFrame(() => {
-      const target = reservationFlowStartRef.current
+      const target = quickTopicHistory.length > 0 ? (latestQuickTopicEntryRef.current ?? reservationFlowStartRef.current) : reservationFlowStartRef.current
       if (!target) {
         return
       }
@@ -390,7 +457,11 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
       const isMobileView = window.innerWidth < 1024
       const mobileQuickTopicsHeight = isMobileView ? (mobileQuickTopicsRef.current?.offsetHeight ?? 0) : 0
       const spacing = isMobileView ? 16 : 24
-      const top = target.getBoundingClientRect().top + window.scrollY - (headerHeight + mobileQuickTopicsHeight + spacing)
+      const contextPeekOffset = quickTopicHistory.length > 0 ? (isMobileView ? 28 : 72) : 0
+      const top =
+        target.getBoundingClientRect().top +
+        window.scrollY -
+        (headerHeight + mobileQuickTopicsHeight + spacing + contextPeekOffset)
 
       window.scrollTo({ top: Math.max(0, top), behavior: "smooth" })
     })
@@ -398,14 +469,59 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
     return () => {
       window.cancelAnimationFrame(frameId)
     }
-  }, [isReservationFlowStarted])
+  }, [isReservationFlowStarted, quickTopicHistory.length])
 
   useEffect(() => {
-    if (quickTopicHistory.length === 0 && !isReservationFlowStarted) {
+    if (isReservationFlowStarted || quickTopicHistory.length === 0) {
       return
     }
 
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    const isDesktopView = window.innerWidth >= 1024
+    const latestEntry = quickTopicHistory[quickTopicHistory.length - 1]
+
+    if (isDesktopView && latestEntry) {
+      const ageSelectionCount = quickTopicHistory.filter((entry) => isQuickIntroAgeEntryId(entry.id)).length
+      const quickTopicSelectionCount = quickTopicHistory.filter((entry) => isQuickTopicRootEntryId(entry.id)).length
+      const isFirstAgeSelection = isQuickIntroAgeEntryId(latestEntry.id) && ageSelectionCount === 1
+      const isFirstQuickTopicSelection =
+        isQuickTopicRootEntryId(latestEntry.id) &&
+        quickTopicSelectionCount === 1 &&
+        ageSelectionCount === 0
+
+      if (isFirstAgeSelection || isFirstQuickTopicSelection) {
+        const frameId = window.requestAnimationFrame(() => {
+          window.scrollTo({ top: 0, behavior: "smooth" })
+        })
+
+        return () => {
+          window.cancelAnimationFrame(frameId)
+        }
+      }
+    }
+
+    const target = latestQuickTopicEntryRef.current
+    if (!target) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+      return
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      const headerHeight = headerRef.current?.offsetHeight ?? (window.innerWidth >= 768 ? 80 : 64)
+      const isMobileView = window.innerWidth < 1024
+      const mobileQuickTopicsHeight = isMobileView ? (mobileQuickTopicsRef.current?.offsetHeight ?? 0) : 0
+      const spacing = isMobileView ? 16 : 24
+      const contextPeekOffset = isMobileView ? 28 : 72
+      const top =
+        target.getBoundingClientRect().top +
+        window.scrollY -
+        (headerHeight + mobileQuickTopicsHeight + spacing + contextPeekOffset)
+
+      window.scrollTo({ top: Math.max(0, top), behavior: "smooth" })
+    })
+
+    return () => {
+      window.cancelAnimationFrame(frameId)
+    }
   }, [quickTopicHistory, isReservationFlowStarted, messagesEndRef])
 
   useEffect(() => {
@@ -414,6 +530,10 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
         clearTimeout(timerId)
       })
       quickTopicTypingTimersRef.current = {}
+      if (reservationStartTimerRef.current) {
+        clearTimeout(reservationStartTimerRef.current)
+        reservationStartTimerRef.current = null
+      }
     }
   }, [])
 
@@ -451,6 +571,25 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
     }, QUICK_TOPIC_TYPING_DELAY_MS)
   }
 
+  const startReservationFlowWithTyping = (entry: QuickTopicChatEntry) => {
+    const alreadyQueued = Boolean(quickTopicTypingTimersRef.current[entry.id]) || quickTopicHistory.some((item) => item.id === entry.id)
+    const delay = alreadyQueued ? 0 : QUICK_TOPIC_TYPING_DELAY_MS
+
+    if (!alreadyQueued) {
+      enqueueQuickTopicReplyWithTyping(entry)
+    }
+
+    if (reservationStartTimerRef.current) {
+      clearTimeout(reservationStartTimerRef.current)
+      reservationStartTimerRef.current = null
+    }
+
+    reservationStartTimerRef.current = setTimeout(() => {
+      setIsReservationFlowStarted(true)
+      reservationStartTimerRef.current = null
+    }, delay)
+  }
+
   const handleQuickIntroAgeSelect = (option: QuickIntroAgeOption) => {
     setSelectedQuickAgeId(option.id)
     const ageEntryId = `quick-intro:${option.id}`
@@ -463,22 +602,11 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
   }
 
   const handleQuickIntroReservationStart = () => {
-    setQuickTopicHistory((previous) => {
-      const entryId = "quick-intro:reservation-start"
-      if (previous.some((entry) => entry.id === entryId)) {
-        return previous
-      }
-
-      return [
-        ...previous,
-        {
-          id: entryId,
-          userMessage: QUICK_INTRO_RESERVATION_LABEL,
-          botMessage: "\uC88B\uC544\uC694. \uC608\uC57D \uD50C\uB85C\uC6B0\uB97C \uBC14\uB85C \uC2DC\uC791\uD560\uAC8C\uC694.",
-        },
-      ]
+    startReservationFlowWithTyping({
+      id: "quick-intro:reservation-start",
+      userMessage: QUICK_INTRO_RESERVATION_LABEL,
+      botMessage: "\uC88B\uC544\uC694. \uC608\uC57D \uD50C\uB85C\uC6B0\uB97C \uBC14\uB85C \uC2DC\uC791\uD560\uAC8C\uC694.",
     })
-    setIsReservationFlowStarted(true)
   }
 
   const handleQuickTopicSelect = (topicId: QuickTopicId) => {
@@ -496,25 +624,16 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
 
   const handleQuickTopicActionClick = (topicId: QuickTopicId, action: QuickTopicAction) => {
     setActiveQuickTopicId(topicId)
+    const normalizedTopicActions = normalizeQuickTopicActions(QUICK_TOPICS[topicId].actions)
+    const reservationAction = normalizedTopicActions[normalizedTopicActions.length - 1]
 
     if (action.type === "reservation") {
-      setQuickTopicHistory((previous) => {
-        const reservationIntroId = `${topicId}:reservation-intro`
-        if (previous.some((entry) => entry.id === reservationIntroId)) {
-          return previous
-        }
-
-        return [
-          ...previous,
-          {
-            id: reservationIntroId,
-            topicId,
-            userMessage: "\uC804\uBB38\uAC00 \uC0C1\uB2F4 \uC608\uC57D\uC744 \uC9C4\uD589\uD558\uACE0 \uC2F6\uC5B4\uC694",
-            botMessage: "\uC88B\uC544\uC694. \uC9C0\uAE08\uBD80\uD130 \uC608\uC57D \uD50C\uB85C\uC6B0\uB97C \uC774\uC5B4\uC11C \uC9C4\uD589\uD560\uAC8C\uC694.",
-          },
-        ]
+      startReservationFlowWithTyping({
+        id: `${topicId}:reservation-intro`,
+        topicId,
+        userMessage: "\uC804\uBB38\uAC00 \uC0C1\uB2F4 \uC608\uC57D\uC744 \uC9C4\uD589\uD558\uACE0 \uC2F6\uC5B4\uC694",
+        botMessage: "\uC88B\uC544\uC694. \uC9C0\uAE08\uBD80\uD130 \uC608\uC57D \uD50C\uB85C\uC6B0\uB97C \uC774\uC5B4\uC11C \uC9C4\uD589\uD560\uAC8C\uC694.",
       })
-      setIsReservationFlowStarted(true)
       return
     }
 
@@ -522,25 +641,12 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
       return
     }
 
-    const normalizedTopicActions = normalizeQuickTopicActions(QUICK_TOPICS[topicId].actions)
-    const reservationAction = normalizedTopicActions[normalizedTopicActions.length - 1]
-    const followUpEntryId = `${topicId}:${action.id}`
-
-    setQuickTopicHistory((previous) => {
-      if (previous.some((entry) => entry.id === followUpEntryId)) {
-        return previous
-      }
-
-      return [
-        ...previous,
-        {
-          id: followUpEntryId,
-          topicId,
-          userMessage: action.label,
-          botMessage: action.botReply ?? "",
-          actions: reservationAction ? [reservationAction] : [],
-        },
-      ]
+    enqueueQuickTopicReplyWithTyping({
+      id: `${topicId}:${action.id}`,
+      topicId,
+      userMessage: action.label,
+      botMessage: action.botReply,
+      actions: reservationAction ? [reservationAction] : [],
     })
   }
 
@@ -554,11 +660,13 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
     setQuickTopicTypingEntryIds([])
     setActiveQuickTopicId(null)
     setSelectedQuickAgeId(null)
+    setQuickIntroSeed((previous) => previous + 1)
     setIsReservationFlowStarted(false)
     setEditingField(null)
     setIsRelationshipPromptReady(false)
     setIsBirthdatePromptReady(false)
     setIsGenderPromptReady(false)
+    setIsNudgePromptReady(false)
 
     if (relationshipPromptTimerRef.current) {
       clearTimeout(relationshipPromptTimerRef.current)
@@ -573,6 +681,32 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
     if (genderPromptTimerRef.current) {
       clearTimeout(genderPromptTimerRef.current)
       genderPromptTimerRef.current = null
+    }
+
+    if (nudgePromptTimerRef.current) {
+      clearTimeout(nudgePromptTimerRef.current)
+      nudgePromptTimerRef.current = null
+    }
+
+    if (reservationStartTimerRef.current) {
+      clearTimeout(reservationStartTimerRef.current)
+      reservationStartTimerRef.current = null
+    }
+
+    if (window.innerWidth < 1024) {
+      window.requestAnimationFrame(() => {
+        const target = quickIntroMessageRef.current
+        if (!target) {
+          return
+        }
+
+        const headerHeight = headerRef.current?.offsetHeight ?? 64
+        const mobileQuickTopicsHeight = mobileQuickTopicsRef.current?.offsetHeight ?? 0
+        const spacing = 16
+        const top = target.getBoundingClientRect().top + window.scrollY - (headerHeight + mobileQuickTopicsHeight + spacing)
+
+        window.scrollTo({ top: Math.max(0, top), behavior: "smooth" })
+      })
     }
   }
 
@@ -589,25 +723,27 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen overflow-x-clip bg-white">
       <header ref={headerRef} className="fixed top-0 left-0 right-0 z-[100] border-b border-[#EDE3D8] bg-[#FFF9F4]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between md:h-20">
+          <div className="flex h-16 items-center justify-between gap-2 md:h-20">
             <Link
               href="/"
-              className="shrink-0"
+              className="min-w-0"
               onClick={(e) => {
                 e.preventDefault()
                 setShowExitModal(true)
               }}
             >
-              <span className="text-2xl font-bold tracking-tight text-[#0C0C0C] md:text-[2.1rem]">{"\uC0AC\uBC1C\uBA74"}</span>
+              <span className="block truncate text-[1.75rem] font-bold tracking-tight text-[#0C0C0C] sm:text-2xl md:text-[2.1rem]">
+                {"\uC0AC\uBC1C\uBA74"}
+              </span>
             </Link>
             <Button
               type="button"
               variant="outline"
               onClick={() => setShowExitModal(true)}
-              className="h-10 cursor-pointer rounded-full border-[#0C0C0C] bg-white px-6 text-base font-semibold text-[#0C0C0C] shadow-none hover:bg-[#0C0C0C] hover:text-white"
+              className="h-9 shrink-0 cursor-pointer rounded-full border-[#0C0C0C] bg-white px-4 text-sm font-semibold text-[#0C0C0C] shadow-none hover:bg-[#0C0C0C] hover:text-white sm:h-10 sm:px-6 sm:text-base"
             >
               {"\uB098\uAC00\uAE30"}
             </Button>
@@ -625,8 +761,8 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
           </section>
 
           <div className="grid gap-10 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-16">
-            <aside className="hidden self-start lg:block lg:sticky lg:top-28">
-              <div className="rounded-2xl border border-[#D6D9F3] bg-white p-5">
+            <aside className="hidden self-start lg:sticky lg:top-28 lg:block">
+              <div className="rounded-2xl border border-[#D6D9F3] bg-white p-5 lg:max-h-[calc(100vh-7.5rem)] lg:overflow-y-auto">
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-lg font-bold text-[#6570A5]">{"\uBE60\uB978 \uC0C1\uB2F4 \uC8FC\uC81C"}</p>
                   <button
@@ -674,11 +810,11 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
               </div>
             </aside>
 
-            <div className="space-y-4">
+            <div className="min-w-0 space-y-4">
               <div
                 ref={mobileQuickTopicsRef}
                 className={cn(
-                  "sticky top-[74px] z-30 rounded-2xl border border-[#D6D9F3] bg-white transition-all duration-300 md:top-[90px] lg:hidden",
+                  "sticky top-[74px] z-30 min-w-0 overflow-hidden rounded-2xl border border-[#D6D9F3] bg-white transition-all duration-300 md:top-[90px] lg:hidden",
                   isMobileStepCompact ? "p-2.5" : "p-3.5",
                 )}
               >
@@ -706,7 +842,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                     <span>{"\uCD08\uAE30\uD654"}</span>
                   </button>
                 </div>
-                <div className="mt-2 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                <div className="mt-2 flex max-w-full gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                   {QUICK_TOPIC_ORDER.map((topicId) => {
                     const topic = QUICK_TOPICS[topicId]
                     const Icon = QUICK_TOPIC_ICON_MAP[topic.icon]
@@ -728,53 +864,64 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                         )}
                       >
                         <Icon className="h-4 w-4 shrink-0" />
-                        <span className="text-lg leading-none">{topic.label}</span>
+                        <span className="text-sm leading-none sm:text-base">{topic.label}</span>
                       </button>
                     )
                   })}
                 </div>
               </div>
 
-              <BotMessage
-                content={
-                  <div className="space-y-3">
-                    <p className="text-sm leading-relaxed whitespace-pre-line text-foreground md:text-base">
-                      {QUICK_TOPIC_GUIDE_MESSAGE}
-                    </p>
-                    <div className="flex flex-wrap gap-2 pt-1">
-                      {QUICK_INTRO_AGE_OPTIONS.map((option) => (
-                        <button
-                          key={option.id}
-                          type="button"
-                          onClick={() => handleQuickIntroAgeSelect(option)}
-                          className={cn(
-                            "inline-flex items-center rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors",
-                            selectedQuickAgeId === option.id
-                              ? "border-primary bg-[#EEF3FF] text-primary"
-                              : "border-[#D8CEBC] bg-white text-[#2F2A23] hover:bg-[#F4F0E7]",
-                          )}
-                        >
-                          {option.label}
-                        </button>
-                      ))}
-                      <button
-                        type="button"
-                        onClick={handleQuickIntroReservationStart}
-                        className="inline-flex items-center rounded-full bg-primary px-3 py-1.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
-                      >
-                        {QUICK_INTRO_RESERVATION_LABEL}
-                      </button>
-                    </div>
-                  </div>
-                }
-              />
+              <div ref={quickIntroMessageRef}>
+                {isQuickIntroReady ? (
+                  <BotMessage
+                    content={
+                      <div className="space-y-3">
+                        <p className="text-sm leading-relaxed whitespace-pre-line text-foreground md:text-base">
+                          {QUICK_TOPIC_GUIDE_MESSAGE}
+                        </p>
+                        <div className="flex flex-wrap gap-2 pt-1">
+                          {QUICK_INTRO_AGE_OPTIONS.map((option) => (
+                            <button
+                              key={option.id}
+                              type="button"
+                              onClick={() => handleQuickIntroAgeSelect(option)}
+                              className={cn(
+                                "inline-flex max-w-full items-center rounded-full border px-3 py-1.5 text-left text-sm font-semibold whitespace-normal transition-colors",
+                                selectedQuickAgeId === option.id
+                                  ? "border-primary bg-[#EEF3FF] text-primary"
+                                  : "border-[#D8CEBC] bg-white text-[#2F2A23] hover:bg-[#F4F0E7]",
+                              )}
+                            >
+                              {option.label}
+                            </button>
+                          ))}
+                          <button
+                            type="button"
+                            onClick={handleQuickIntroReservationStart}
+                            className="inline-flex max-w-full items-center rounded-full bg-primary px-3 py-1.5 text-left text-sm font-semibold whitespace-normal text-primary-foreground transition-colors hover:bg-primary/90"
+                          >
+                            {QUICK_INTRO_RESERVATION_LABEL}
+                          </button>
+                        </div>
+                      </div>
+                    }
+                  />
+                ) : (
+                  <BotMessage content="" isTyping />
+                )}
+              </div>
 
-              {quickTopicHistory.map((entry) => {
+              {quickTopicHistory.map((entry, index) => {
                 const normalizedActions = entry.actions ? normalizeQuickTopicActions(entry.actions) : []
                 const isQuickEntryTyping = quickTopicTypingEntryIds.includes(entry.id)
+                const isLatestQuickTopicEntry = index === quickTopicHistory.length - 1
 
                 return (
-                  <div key={entry.id} className="space-y-3">
+                  <div
+                    key={entry.id}
+                    ref={isLatestQuickTopicEntry ? latestQuickTopicEntryRef : undefined}
+                    className="space-y-3"
+                  >
                     <UserMessage content={entry.userMessage} />
                     {isQuickEntryTyping ? (
                       <BotMessage content="" isTyping />
@@ -811,7 +958,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                                         handleQuickTopicActionClick(entry.topicId, action)
                                       }}
                                       className={cn(
-                                        "inline-flex items-center rounded-full px-3 py-1.5 text-sm font-semibold transition-colors",
+                                        "inline-flex max-w-full items-center rounded-full px-3 py-1.5 text-left text-sm font-semibold whitespace-normal transition-colors",
                                         action.type === "reservation"
                                           ? "bg-primary text-primary-foreground hover:bg-primary/90"
                                           : "border border-[#D8CEBC] bg-white text-[#2F2A23] hover:bg-[#F4F0E7]",
@@ -1143,25 +1290,33 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                   {/* Nudge Message */}
                   {showNudge && (
                     <>
-                      <BotMessage
-                        content={
-                          <div className="space-y-3">
-                            <p className="leading-relaxed">
-                              {"\ubb3c\ub860 \ud640\ub85c \ucc38\uc11d\ub3c4 \uac00\ub2a5\ud569\ub2c8\ub2e4. \ud558\uc9c0\ub9cc \uc5d0\uc138\uc2a4\ud0c0 \ub9de\ucda4\ud615 \ucf54\uce6d\uc740 \ubd80\ubaa8\ub2d8\uacfc \uc790\ub140\uac00 \ud568\uaed8 \uc624\uc2e4 \ub54c \uc11c\ub85c\uc758 \uc131\ud5a5\uc744 \ud655\uc778\ud558\uace0 \uc18c\ud1b5\ud558\ub294 \ud6a8\uacfc\uac00 \ud6e8\uc52c \ucee4\uc9d1\ub2c8\ub2e4."}
-                            </p>
-                            <p className="leading-relaxed">
-                              {"\uc544\uc774\uc758 \ud604\uc7ac \uc0c1\ud0dc\uc640 \ubd80\ubaa8\ub2d8\uc758 \uc591\uc721 \uc131\ud5a5\uc744 \ud568\uaed8 \uc810\uac80\ud558\ub294 \uacfc\uc815\uc740 \ucf54\uce6d \ubc29\ud5a5\uc744 \ub354 \uc815\ud655\ud558\uac8c \uc7a1\ub294 \ub370 \ud070 \ub3c4\uc6c0\uc774 \ub429\ub2c8\ub2e4."}
-                            </p>
-                            <p className="font-medium">{"\uc0c1\ub2f4 \ud6a8\uacfc\ub97c \uc704\ud574 \ub450 \ubd84\uc774 \ud568\uaed8 \ucc38\uc11d\ud558\uc2dc\ub294 \uc77c\uc815\uc73c\ub85c \uc7a1\uc544\ubcfc\uae4c\uc694?"}</p>
+                      {isNudgePromptReady ? (
+                        <>
+                          <BotMessage
+                            content={
+                              <div className="space-y-3">
+                                <p className="leading-relaxed">
+                                  {"\ubb3c\ub860 \ud640\ub85c \ucc38\uc11d\ub3c4 \uac00\ub2a5\ud569\ub2c8\ub2e4. \ud558\uc9c0\ub9cc \uc5d0\uc138\uc2a4\ud0c0 \ub9de\ucda4\ud615 \ucf54\uce6d\uc740 \ubd80\ubaa8\ub2d8\uacfc \uc790\ub140\uac00 \ud568\uaed8 \uc624\uc2e4 \ub54c \uc11c\ub85c\uc758 \uc131\ud5a5\uc744 \ud655\uc778\ud558\uace0 \uc18c\ud1b5\ud558\ub294 \ud6a8\uacfc\uac00 \ud6e8\uc52c \ucee4\uc9d1\ub2c8\ub2e4."}
+                                </p>
+                                <p className="leading-relaxed">
+                                  {"\uc544\uc774\uc758 \ud604\uc7ac \uc0c1\ud0dc\uc640 \ubd80\ubaa8\ub2d8\uc758 \uc591\uc721 \uc131\ud5a5\uc744 \ud568\uaed8 \uc810\uac80\ud558\ub294 \uacfc\uc815\uc740 \ucf54\uce6d \ubc29\ud5a5\uc744 \ub354 \uc815\ud655\ud558\uac8c \uc7a1\ub294 \ub370 \ud070 \ub3c4\uc6c0\uc774 \ub429\ub2c8\ub2e4."}
+                                </p>
+                                <p className="font-medium">{"\uc0c1\ub2f4 \ud6a8\uacfc\ub97c \uc704\ud574 \ub450 \ubd84\uc774 \ud568\uaed8 \ucc38\uc11d\ud558\uc2dc\ub294 \uc77c\uc815\uc73c\ub85c \uc7a1\uc544\ubcfc\uae4c\uc694?"}</p>
+                              </div>
+                            }
+                          />
+                          <div className="flex gap-3 animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
+                            <Button onClick={() => handleNudgeResponse(true)} className="flex-1">
+                              {"\ub124, \ud568\uaed8 \ucc38\uc11d\ud560\uac8c\uc694"}
+                            </Button>
+                            <Button variant="outline" onClick={() => handleNudgeResponse(false)} className="flex-1">
+                              {"\uc774\ubc88\uc5d0\ub294 \ud640\ub85c \ucc38\uc11d\ud560\uac8c\uc694"}
+                            </Button>
                           </div>
-                        }
-                      />
-                      <div className="flex gap-3 animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
-                        <Button onClick={() => handleNudgeResponse(true)} className="flex-1">
-                          {"\ub124, \ud568\uaed8 \ucc38\uc11d\ud560\uac8c\uc694"}                        </Button>
-                        <Button variant="outline" onClick={() => handleNudgeResponse(false)} className="flex-1">
-                          {"\uc774\ubc88\uc5d0\ub294 \ud640\ub85c \ucc38\uc11d\ud560\uac8c\uc694"}                        </Button>
-                      </div>
+                        </>
+                      ) : (
+                        <BotMessage content="" isTyping />
+                      )}
                     </>
                   )}
                 </>

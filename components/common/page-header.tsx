@@ -9,7 +9,7 @@ type PageHeaderProps = {
 
 export function PageHeader({ label, title, description }: PageHeaderProps) {
   return (
-    <section className="border-b border-[#EDE3D8] bg-[#FFF9F4]">
+    <section className="border-b border-[#e6ebf7] bg-[#f0f8ff]">
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 md:py-14 lg:px-8">
         <nav aria-label="Breadcrumb" className="mb-6">
           <ol className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
@@ -27,7 +27,7 @@ export function PageHeader({ label, title, description }: PageHeaderProps) {
           </ol>
         </nav>
 
-        <span className="mb-4 inline-flex items-center rounded-full bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary">
+        <span className="mb-4 inline-flex items-center rounded-full bg-[#cce5ff] px-4 py-1.5 text-sm font-semibold text-[#1153f3]">
           {label}
         </span>
         <h1 className="mobile-auto-phrase text-3xl font-bold leading-tight text-slate-900 md:text-4xl">{title}</h1>

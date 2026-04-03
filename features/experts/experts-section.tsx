@@ -214,7 +214,7 @@ function ExpertsSectionFull() {
   }, [query])
 
   return (
-    <section className="min-h-screen bg-[#EEF2F6] py-12 md:py-16">
+    <section className="min-h-screen bg-[#fafafa] py-12 md:py-16">
       <div className="mx-auto w-full max-w-[1200px] px-4">
         <div className="max-w-md">
           <label htmlFor="expert-search" className="text-sm font-medium text-slate-700">

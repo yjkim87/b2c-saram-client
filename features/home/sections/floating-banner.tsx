@@ -6,7 +6,7 @@ import { Plus, X } from "lucide-react"
 import { cn } from "@/shared/lib/utils"
 
 type SnsItem = {
-  id: "kakao" | "instagram" | "youtube"
+  id: "kakao" | "naver-blog" | "instagram" | "youtube"
   label: string
   ariaLabel: string
   href: string
@@ -28,6 +28,17 @@ const SNS_ITEMS: SnsItem[] = [
     buttonClassName: "bg-[#FEE500] text-[#2B1A0E] hover:bg-[#f6de00]",
     iconWrapClassName: "bg-[#2B1A0E]/10",
     iconClassName: "text-[#2B1A0E]",
+  },
+  {
+    id: "naver-blog",
+    label: "네이버블로그",
+    ariaLabel: "네이버블로그 바로가기",
+    href: "https://blog.naver.com/",
+    viewBox: "0 0 24 24",
+    path: "M5.25 2A3.25 3.25 0 0 0 2 5.25v13.5A3.25 3.25 0 0 0 5.25 22h13.5A3.25 3.25 0 0 0 22 18.75V5.25A3.25 3.25 0 0 0 18.75 2H5.25zm4.1 4.5h3.52c1.9 0 3.08.98 3.08 2.58 0 .92-.4 1.58-1.12 1.95.97.3 1.58 1.1 1.58 2.24 0 1.8-1.26 2.98-3.26 2.98H9.35V6.5zm2.35 3.78h.94c.7 0 1.1-.35 1.1-.93 0-.57-.4-.9-1.08-.9h-.96v1.83zm0 4.01h1.12c.76 0 1.2-.38 1.2-1.04 0-.64-.44-1-1.2-1H11.7v2.04z",
+    buttonClassName: "bg-[#03C75A] text-white hover:bg-[#02b651]",
+    iconWrapClassName: "bg-white/20",
+    iconClassName: "text-white",
   },
   {
     id: "instagram",
@@ -111,9 +122,22 @@ export function FloatingBanner() {
           type="button"
           onClick={() => setOpen((prev) => !prev)}
           aria-label={open ? "플로팅 메뉴 닫기" : "플로팅 메뉴 열기"}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-white shadow-[0_10px_24px_rgba(12,12,12,0.28)] transition-colors hover:bg-slate-800"
+          className="group inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-white shadow-[0_10px_24px_rgba(12,12,12,0.28)] transition-colors hover:bg-slate-800"
         >
-          {open ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+          <span className="relative h-4 w-4">
+            <Plus
+              className={cn(
+                "absolute inset-0 h-4 w-4 transform-gpu transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                open ? "rotate-90 scale-75 opacity-0" : "rotate-0 scale-100 opacity-100"
+              )}
+            />
+            <X
+              className={cn(
+                "absolute inset-0 h-4 w-4 transform-gpu transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                open ? "rotate-0 scale-100 opacity-100" : "-rotate-90 scale-75 opacity-0"
+              )}
+            />
+          </span>
         </button>
       </div>
     </>

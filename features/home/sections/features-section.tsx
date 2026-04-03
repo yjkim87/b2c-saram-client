@@ -15,7 +15,7 @@ const FEATURE_CARDS = [
   {
     key: "counseling",
     eyebrow: "마음의 어려움을 믿고 치유하는 과정",
-    title: "심리상담",
+    title: "심리상담·성장코칭",
     description:
       "심리적 문제나 감정적 어려움을 전문가와 함께 탐색하고 해결하는 치료적 접근법입니다. 아이의 현재 심리 상태를 이해하고 정서적 안정을 회복하는 데 초점을 맞춥니다.",
     chips: ["문제 진단 및 평가", "감정 표현과 이해", "행동 변화 지원", "정서적 안정화"],
@@ -61,6 +61,8 @@ function useFadeIn(delay = 0) {
 export function FeaturesSection() {
   const headerRef = useFadeIn(0)
   const cardsRef = useFadeIn(100)
+  const visibleCards = FEATURE_CARDS.filter((card) => card.key !== "coaching")
+  const isSingleCard = visibleCards.length === 1
 
   return (
     <section id="features" className={cn("bg-[#FFFFFF]", landingSectionTokens.base)}>
@@ -81,11 +83,19 @@ export function FeaturesSection() {
           </p>
         </div>
 
-        <div ref={cardsRef} className={cn("grid md:grid-cols-2", landingSpaceTokens.gridGap)}>
-          {FEATURE_CARDS.map((card) => (
+        <div
+          ref={cardsRef}
+          className={cn(
+            "grid",
+            isSingleCard ? "mx-auto w-full max-w-3xl" : "md:grid-cols-2",
+            landingSpaceTokens.gridGap
+          )}
+        >
+          {visibleCards.map((card) => (
             <article
               key={card.key}
               className={cn(
+                "w-full",
                 landingRadiusTokens.card,
                 landingSpaceTokens.cardPaddingResponsive,
                 card.cardClassName

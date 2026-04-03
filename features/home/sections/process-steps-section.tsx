@@ -27,22 +27,22 @@ const COUNSELING_STEPS: ProcessStep[] = [
   {
     num: "1",
     title: "마음 진단",
-    desc: "다각적 심리검사를 통한 내면 기질 및 현재 상태 파악",
+    desc: "감각 및 심리검사를 통한 내면 기초와 현재 상태를 파악합니다.",
   },
   {
     num: "2",
     title: "상담 목표 설정",
-    desc: "호소 문제의 근본 원인 탐색 및 맞춤형 치료 방향 수립",
+    desc: "정서 문제의 근본 원인을 탐색하고 맞춤형 상담 방향을 수립합니다.",
   },
   {
     num: "3",
-    title: "심층 상담 진행",
-    desc: "증상 완화 및 심리적 회복을 위한 전문적 개입 실행",
+    title: "주차별 상담 진행",
+    desc: "지속 대화와 심리 회복을 위한 전문적 개입을 실행합니다.",
   },
   {
     num: "4",
     title: "종결 및 사후 관리",
-    desc: "변화된 마음의 안정성 확인 및 일상 적응력 유지 지원",
+    desc: "변화된 마음의 안정을 확인하고 일상 적응을 지속 지원합니다.",
   },
 ]
 
@@ -50,7 +50,7 @@ const COACHING_STEPS: ProcessStep[] = [
   {
     num: "1",
     title: "강점 진단",
-    desc: "강점·흥미·학습 성향을 진단해 성장의 출발점을 찾습니다.",
+    desc: "강점, 성향, 학습 특성을 진단해 성장의 출발점을 찾습니다.",
   },
   {
     num: "2",
@@ -60,7 +60,7 @@ const COACHING_STEPS: ProcessStep[] = [
   {
     num: "3",
     title: "맞춤 코칭 진행",
-    desc: "주기적인 1:1 코칭으로 실행 습관과 자기주도성을 강화합니다.",
+    desc: "주기적인 1:1 코칭으로 실행 동기와 자기주도성을 강화합니다.",
   },
   {
     num: "4",
@@ -170,12 +170,12 @@ export function ProcessStepsSection({ tab }: ProcessStepsSectionProps) {
   const [isInView, setIsInView] = useState(false)
 
   const steps = tab === "counseling" ? COUNSELING_STEPS : COACHING_STEPS
-  const badgeLabel = tab === "counseling" ? "심리상담 프로세스" : "성장코칭 프로세스"
+  const badgeLabel = "심리상담/성장코칭 프로세스"
   const headline = tab === "counseling" ? "체계적인 4단계 상담" : "체계적인 4단계 코칭"
   const description =
     tab === "counseling"
-      ? "심리 진단에서 사후 관리까지, 전 과정을 책임지는 전문 상담 시스템"
-      : "진단부터 성장 모니터링까지, 전 과정을 책임지는 전문 코칭 시스템"
+      ? "심리 진단에서 사후 관리까지, 전 과정을 책임지는 전문 상담 프로세스"
+      : "진단부터 성장 모니터링까지, 전 과정을 책임지는 전문 코칭 프로세스"
 
   useEffect(() => {
     const section = sectionRef.current
@@ -237,7 +237,7 @@ export function ProcessStepsSection({ tab }: ProcessStepsSectionProps) {
             href="/about"
             className="inline-flex h-10 items-center gap-2 rounded-full border border-[#0C0C0C] bg-white px-7 text-base font-semibold text-[#0C0C0C] transition-colors hover:bg-[#0C0C0C] hover:text-white"
           >
-            사발면 소개 보러가기
+            센터 소개 보러가기
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
