@@ -50,7 +50,7 @@ export function Header() {
   }, [pathname])
 
   return (
-    <header className="fixed left-0 right-0 top-0 z-[100] border-b border-[#EDE3D8] bg-[#FFF9F4]">
+    <header className="fixed left-0 right-0 top-0 z-[100] border-b border-[#e6ebf7] bg-[#ffffff]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between md:hidden">
           <Link href="/" className="flex items-center">
@@ -90,7 +90,7 @@ export function Header() {
                       type="button"
                       className={cn(
                         "inline-flex items-center gap-1 text-[1.05rem] font-semibold transition-colors",
-                        groupActive ? "text-primary" : "text-[#0C0C0C] hover:opacity-70"
+                        groupActive ? "text-[#2b66f6]" : "text-[#0C0C0C] hover:opacity-70"
                       )}
                       aria-haspopup="menu"
                       aria-expanded={groupActive}
@@ -99,7 +99,7 @@ export function Header() {
                       <ChevronDown className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180" />
                     </button>
 
-                    <div className="pointer-events-none absolute left-1/2 top-full z-[120] w-56 -translate-x-1/2 translate-y-2 scale-[0.98] rounded-xl border border-[#EDE3D8] bg-white p-2 opacity-0 shadow-[0_16px_36px_rgba(12,12,12,0.12)] transition-[opacity,transform] duration-200 ease-out group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:scale-100 group-focus-within:opacity-100">
+                    <div className="pointer-events-none absolute left-1/2 top-full z-[120] w-56 -translate-x-1/2 translate-y-2 scale-[0.98] rounded-xl border border-[#e6ebf7] bg-white p-2 opacity-0 shadow-[0_16px_36px_rgba(12,12,12,0.12)] transition-[opacity,transform] duration-200 ease-out group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:scale-100 group-focus-within:opacity-100">
                       <ul className="space-y-1">
                         {group.children.map((item) => (
                           <li key={item.href}>
@@ -108,8 +108,8 @@ export function Header() {
                               className={cn(
                                 "block rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                                 isChildActive(item.href)
-                                  ? "bg-[#FFF4EA] text-slate-900"
-                                  : "text-slate-700 hover:bg-[#FFF4EA] hover:text-slate-900"
+                                  ? "bg-[#eff6ff] text-slate-900"
+                                  : "text-slate-700 hover:bg-[#eff6ff] hover:text-slate-900"
                               )}
                             >
                               {item.title}
@@ -136,7 +136,7 @@ export function Header() {
 
       <div
         className={cn(
-          "absolute left-0 right-0 top-full overflow-hidden border-b border-[#EDE3D8] bg-[#FFF9F4] transition-all duration-300 md:hidden",
+          "absolute left-0 right-0 top-full overflow-hidden border-b border-[#e6ebf7] bg-[#ffffff] transition-all duration-300 md:hidden",
           mobileMenuOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0"
         )}
       >
@@ -150,14 +150,14 @@ export function Header() {
                 key={group.title}
                 className={cn(
                   "rounded-xl border bg-white transition-colors",
-                  groupActive ? "border-[#E9D7C4]" : "border-[#EEE2D6]"
+                  groupActive ? "border-[#e6ebf7]" : "border-[#e6ebf7]"
                 )}
               >
                 <button
                   type="button"
                   className={cn(
                     "flex w-full items-center justify-between px-4 py-3 text-left text-base font-semibold",
-                    groupActive ? "text-primary" : "text-[#0C0C0C]"
+                    groupActive ? "text-[#2b66f6]" : "text-[#0C0C0C]"
                   )}
                   onClick={() => toggleMobileGroup(group.title)}
                   aria-expanded={isOpen}
@@ -175,8 +175,8 @@ export function Header() {
                           className={cn(
                             "block rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                             isChildActive(item.href)
-                              ? "bg-[#FFF4EA] text-slate-900"
-                              : "text-slate-700 hover:bg-[#FFF4EA]"
+                              ? "bg-[#eff6ff] text-slate-900"
+                              : "text-slate-700 hover:bg-[#eff6ff]"
                           )}
                           onClick={() => {
                             setMobileMenuOpen(false)

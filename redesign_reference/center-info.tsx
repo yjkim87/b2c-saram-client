@@ -38,7 +38,6 @@ const slides = [
 const hours = [
   { days: "월 – 금", time: "09:00 – 20:00", badge: "평일", primary: true },
   { days: "토요일",  time: "09:00 – 17:00", badge: "주말", primary: false },
-  { days: "일 · 공휴일", time: "휴무",       badge: null,    primary: null },
 ];
 
 // ─── Image slideshow ──────────────────────────────────────────────────────────
@@ -206,13 +205,14 @@ function DesktopInfoPanel() {
           <p className="text-xs leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
             평일 09:00–20:00<br />주말 09:00–17:00
           </p>
-          <button
-            className="mt-auto w-full py-2 rounded-xl text-xs font-semibold transition-all duration-200 hover:opacity-90 hover:-translate-y-0.5 hover:shadow-md flex items-center justify-center gap-1"
+          <a
+            href="#contact"
+            className="mt-auto w-full py-2.5 px-4 rounded-xl text-xs font-semibold transition-all duration-200 hover:opacity-90 hover:-translate-y-0.5 hover:shadow-md flex items-center justify-center gap-1.5"
             style={{ background: "var(--primary)", color: "var(--primary-foreground)" }}
           >
             <Calendar className="w-3 h-3" />
-            상담 예약하기
-          </button>
+            무료 상담하기
+          </a>
         </div>
       </div>
     </div>
@@ -286,13 +286,14 @@ function MobileInfoCard() {
 
       {/* CTA button */}
       <div className="px-4 pb-4">
-        <button
-          className="w-full py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-1.5 transition-all duration-200 hover:opacity-90 hover:shadow-md"
+        <a
+          href="#contact"
+          className="w-full py-3 px-5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-200 hover:opacity-90 hover:shadow-md"
           style={{ background: "var(--primary)", color: "var(--primary-foreground)" }}
         >
           <Calendar className="w-4 h-4" />
-          상담 예약하기
-        </button>
+          무료 상담하기
+        </a>
       </div>
     </div>
   );

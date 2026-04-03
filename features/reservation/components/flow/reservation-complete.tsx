@@ -60,14 +60,14 @@ export function ReservationComplete({ flow }: ReservationCompleteProps) {
   ]
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#F8FAFC] bg-[radial-gradient(#E5E7EB_1px,transparent_1px)] [background-size:16px_16px] text-gray-900">
+    <div className="relative min-h-screen overflow-hidden bg-[#F8FAFC] text-gray-900">
       <div className="pointer-events-none absolute top-0 left-1/2 h-96 w-96 -translate-x-[150%] rounded-full bg-blue-400/15 blur-[100px]" />
       <div className="pointer-events-none absolute top-40 left-1/2 h-80 w-80 translate-x-[50%] rounded-full bg-emerald-400/10 blur-[100px]" />
 
-      <header className="fixed top-0 left-0 right-0 z-[100] border-b border-gray-100 bg-white/80 backdrop-blur-md">
-        <div className="mx-auto flex h-14 max-w-3xl items-center px-4">
+      <header className="fixed top-0 left-0 right-0 z-[100] border-b border-[#e6ebf7] bg-[#ffffff]">
+        <div className="mx-auto flex h-16 max-w-7xl items-center px-4 sm:px-6 lg:h-20 lg:px-8">
           <Link href="/" className="shrink-0">
-            <span className="text-[18px] font-bold tracking-tight text-gray-900">사발면</span>
+            <span className="text-2xl font-bold tracking-tight text-[#0C0C0C] lg:text-[2.1rem]">사발면</span>
           </Link>
         </div>
       </header>

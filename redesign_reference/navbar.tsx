@@ -1,4 +1,3 @@
-// v12 — all strings inlined as unicode, aria-label ASCII, hover bridge via padding-top
 "use client";
 
 import { useState, useEffect } from "react";
@@ -23,13 +22,19 @@ const NAV_MENUS: NavMenu[] = [
   },
   {
     label: "사발면 스토리",
-    href: "/story",
-  },
-  {
-    label: "이용 가이드",
     href: "#",
     subItems: [
-      { label: "상담/코칭 프로세스", href: "/process" },
+      { label: "사발면 소개", href: "/story" },
+      { label: "전문가 소개", href: "/experts" },
+      { label: "오시는 길", href: "/location" },
+    ],
+  },
+  {
+    label: "커뮤니티",
+    href: "#",
+    subItems: [
+      { label: "고객 후기", href: "/reviews" },
+      { label: "전문가 칼럼, 인터뷰", href: "/columns" },
       { label: "FAQ", href: "/faq" },
     ],
   },

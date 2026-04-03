@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { ArrowLeft, ChevronDown, HelpCircle, BookOpen, Lightbulb, Star } from "lucide-react";
+import { ChevronDown, HelpCircle } from "lucide-react";
 import Navbar from "@/components/navbar";
+import SubpageHeader from "@/components/subpage-header";
+import { Footer } from "@/components/cta-footer";
 
 const FAQ_ITEMS = [
   {
@@ -28,41 +29,6 @@ const FAQ_ITEMS = [
   },
 ];
 
-function FloatingMenu() {
-  return (
-    <div className="fixed bottom-8 right-6 z-50 flex flex-col items-end gap-3">
-      <a
-        href="/#contact"
-        className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-95"
-        style={{ background: "oklch(0.48 0.09 165)", color: "white" }}
-        title="예약하기"
-      >
-        <BookOpen className="w-5 h-5" />
-      </a>
-      <a
-        href="https://pf.kakao.com/"
-        target="_blank"
-        rel="noreferrer"
-        className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-95"
-        style={{ background: "oklch(0.62 0.09 45)", color: "white" }}
-        title="카카오톡 문의"
-      >
-        <Lightbulb className="w-5 h-5" />
-      </a>
-      <a
-        href="https://instagram.com/"
-        target="_blank"
-        rel="noreferrer"
-        className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-95"
-        style={{ background: "oklch(0.55 0.07 200)", color: "white" }}
-        title="인스타그램"
-      >
-        <Star className="w-5 h-5" />
-      </a>
-    </div>
-  );
-}
-
 export default function FaqPage() {
   const [openId, setOpenId] = useState<number | null>(null);
 
@@ -71,39 +37,11 @@ export default function FaqPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: "oklch(0.99 0.003 80)" }}>
+    <main className="min-h-screen" style={{ background: "var(--background)" }}>
       <Navbar />
+      <SubpageHeader title="FAQ" subtitle="자주 묻는 질문들을 모았습니다" />
 
-      {/* Dark header */}
-      <section
-        className="pt-28 pb-16 px-4 sm:px-6 lg:px-8"
-        style={{ background: "oklch(0.22 0.03 200)" }}
-      >
-        <div className="max-w-3xl mx-auto text-center flex flex-col items-center">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 text-xs mb-6 transition-opacity hover:opacity-70"
-            style={{ color: "oklch(0.7 0.05 165)" }}
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            메인으로 돌아가기
-          </Link>
-          <h1
-            className="font-serif text-4xl sm:text-5xl font-bold mb-4 text-balance"
-            style={{ color: "white", wordBreak: "keep-all" }}
-          >
-            FAQ
-          </h1>
-          <p
-            className="text-base leading-relaxed"
-            style={{ color: "rgba(255,255,255,0.75)", lineHeight: "1.7", wordBreak: "keep-all" }}
-          >
-            자주 묻는 질문들을 모았습니다. 추가로 궁금한 점은 카카오톡 오픈채널로 문의해 주세요.
-          </p>
-        </div>
-      </section>
-
-      <main className="pb-32">
+      <section className="pb-20">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-14">
 
           {/* FAQ Accordion */}
@@ -113,7 +51,7 @@ export default function FaqPage() {
               return (
                 <div
                   key={i}
-                  style={{ borderBottom: "1px solid oklch(0.91 0.01 240)" }}
+                  style={{ borderBottom: "1px solid var(--border)" }}
                 >
                   <button
                     onClick={() => toggle(i)}
@@ -124,13 +62,13 @@ export default function FaqPage() {
                       <HelpCircle
                         className="w-5 h-5 flex-shrink-0 mt-0.5"
                         style={{
-                          color: isOpen ? "oklch(0.48 0.09 165)" : "oklch(0.65 0.01 240)",
+                          color: isOpen ? "var(--primary)" : "var(--muted-foreground)",
                         }}
                       />
                       <span
                         className="font-semibold text-base"
                         style={{
-                          color: isOpen ? "oklch(0.18 0.01 240)" : "oklch(0.28 0.01 240)",
+                          color: isOpen ? "var(--foreground)" : "var(--foreground)",
                         }}
                       >
                         {item.q}
@@ -139,7 +77,7 @@ export default function FaqPage() {
                     <ChevronDown
                       className="w-5 h-5 flex-shrink-0 mt-0.5 transition-transform duration-200"
                       style={{
-                        color: "oklch(0.55 0.01 240)",
+                        color: "var(--muted-foreground)",
                         transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
                       }}
                     />
@@ -148,7 +86,7 @@ export default function FaqPage() {
                     <div className="pl-8 pb-5">
                       <p
                         className="text-base leading-relaxed"
-                        style={{ color: "oklch(0.38 0.01 240)", lineHeight: "1.75" }}
+                        style={{ color: "var(--foreground)", lineHeight: "1.75" }}
                       >
                         {item.a}
                       </p>
@@ -163,17 +101,17 @@ export default function FaqPage() {
           <div
             className="mt-16 rounded-2xl p-8 text-center"
             style={{
-              background: "oklch(0.48 0.09 165 / 0.06)",
-              border: "1px solid oklch(0.48 0.09 165 / 0.15)",
+              background: "var(--primary) / 0.06",
+              border: "1px solid var(--primary) / 0.15",
             }}
           >
             <p
               className="font-semibold text-base mb-2"
-              style={{ color: "oklch(0.18 0.01 240)" }}
+              style={{ color: "var(--foreground)" }}
             >
               원하는 답을 찾지 못하셨나요?
             </p>
-            <p className="text-sm mb-5" style={{ color: "oklch(0.45 0.01 240)" }}>
+            <p className="text-sm mb-5" style={{ color: "var(--muted-foreground)" }}>
               카카오톡 채널로 직접 도움을 드립니다.
             </p>
             <a
@@ -187,8 +125,10 @@ export default function FaqPage() {
             </a>
           </div>
         </div>
-      </main>
-      <FloatingMenu />
-    </div>
+      </section>
+      <Footer />
+    </main>
   );
 }
+
+

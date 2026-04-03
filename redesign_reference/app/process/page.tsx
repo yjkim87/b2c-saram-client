@@ -1,11 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import {
-  ArrowLeft, ClipboardList, Brain, TrendingUp,
-  CheckCircle2, ChevronRight, BookOpen, Lightbulb, Star,
+  ClipboardList, Brain, TrendingUp,
+  CheckCircle2, ChevronRight,
 } from "lucide-react";
 import Navbar from "@/components/navbar";
+import SubpageHeader from "@/components/subpage-header";
+import { Footer } from "@/components/cta-footer";
 
 // ─── FLOATING MENU ────────────────────────────────────────────────────────────
 function FloatingMenu() {
@@ -15,7 +16,7 @@ function FloatingMenu() {
         href="/#contact"
         className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-95"
         style={{ background: "oklch(0.48 0.09 165)", color: "white" }}
-        title="예약하기"
+        title="맞춤형 여정 상담"
       >
         <BookOpen className="w-5 h-5" />
       </a>
@@ -113,49 +114,21 @@ const coachingSteps = [
 // ─── PAGE ─────────────────────────────────────────────────────────────────────
 export default function ProcessPage() {
   return (
-    <div className="min-h-screen" style={{ background: "oklch(0.99 0.003 80)" }}>
+    <main className="min-h-screen" style={{ background: "var(--background)" }}>
       <Navbar />
+      <SubpageHeader title="상담 / 코칭 프로세스" subtitle="첫 방문부터 종결까지 우리의 모든 과정" />
 
-      {/* Dark header */}
-      <section
-        className="pt-28 pb-16 px-4 sm:px-6 lg:px-8"
-        style={{ background: "oklch(0.22 0.03 200)" }}
-      >
-        <div className="max-w-3xl mx-auto text-center flex flex-col items-center">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 text-xs mb-6 transition-opacity hover:opacity-70"
-            style={{ color: "oklch(0.7 0.05 165)" }}
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            메인으로 돌아가기
-          </Link>
-          <h1
-            className="font-serif text-4xl sm:text-5xl font-bold mb-4 text-balance"
-            style={{ color: "white", wordBreak: "keep-all" }}
-          >
-            상담 / 코칭 프로세스
-          </h1>
-          <p
-            className="text-base leading-relaxed"
-            style={{ color: "rgba(255,255,255,0.75)", lineHeight: "1.7", wordBreak: "keep-all" }}
-          >
-            첫 방문부터 종결까지, 사발면 센터의 모든 과정은 아이의 울림을 중심으로 설계되어 있습니다.
-          </p>
-        </div>
-      </section>
-
-      <main className="pb-32">
+      <section className="pb-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-14">
 
           {/* Counseling Process */}
           <section className="mb-20">
             <div
               className="flex items-center gap-3 mb-10"
-              style={{ borderBottom: "2px solid oklch(0.48 0.09 165)", paddingBottom: "12px" }}
+              style={{ borderBottom: "2px solid var(--primary)", paddingBottom: "12px" }}
             >
-              <Brain className="w-5 h-5" style={{ color: "oklch(0.48 0.09 165)" }} />
-              <h2 className="font-bold text-2xl" style={{ color: "oklch(0.16 0.01 240)" }}>
+              <Brain className="w-5 h-5" style={{ color: "var(--primary)" }} />
+              <h2 className="font-bold text-2xl" style={{ color: "var(--foreground)" }}>
                 심리상담 프로세스
               </h2>
             </div>
@@ -165,20 +138,20 @@ export default function ProcessPage() {
                   {i < counselingSteps.length - 1 && (
                     <div
                       className="absolute left-5 top-10 bottom-0 w-px"
-                      style={{ background: "oklch(0.48 0.09 165 / 0.2)" }}
+                      style={{ background: "var(--primary) / 0.2" }}
                     />
                   )}
                   <div
                     className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold z-10"
-                    style={{ background: "oklch(0.48 0.09 165)", color: "white" }}
+                    style={{ background: "var(--primary)", color: "white" }}
                   >
                     {s.step}
                   </div>
                   <div className="flex-1 pt-1">
-                    <h3 className="font-bold text-lg mb-2" style={{ color: "oklch(0.18 0.01 240)" }}>
+                    <h3 className="font-bold text-lg mb-2" style={{ color: "var(--foreground)" }}>
                       {s.title}
                     </h3>
-                    <p className="text-base mb-3" style={{ color: "oklch(0.42 0.01 240)", lineHeight: "1.7" }}>
+                    <p className="text-base mb-3" style={{ color: "var(--foreground)", lineHeight: "1.7" }}>
                       {s.desc}
                     </p>
                     <ul className="flex flex-col gap-1.5">
@@ -186,9 +159,9 @@ export default function ProcessPage() {
                         <li key={item} className="flex items-center gap-2">
                           <CheckCircle2
                             className="w-3.5 h-3.5 flex-shrink-0"
-                            style={{ color: "oklch(0.48 0.09 165)" }}
+                            style={{ color: "var(--primary)" }}
                           />
-                          <span className="text-sm" style={{ color: "oklch(0.38 0.01 240)" }}>
+                          <span className="text-sm" style={{ color: "var(--muted-foreground)" }}>
                             {item}
                           </span>
                         </li>
@@ -201,7 +174,7 @@ export default function ProcessPage() {
           </section>
 
           {/* Divider */}
-          <div className="my-6 border-t" style={{ borderColor: "oklch(0.90 0.01 240)" }} />
+          <div className="my-6 border-t" style={{ borderColor: "var(--border)" }} />
 
           {/* Coaching Process */}
           <section className="mt-14 mb-20">
@@ -210,7 +183,7 @@ export default function ProcessPage() {
               style={{ borderBottom: "2px solid oklch(0.62 0.09 45)", paddingBottom: "12px" }}
             >
               <TrendingUp className="w-5 h-5" style={{ color: "oklch(0.62 0.09 45)" }} />
-              <h2 className="font-bold text-2xl" style={{ color: "oklch(0.16 0.01 240)" }}>
+              <h2 className="font-bold text-2xl" style={{ color: "var(--foreground)" }}>
                 성장코칭 프로세스
               </h2>
             </div>
@@ -230,10 +203,10 @@ export default function ProcessPage() {
                     {s.step}
                   </div>
                   <div className="flex-1 pt-1">
-                    <h3 className="font-bold text-lg mb-2" style={{ color: "oklch(0.18 0.01 240)" }}>
+                    <h3 className="font-bold text-lg mb-2" style={{ color: "var(--foreground)" }}>
                       {s.title}
                     </h3>
-                    <p className="text-base mb-3" style={{ color: "oklch(0.42 0.01 240)", lineHeight: "1.7" }}>
+                    <p className="text-base mb-3" style={{ color: "var(--foreground)", lineHeight: "1.7" }}>
                       {s.desc}
                     </p>
                     <ul className="flex flex-col gap-1.5">
@@ -243,7 +216,7 @@ export default function ProcessPage() {
                             className="w-3.5 h-3.5 flex-shrink-0"
                             style={{ color: "oklch(0.62 0.09 45)" }}
                           />
-                          <span className="text-sm" style={{ color: "oklch(0.38 0.01 240)" }}>
+                          <span className="text-sm" style={{ color: "var(--muted-foreground)" }}>
                             {item}
                           </span>
                         </li>
@@ -259,29 +232,29 @@ export default function ProcessPage() {
           <div
             className="rounded-2xl p-8 text-center"
             style={{
-              background: "oklch(0.48 0.09 165 / 0.06)",
-              border: "1px solid oklch(0.48 0.09 165 / 0.15)",
+              background: "var(--primary) / 0.06",
+              border: "1px solid var(--primary) / 0.15",
             }}
           >
-            <h3 className="font-bold text-xl mb-2" style={{ color: "oklch(0.18 0.01 240)" }}>
+            <h3 className="font-bold text-xl mb-2" style={{ color: "var(--foreground)" }}>
               먼저 무료로 상담해 보세요
             </h3>
-            <p className="text-base mb-5" style={{ color: "oklch(0.42 0.01 240)" }}>
+            <p className="text-base mb-5" style={{ color: "var(--foreground)" }}>
               어떤 서비스가 우리 아이에게 맞는지 함께 확인해 드립니다.
             </p>
-            <Link
+            <a
               href="/#contact"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm transition-all hover:opacity-90"
-              style={{ background: "oklch(0.48 0.09 165)", color: "white" }}
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold text-sm transition-all hover:opacity-90 hover:scale-105"
+              style={{ background: "var(--primary)", color: "white" }}
             >
               <ClipboardList className="w-4 h-4" />
-              무료 상담 신청
+              무료 상담하기
               <ChevronRight className="w-4 h-4" />
-            </Link>
+            </a>
           </div>
         </div>
-      </main>
-      <FloatingMenu />
-    </div>
+      </section>
+      <Footer />
+    </main>
   );
 }

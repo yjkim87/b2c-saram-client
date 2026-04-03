@@ -1,52 +1,18 @@
 "use client";
 
+// Force rebuild
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
-  Heart, Users, Brain, BookOpen, Lightbulb, Star,
-  Clock, ArrowLeft, CheckCircle2, UserCircle2, ChevronDown,
+  Heart, Users, Brain, CheckCircle2, UserCircle2, ChevronDown, Clock, Star,
 } from "lucide-react";
 import Navbar from "@/components/navbar";
+import SubpageHeader from "@/components/subpage-header";
+import { Footer } from "@/components/cta-footer";
 
 // ─── THEME ────────────────────────────────────────────────────────────────────
 const GREEN = "oklch(0.48 0.09 165)";
 const AMBER = "oklch(0.62 0.09 45)";
-
-// ─── FLOATING MENU ────────────────────────────────────────────────────────────
-function FloatingMenu() {
-  return (
-    <div className="fixed bottom-8 right-6 z-50 flex flex-col items-end gap-3">
-      <a
-        href="/#contact"
-        className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-95"
-        style={{ background: GREEN, color: "white" }}
-        title="예약하기"
-      >
-        <BookOpen className="w-5 h-5" />
-      </a>
-      <a
-        href="https://pf.kakao.com/"
-        target="_blank"
-        rel="noreferrer"
-        className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-95"
-        style={{ background: AMBER, color: "white" }}
-        title="카카오톡 문의"
-      >
-        <Lightbulb className="w-5 h-5" />
-      </a>
-      <a
-        href="https://instagram.com/"
-        target="_blank"
-        rel="noreferrer"
-        className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-95"
-        style={{ background: "oklch(0.55 0.07 200)", color: "white" }}
-        title="인스타그램"
-      >
-        <Star className="w-5 h-5" />
-      </a>
-    </div>
-  );
-}
 
 // ─── DATA ─────────────────────────────────────────────────────────────────────
 type Program = {
@@ -352,38 +318,9 @@ export default function ProgramsPage() {
   }, []);
 
   return (
-    <div className="min-h-screen" style={{ background: "oklch(0.99 0.003 80)" }}>
+    <main className="min-h-screen" style={{ background: "var(--background)" }}>
       <Navbar />
-
-      {/* Hero */}
-      <section
-        className="pt-28 pb-16 px-4 sm:px-6 lg:px-8"
-        style={{ background: "oklch(0.22 0.03 200)" }}
-      >
-        <div className="max-w-3xl mx-auto text-center">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 text-xs mb-6 transition-opacity hover:opacity-70"
-            style={{ color: "oklch(0.7 0.05 165)" }}
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            메인으로
-          </Link>
-          <h1
-            className="font-serif text-4xl sm:text-5xl font-bold mb-4 text-balance"
-            style={{ color: "white", wordBreak: "keep-all" }}
-          >
-            상담 / 코칭 프로그램
-          </h1>
-          <p
-            className="text-base leading-relaxed"
-            style={{ color: "oklch(0.78 0.02 200)", wordBreak: "keep-all" }}
-          >
-            아이의 감정, 관계, 학습, 그리고 가족까지 —<br />
-            발달심리학 기반의 맞춤형 코칭 프로그램을 소개합니다.
-          </p>
-        </div>
-      </section>
+      <SubpageHeader title="상담 / 코칭 프로그램" subtitle="맞춤형 코칭으로 우리 아이의 성장을 지원합니다" />
 
       {/* Sentinel for sticky detection */}
       <div ref={sentinelRef} aria-hidden="true" />
@@ -457,19 +394,18 @@ export default function ProgramsPage() {
             className="text-sm leading-relaxed mb-8"
             style={{ color: "oklch(0.75 0.02 200)", wordBreak: "keep-all" }}
           >
-            전문 코치와 15분 무료 상담을 통해 아이에게 맞는 프로그램을 찾아드립니다.
+            전문가와 함께 아이에게 맞는 프로그램을 찾아드립니다.
           </p>
           <Link
             href="/#contact"
-            className="inline-block px-8 py-3.5 rounded-full font-semibold text-sm transition-all hover:scale-105 hover:opacity-95"
+            className="inline-block px-8 py-4 rounded-full font-semibold text-sm transition-all hover:scale-105 hover:opacity-95"
             style={{ background: themeColor, color: "white" }}
           >
-            무료 상담 신청하기
+            우리 아이 맞춤형 여정 상담하기
           </Link>
         </div>
       </section>
-
-      <FloatingMenu />
-    </div>
+      <Footer />
+    </main>
   );
 }

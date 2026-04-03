@@ -16,29 +16,39 @@ interface MobileCTAConfig {
   emphasis: CTAEmphasis
 }
 
+const DEFAULT_MENU_CTA_CONFIG: MobileCTAConfig = {
+  label: "무료 상담 예약하기",
+  threshold: 0.1,
+  emphasis: "high",
+}
+
+function matchesPath(pathname: string, basePath: string): boolean {
+  return pathname === basePath || pathname.startsWith(`${basePath}/`)
+}
+
+function isMenuDetailPath(pathname: string): boolean {
+  return matchesPath(pathname, "/program") || matchesPath(pathname, "/about") || matchesPath(pathname, "/community")
+}
+
 function getMobileCTAConfig(pathname: string): MobileCTAConfig | null {
   if (pathname === "/") {
-    return {
-      label: "\uBB34\uB8CC \uC0C1\uB2F4 \uC608\uC57D\uD558\uAE30",
-      threshold: 0.1,
-      emphasis: "high",
-    }
+    return DEFAULT_MENU_CTA_CONFIG
+  }
+
+  if (isMenuDetailPath(pathname)) {
+    return DEFAULT_MENU_CTA_CONFIG
   }
 
   if (pathname === "/solution" || pathname.startsWith("/solution/")) {
     return {
-      label: "\uC6B0\uB9AC \uC544\uC774 \uB9DE\uCDA4 \uC0C1\uB2F4 \uBC1B\uAE30",
+      label: "우리 아이 맞춤 상담 받기",
       threshold: 0.1,
       emphasis: "high",
     }
   }
 
   if (pathname === "/brand" || pathname.startsWith("/brand/")) {
-    return {
-      label: "\uBB34\uB8CC \uC0C1\uB2F4 \uC608\uC57D\uD558\uAE30",
-      threshold: 0.1,
-      emphasis: "normal",
-    }
+    return DEFAULT_MENU_CTA_CONFIG
   }
 
   if (
@@ -48,18 +58,13 @@ function getMobileCTAConfig(pathname: string): MobileCTAConfig | null {
     pathname.startsWith("/about/experts/")
   ) {
     return {
-      label: "\uC0C1\uB2F4 \uC608\uC57D\uD558\uAE30",
+      label: "상담 예약하기",
       threshold: 0.1,
       emphasis: "normal",
     }
   }
 
-  if (
-    pathname === "/center" ||
-    pathname.startsWith("/center/") ||
-    pathname === "/about/location" ||
-    pathname.startsWith("/about/location/")
-  ) {
+  if (pathname === "/center" || pathname.startsWith("/center/")) {
     return null
   }
 

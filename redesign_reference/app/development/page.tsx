@@ -1,13 +1,15 @@
 "use client";
 
+// Force rebuild
 import { useState, useRef, useEffect } from "react";
-import Link from "next/link";
 import {
   Baby, Smile, BookOpen, Compass,
   Brain, TrendingUp, ChevronDown, ChevronRight,
-  CheckCircle2, Star, Lightbulb, Target, ArrowLeft, BookMarked,
+  CheckCircle2, Target, BookMarked, Star, Lightbulb,
 } from "lucide-react";
 import Navbar from "@/components/navbar";
+import SubpageHeader from "@/components/subpage-header";
+import { Footer } from "@/components/cta-footer";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Mode = "counseling" | "coaching";
@@ -319,42 +321,6 @@ function HScroll({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Floating action buttons — always visible 3 buttons, fixed bottom-right
-function FloatingMenu() {
-  return (
-    <div className="fixed bottom-8 right-6 z-50 flex flex-col items-end gap-3">
-      <a
-        href="/#contact"
-        className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-95"
-        style={{ background: "oklch(0.48 0.09 165)", color: "white" }}
-        title="예약하기"
-      >
-        <BookOpen className="w-5 h-5" />
-      </a>
-      <a
-        href="https://pf.kakao.com/"
-        target="_blank"
-        rel="noreferrer"
-        className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-95"
-        style={{ background: "oklch(0.62 0.09 45)", color: "white" }}
-        title="카카오톡 문의"
-      >
-        <Lightbulb className="w-5 h-5" />
-      </a>
-      <a
-        href="https://instagram.com/"
-        target="_blank"
-        rel="noreferrer"
-        className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-95"
-        style={{ background: "oklch(0.55 0.07 200)", color: "white" }}
-        title="인스타그램"
-      >
-        <Star className="w-5 h-5" />
-      </a>
-    </div>
-  );
-}
-
 function StageBody({
   stage,
   mode,
@@ -610,37 +576,9 @@ export default function DevelopmentPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: "oklch(0.98 0.005 80)" }}>
+    <main className="min-h-screen" style={{ background: "var(--background)" }}>
       <Navbar />
-
-      {/* Page header — dark forest green */}
-      <div
-        className="pt-28 pb-16 px-4 sm:px-6 lg:px-8"
-        style={{ background: "oklch(0.22 0.03 200)" }}
-      >
-        <div className="max-w-3xl mx-auto text-center flex flex-col items-center">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 text-xs mb-6 transition-opacity hover:opacity-70"
-            style={{ color: "oklch(0.7 0.05 165)" }}
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            메인으로 돌아가기
-          </Link>
-          <h1
-            className="font-serif text-4xl sm:text-5xl font-bold mb-4 text-balance"
-            style={{ color: "white", wordBreak: "keep-all" }}
-          >
-            우리 아이 발달 단계
-          </h1>
-          <p
-            className="text-base max-w-2xl"
-            style={{ color: "rgba(255,255,255,0.75)", lineHeight: "1.7", wordBreak: "keep-all" }}
-          >
-            에릭슨, 피아제, 볼비 등의 발달 이론을 기반으로 각 연령대별 특성과 적절한 지원 방법을 안내합니다.
-          </p>
-        </div>
-      </div>
+      <SubpageHeader title="우리 아이 발달 단계" subtitle="연령대별 발달 이론과 적절한 지원 방법" />
 
       {/* Sentinel for sticky detection */}
       <div ref={sentinelRef} aria-hidden="true" />
@@ -701,7 +639,7 @@ export default function DevelopmentPage() {
       </div>
 
       {/* Accordion */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-36 flex flex-col gap-4">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-20 flex flex-col gap-4">
         {STAGES.map((stage) => (
           <AccordionItem
             key={stage.id}
@@ -713,9 +651,7 @@ export default function DevelopmentPage() {
           />
         ))}
       </div>
-
-      {/* Floating action menu */}
-      <FloatingMenu />
-    </div>
+      <Footer />
+    </main>
   );
 }

@@ -724,7 +724,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
 
   return (
     <div className="min-h-screen overflow-x-clip bg-white">
-      <header ref={headerRef} className="fixed top-0 left-0 right-0 z-[100] border-b border-[#EDE3D8] bg-[#FFF9F4]">
+      <header ref={headerRef} className="fixed top-0 left-0 right-0 z-[100] border-b border-[#e6ebf7] bg-[#ffffff]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between gap-2 md:h-20">
             <Link

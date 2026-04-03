@@ -1,6 +1,7 @@
 "use client";
 // cache invalidation: v5 — rebuild all modules
 import { useRef, useEffect, useState, type ReactNode } from "react";
+import Link from "next/link";
 import Navbar from "@/components/navbar";
 import HeroSection from "@/components/hero-section";
 import StickyTabBar from "@/components/sticky-tab-bar";
@@ -8,10 +9,11 @@ import CenterInfo from "@/components/center-info";
 import Testimonials from "@/components/testimonials";
 import { CTASection, Footer } from "@/components/cta-footer";
 import { TabProvider, useTabContext as useTab } from "@/components/tab-context";
+import FloatingActionMenu from "@/components/floating-action-menu";
 import {
-  Baby, Smile, BookOpen, Sparkles,
-  Brain, Heart, Shield, Compass, Users, TrendingUp,
-  ChevronDown, CheckCircle2, ClipboardList, Map, Mic2, BarChart2, X,
+  Baby, Smile, Sparkles, Shield, Compass, TrendingUp,
+  ChevronDown, ChevronRight, CheckCircle2, ClipboardList, Map, Mic2, BarChart2,
+  BookOpen, Brain, Heart, Users, Star,
 } from "lucide-react";
 
 // Unused but forces Turbopack to invalidate module cache on this file
@@ -262,7 +264,7 @@ function ServiceDefinitionSection() {
             }}
           >
             <Compass className="w-5 h-5" />
-            <span>우리 아이 맞춤형 여정 상담하기</span>
+            <span>무료 상담하기</span>
           </a>
           
           <p className="mt-5 text-xs" style={{ color: "oklch(0.55 0.03 260)" }}>
@@ -274,89 +276,6 @@ function ServiceDefinitionSection() {
   );
 }
 
-// ─── FLOATING ACTION MENU ───────────────────────────────────────────────────────
-function FloatingActionMenu() {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <>
-      {/* Desktop floating buttons — right bottom corner */}
-      <div className="hidden md:fixed md:flex md:bottom-12 md:right-8 md:flex-col md:gap-4 md:z-40">
-        <a
-          href="#"
-          className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110"
-          style={{ background: "oklch(0.48 0.09 165)", color: "white" }}
-          title="예약하기"
-        >
-          <BookOpen className="w-5 h-5" />
-        </a>
-        <a
-          href="https://pf.kakao.com/"
-          target="_blank"
-          className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110"
-          style={{ background: "oklch(0.62 0.09 45)", color: "white" }}
-          title="카카오톡"
-        >
-          <Heart className="w-5 h-5" />
-        </a>
-        <a
-          href="https://instagram.com/"
-          target="_blank"
-          className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110"
-          style={{ background: "oklch(0.55 0.07 200)", color: "white" }}
-          title="인스타그램"
-        >
-          <Users className="w-5 h-5" />
-        </a>
-      </div>
-
-      {/* Mobile floating button with menu */}
-      <div className="md:hidden fixed bottom-6 right-6 z-40">
-        <button
-          onClick={() => setOpen(!open)}
-          className="w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all"
-          style={{ background: "oklch(0.48 0.09 165)", color: "white" }}
-          aria-label="메뉴"
-        >
-          {open ? <X className="w-6 h-6" /> : <Brain className="w-6 h-6" />}
-        </button>
-        {open && (
-          <div className="absolute bottom-20 right-0 flex flex-col gap-3">
-            <a
-              href="#"
-              className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all"
-              style={{ background: "oklch(0.48 0.09 165)", color: "white" }}
-              onClick={() => setOpen(false)}
-              title="예약하기"
-            >
-              <BookOpen className="w-5 h-5" />
-            </a>
-            <a
-              href="https://pf.kakao.com/"
-              target="_blank"
-              className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all"
-              style={{ background: "oklch(0.62 0.09 45)", color: "white" }}
-              onClick={() => setOpen(false)}
-              title="카카오톡"
-            >
-              <Heart className="w-5 h-5" />
-            </a>
-            <a
-              href="https://instagram.com/"
-              target="_blank"
-              className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all"
-              style={{ background: "oklch(0.55 0.07 200)", color: "white" }}
-              onClick={() => setOpen(false)}
-              title="인스타그램"
-            >
-              <Users className="w-5 h-5" />
-            </a>
-          </div>
-        )}
-      </div>
-    </>
-  );
-}
 
 function useFadeIn(delay = 0) {
   const ref = useRef<HTMLDivElement>(null);
@@ -385,13 +304,13 @@ const stages = [
     label: "영아기", range: "0 – 2세", icon: Baby,
     accent: "oklch(0.52 0.12 195)", bg: "oklch(0.52 0.12 195 / 0.08)", border: "oklch(0.52 0.12 195 / 0.28)",
     counseling: ["발달 지연 조기 발견", "부모 상담 및 교육", "정서적 안정 지원"],
-    coaching:   ["감각 통합 활동 코칭", "부모-��아 놀이 코칭", "두뇌 발달 자극"],
+    coaching:   ["감각 통합 활동 �����", "부모-��아 놀이 코칭", "두뇌 발달 자극"],
   },
   {
     label: "유아기", range: "3 – 5세", icon: Smile,
     accent: "oklch(0.60 0.13 45)", bg: "oklch(0.60 0.13 45 / 0.08)", border: "oklch(0.60 0.13 45 / 0.28)",
-    counseling: ["분리 불안 상담", "언어 발달 치료 연계", "행동 문제 평가"],
-    coaching:   ["강점 기반 놀이 코칭", "창의력��������상상력 계발", "사회성 향상 코칭"],
+    counseling: ["분리 불안 상담", "언어 발달 치료 ���계", "행동 문제 평가"],
+    coaching:   ["강점 기반 놀��� 코칭", "창의�����������상상력 계발", "사회성 향상 코칭"],
   },
   {
     label: "아동기", range: "6 – 12세", icon: BookOpen,
@@ -420,7 +339,7 @@ function AccordionRow({
   return (
     <div
       ref={rowRef}
-      className="rounded-2xl border overflow-hidden"
+      className="rounded-[2.5rem] border overflow-hidden"
       style={{ borderColor: isOpen ? stage.border : "var(--border)", transition: "border-color 0.3s ease" }}
     >
       {/* Header */}
@@ -436,8 +355,8 @@ function AccordionRow({
           <Icon className="w-5 h-5" style={{ color: stage.accent }} />
         </div>
         <div className="flex-1 min-w-0">
-          <span className="font-bold text-sm" style={{ color: "var(--foreground)" }}>{stage.label}</span>
-          <span className="text-xs ml-2" style={{ color: "var(--muted-foreground)" }}>{stage.range}</span>
+          <span className="font-bold text-sm text-[#111111]">{stage.label}</span>
+          <span className="text-xs ml-2 text-[#111111]">{stage.range}</span>
         </div>
         <ChevronDown
           className="w-4 h-4 flex-shrink-0 transition-transform duration-300"
@@ -453,14 +372,20 @@ function AccordionRow({
           transition: "max-height 0.35s ease",
         }}
       >
-        <div className="px-5 pb-5 pt-1 flex flex-col gap-2">
-          {features.map((f) => (
-            <div key={f} className="flex items-start gap-2.5">
-              <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: stage.accent }} />
-              <span className="text-sm leading-relaxed" style={{ color: "var(--muted-foreground)" }}>{f}</span>
+        <Link href="/development" className="block">
+          <div className="px-5 pb-5 pt-1 flex flex-col gap-2 relative">
+            {features.map((f) => (
+              <div key={f} className="flex items-start gap-2.5">
+                <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: stage.accent }} />
+                <span className="text-sm leading-relaxed text-[#111111]">{f}</span>
+              </div>
+            ))}
+            {/* Dark green chevron icon in bottom-right */}
+            <div className="absolute bottom-4 right-4 w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "#1a2e2a" }}>
+              <ChevronRight className="w-5 h-5 text-white" />
             </div>
-          ))}
-        </div>
+          </div>
+        </Link>
       </div>
     </div>
   );
@@ -511,49 +436,55 @@ function AgeCard({
   const Icon = stage.icon;
   const grads = tabKey === "counseling" ? counselingGrads : coachingGrads;
   const cardBg = grads[index] ?? grads[grads.length - 1];
-  const textColor = index >= 2 ? "white" : "var(--foreground)";
-  const mutedColor = index >= 2 ? "rgba(255,255,255,0.75)" : "var(--muted-foreground)";
 
   return (
-    <div
-      ref={cardRef}
-      className="rounded-2xl border p-6 flex flex-col gap-4 cursor-default"
-      style={{
-        background: cardBg,
-        borderColor: index >= 2 ? "transparent" : "var(--border)",
-        transition: "transform 0.25s ease, box-shadow 0.25s ease",
-      }}
-      onMouseEnter={e => {
-        (e.currentTarget as HTMLDivElement).style.transform = "translateY(-4px)";
-        (e.currentTarget as HTMLDivElement).style.boxShadow = "0 12px 32px rgba(0,0,0,0.15)";
-      }}
-      onMouseLeave={e => {
-        (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
-        (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
-      }}
-    >
+    <Link href="/development">
       <div
-        className="w-11 h-11 rounded-xl flex items-center justify-center"
+        ref={cardRef}
+        className="rounded-[2.5rem] border p-6 flex flex-col gap-4 cursor-pointer backdrop-blur-md relative"
         style={{
-          background: index >= 2 ? "rgba(255,255,255,0.2)" : stage.bg,
-          border: `1px solid ${index >= 2 ? "rgba(255,255,255,0.3)" : stage.border}`,
+          background: "linear-gradient(135deg, " + cardBg + ", rgba(255,255,255,0.5))",
+          borderColor: "rgba(255,255,255,0.4)",
+          backdropFilter: "blur(12px)",
+          transition: "transform 0.25s ease, box-shadow 0.25s ease",
+        }}
+        onMouseEnter={e => {
+          (e.currentTarget as HTMLDivElement).style.transform = "translateY(-4px)";
+          (e.currentTarget as HTMLDivElement).style.boxShadow = "0 12px 32px rgba(0,0,0,0.15)";
+        }}
+        onMouseLeave={e => {
+          (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
+          (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
         }}
       >
-        <Icon className="w-5 h-5" style={{ color: index >= 2 ? "white" : stage.accent }} />
+        <div
+          className="w-11 h-11 rounded-xl flex items-center justify-center"
+          style={{
+            background: index >= 2 ? "rgba(255,255,255,0.2)" : stage.bg,
+            border: `1px solid ${index >= 2 ? "rgba(255,255,255,0.3)" : stage.border}`,
+          }}
+        >
+          <Icon className="w-5 h-5" style={{ color: index >= 2 ? "white" : stage.accent }} />
+        </div>
+        <div>
+          <p className="font-bold text-base text-[#111111]">{stage.label}</p>
+          <p className="text-xs text-[#111111]">{stage.range}</p>
+        </div>
+        <div className="flex flex-col gap-2 mt-auto">
+          {features.map(f => (
+            <div key={f} className="flex items-start gap-2">
+              <CheckCircle2 className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" style={{ color: index >= 2 ? "white" : stage.accent }} />
+              <span className="text-xs leading-relaxed text-[#111111]">{f}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Dark green chevron icon in bottom-right */}
+        <div className="absolute bottom-6 right-6 w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "#1a2e2a" }}>
+          <ChevronRight className="w-5 h-5 text-white" />
+        </div>
       </div>
-      <div>
-        <p className="font-bold text-base" style={{ color: textColor }}>{stage.label}</p>
-        <p className="text-xs" style={{ color: mutedColor }}>{stage.range}</p>
-      </div>
-      <div className="flex flex-col gap-2 mt-auto">
-        {features.map(f => (
-          <div key={f} className="flex items-start gap-2">
-            <CheckCircle2 className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" style={{ color: index >= 2 ? "white" : stage.accent }} />
-            <span className="text-xs leading-relaxed" style={{ color: mutedColor }}>{f}</span>
-          </div>
-        ))}
-      </div>
-    </div>
+    </Link>
   );
 }
 
@@ -644,7 +575,7 @@ const coachingServices = [
   },
   {
     icon: Users, title: "사회성 코칭", tag: "관계",
-    desc: "또래 관계, 리더십, 공감 능력을 체계적 프로그램으로 계발합니다.",
+    desc: "또래 관계, ���더십, 공감 능력을 체계적 프로그램으로 계발합니다.",
     detail: "소그룹 세션 병행. 역할극·피드백 루프로 실제 상황 적용력을 키웁니다.",
     accent: "oklch(0.50 0.10 240)", bg: "oklch(0.50 0.10 240 / 0.08)", border: "oklch(0.50 0.10 240 / 0.2)",
     cardBg: "oklch(0.97 0.005 240)",
@@ -685,51 +616,65 @@ function StickyServiceCard({
         transition: "opacity 0.5s ease, transform 0.5s ease",
       }}
     >
-      <div
-        className="rounded-2xl border overflow-hidden"
-        style={{
-          background: item.cardBg,
-          borderColor: item.border,
-          boxShadow: `0 4px 24px ${item.bg.replace("0.08", "0.18")}`,
-        }}
-      >
-        {/* Top accent bar */}
-        <div className="h-1 w-full" style={{ background: item.accent }} />
+      <Link href="/programs" className="block w-full">
+        <div
+          className="rounded-[2.5rem] border overflow-hidden backdrop-blur-md"
+          style={{
+            background: `linear-gradient(135deg, ${item.cardBg}, rgba(255,255,255,0.4))`,
+            borderColor: "rgba(255,255,255,0.3)",
+            backdropFilter: "blur(12px)",
+            boxShadow: `0 4px 24px ${item.bg.replace("0.08", "0.18")}`,
+          }}
+        >
+          {/* Top accent bar */}
+          <div className="h-1 w-full" style={{ background: item.accent }} />
 
-        <div className="p-6 sm:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-start gap-5">
-            {/* Icon + tag */}
-            <div className="flex-shrink-0 flex flex-col items-center gap-2">
-              <div
-                className="w-14 h-14 rounded-2xl flex items-center justify-center"
-                style={{ background: item.bg, border: `1.5px solid ${item.border}` }}
-              >
-                <Icon className="w-7 h-7" style={{ color: item.accent }} />
+          <div className="p-6 sm:p-8 relative">
+            <div className="flex flex-col sm:flex-row sm:items-start gap-5">
+              {/* Icon + tag */}
+              <div className="flex-shrink-0 flex flex-col items-center gap-2">
+                <div
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                  style={{ background: item.bg, border: `1.5px solid ${item.border}` }}
+                >
+                  <Icon className="w-7 h-7" style={{ color: item.accent }} />
+                </div>
+                <span
+                  className="text-xs font-bold px-2.5 py-1 rounded-full"
+                  style={{ background: item.bg, color: item.accent, border: `1px solid ${item.border}` }}
+                >
+                  {item.tag}
+                </span>
               </div>
-              <span
-                className="text-xs font-bold px-2.5 py-1 rounded-full"
-                style={{ background: item.bg, color: item.accent, border: `1px solid ${item.border}` }}
-              >
-                {item.tag}
-              </span>
-            </div>
 
-            {/* Text */}
-            <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-xl mb-2" style={{ color: "var(--foreground)" }}>{item.title}</h3>
-              <p className="text-sm leading-relaxed mb-3" style={{ color: "var(--foreground)", opacity: 0.85 }}>
-                {item.desc}
-              </p>
-              <div
-                className="flex items-start gap-2 text-xs leading-relaxed pl-3 py-0.5"
-                style={{ color: "var(--muted-foreground)", borderLeft: `2px solid ${item.accent}` }}
-              >
-                {item.detail}
+              {/* Text */}
+              <div className="flex-1 min-w-0">
+                <h3 className="font-bold text-xl mb-2 text-[#111111]">{item.title}</h3>
+                <p className="text-sm leading-relaxed mb-3 text-[#111111]">
+                  {item.desc}
+                </p>
+                <div
+                  className="flex items-start gap-2 text-xs leading-relaxed pl-3 py-0.5 text-[#111111]"
+                  style={{ borderLeft: `2px solid ${item.accent}` }}
+                >
+                  {item.detail}
+                </div>
+              </div>
+
+              {/* Mobile CTA Button */}
+              <div className="md:hidden absolute bottom-6 right-6 flex items-center gap-2">
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                  style={{ background: "#1a2e2a" }}
+                >
+                  <ChevronRight className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-xs font-semibold text-[#111111]">자세히</span>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </Link>
     </div>
   );
 }
@@ -755,71 +700,82 @@ function ServicePcCard({
 }) {
   const cardRef = useFadeIn(index * 100);
   const Icon = item.icon;
-  // 3 cards: light → mid → dark
-  const svcGrads = tabKey === "counseling"
-    ? ["oklch(0.97 0.015 165)", "oklch(0.85 0.07 165)", "oklch(0.62 0.10 165)"]
-    : ["oklch(0.97 0.015 65)", "oklch(0.88 0.08 55)", "oklch(0.75 0.12 40)"];
-  const cardBg = svcGrads[index] ?? svcGrads[svcGrads.length - 1];
+  
+  // Hardcoded gradients per tab and index
+  let gradientClass = "";
+  if (tabKey === "counseling") {
+    if (index === 0) gradientClass = "bg-gradient-to-br from-green-50 to-green-100";
+    else if (index === 1) gradientClass = "bg-gradient-to-br from-green-100 to-green-200/60";
+    else gradientClass = "bg-gradient-to-br from-green-200/60 to-green-300/40";
+  } else {
+    if (index === 0) gradientClass = "bg-gradient-to-br from-orange-50 to-orange-100";
+    else if (index === 1) gradientClass = "bg-gradient-to-br from-orange-100 to-orange-200/60";
+    else gradientClass = "bg-gradient-to-br from-orange-200/60 to-orange-300/40";
+  }
+  
   const isLight = index === 0;
-  const textColor = isLight ? "var(--foreground)" : index === 1 ? "oklch(0.2 0.01 0)" : "white";
-  const mutedColor = isLight ? "var(--muted-foreground)" : index === 1 ? "oklch(0.35 0.01 0)" : "rgba(255,255,255,0.8)";
 
   return (
-    <div
-      ref={cardRef}
-      className="rounded-2xl border overflow-hidden flex flex-col"
-      style={{
-        background: cardBg,
-        borderColor: isLight ? "var(--border)" : "transparent",
-        transition: "transform 0.25s ease, box-shadow 0.25s ease",
-      }}
-      onMouseEnter={e => {
-        (e.currentTarget as HTMLDivElement).style.transform = "translateY(-5px)";
-        (e.currentTarget as HTMLDivElement).style.boxShadow = "0 16px 40px rgba(0,0,0,0.15)";
-      }}
-      onMouseLeave={e => {
-        (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
-        (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
-      }}
-    >
-      <div className="h-1 w-full" style={{ background: isLight ? item.accent : "rgba(255,255,255,0.4)" }} />
-      <div className="p-6 flex flex-col gap-4 flex-1">
-        <div className="flex items-center gap-3">
-          <div
-            className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{
-              background: isLight ? item.bg : "rgba(255,255,255,0.2)",
-              border: `1px solid ${isLight ? item.border : "rgba(255,255,255,0.3)"}`,
-            }}
-          >
-            <Icon className="w-5 h-5" style={{ color: isLight ? item.accent : "white" }} />
+    <Link href="/programs">
+      <div
+        ref={cardRef}
+        className={`rounded-[2.5rem] border p-6 flex flex-col gap-4 flex-1 cursor-pointer relative ${gradientClass}`}
+        style={{
+          borderColor: isLight ? "rgba(200,200,200,0.3)" : "rgba(100,100,100,0.2)",
+          transition: "transform 0.25s ease, box-shadow 0.25s ease",
+        }}
+        onMouseEnter={e => {
+          (e.currentTarget as HTMLDivElement).style.transform = "translateY(-5px)";
+          (e.currentTarget as HTMLDivElement).style.boxShadow = "0 16px 40px rgba(0,0,0,0.15)";
+        }}
+        onMouseLeave={e => {
+          (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
+          (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
+        }}
+      >
+        <div className="h-1 w-full" style={{ background: isLight ? item.accent : "rgba(0,0,0,0.15)" }} />
+        <div className="p-6 flex flex-col gap-4 flex-1">
+          <div className="flex items-center gap-3">
+            <div
+              className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{
+                background: isLight ? item.bg : "rgba(0,0,0,0.08)",
+                border: `1px solid ${isLight ? item.border : "rgba(0,0,0,0.15)"}`,
+              }}
+            >
+              <Icon className="w-5 h-5" style={{ color: isLight ? item.accent : "rgba(0,0,0,0.6)" }} />
+            </div>
+            <span
+              className="text-xs font-bold px-2.5 py-1 rounded-full"
+              style={{
+                background: isLight ? item.bg : "rgba(0,0,0,0.08)",
+                color: isLight ? item.accent : "rgba(0,0,0,0.6)",
+                border: `1px solid ${isLight ? item.border : "rgba(0,0,0,0.15)"}`,
+              }}
+            >
+              {item.tag}
+            </span>
           </div>
-          <span
-            className="text-xs font-bold px-2.5 py-1 rounded-full"
+          <div>
+            <h3 className="font-bold text-lg mb-2 text-[#111111]">{item.title}</h3>
+            <p className="text-sm leading-relaxed text-[#111111]">{item.desc}</p>
+          </div>
+          <div
+            className="mt-auto text-xs leading-relaxed pl-3 py-1 text-[#111111]"
             style={{
-              background: isLight ? item.bg : "rgba(255,255,255,0.2)",
-              color: isLight ? item.accent : "white",
-              border: `1px solid ${isLight ? item.border : "rgba(255,255,255,0.3)"}`,
+              borderLeft: `2px solid ${isLight ? item.accent : "rgba(0,0,0,0.3)"}`,
             }}
           >
-            {item.tag}
-          </span>
+            {item.detail}
+          </div>
         </div>
-        <div>
-          <h3 className="font-bold text-lg mb-2" style={{ color: textColor }}>{item.title}</h3>
-          <p className="text-sm leading-relaxed" style={{ color: mutedColor }}>{item.desc}</p>
-        </div>
-        <div
-          className="mt-auto text-xs leading-relaxed pl-3 py-1"
-          style={{
-            color: mutedColor,
-            borderLeft: `2px solid ${isLight ? item.accent : "rgba(255,255,255,0.5)"}`,
-          }}
-        >
-          {item.detail}
+
+        {/* Dark green chevron icon in bottom-right */}
+        <div className="absolute bottom-6 right-6 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "#1a2e2a" }}>
+          <ChevronRight className="w-5 h-5 text-white" />
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -850,7 +806,7 @@ function ServiceSection() {
               color: theme.primary,
             }}
           >
-            전문 {activeTab === "counseling" ? "상담" : "코칭"} 가이드
+            전��� {activeTab === "counseling" ? "상담" : "코칭"} 가이드
           </span>
           <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-3 text-balance" style={{ color: "var(--foreground)" }}>
             과학적 접근, 따뜻한 마음으로
@@ -935,7 +891,7 @@ const getProcessSteps = (tab: TabValue | undefined) => {
   return coachingProcessSteps;
 };
 
-// 기본값 (하위 호환성)
+// 기본값 (하위 호���성)
 const processSteps = coachingProcessSteps;
 
 // Mobile timeline item — independent component so hooks are always at top
@@ -1075,17 +1031,18 @@ function DesktopProcessRow({
   );
 }
 
-function DesktopProcessTimeline({ steps }: { steps?: typeof processSteps }) {
+function DesktopProcessTimeline({ steps: propSteps }: { steps?: typeof processSteps }) {
   const [activeIndex, setActiveIndex] = useState(0);
   
-  // Always use processSteps as fallback - defensive coding
-  const safeSteps = processSteps;
-  const displaySteps = (steps && Array.isArray(steps) && steps.length > 0) ? steps : safeSteps;
+  // Use processSteps as default, only use propSteps if it's a valid non-empty array
+  const stepsToRender = (propSteps && Array.isArray(propSteps) && propSteps.length > 0) 
+    ? propSteps 
+    : processSteps;
   
   return (
     <div className="relative max-w-4xl mx-auto">
       <div className="absolute left-[109px] top-0 bottom-0 w-px" style={{ background: "var(--border)" }} />
-      {displaySteps && displaySteps.map((step, i) => (
+      {stepsToRender.map((step, i) => (
         <DesktopProcessRow key={step.num} step={step} index={i} isActive={activeIndex === i} onActivate={setActiveIndex} />
       ))}
     </div>
@@ -1129,7 +1086,7 @@ function ProcessSection() {
   );
 }
 
-// ─── PAGE ───────────────────────────────────────────────────────────────────���─
+// ─── PAGE ─────────────────────────────────���─────────────────────────────────���─
 export default function Home() {
   return (
     <main className="min-h-screen">

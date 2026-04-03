@@ -78,13 +78,15 @@ const INTRO_CARDS: IntroCard[] = [
     title: "부모 코칭",
     subtitle: "발달 지식 · 양육 기술 · 의사소통 강화",
     badge: "대상 모든 연령 부모님",
-    schedule: "초기-중간-종결 리포트 공유",
+    schedule: "격주 1회 60분 / 8주 / 1:1 또는 부부 코칭",
     description:
       "부모가 아이의 발달 단계를 이해하고, 각 단계에 맞는 효과적인 양육 방법을 실천할 수 있도록 지원합니다. 부모의 자기 이해도 함께 다룹니다.",
     features: [
-      "행동·정서 변화 지표 시각화",
-      "보호자 피드백 루프 운영",
-      "종결 이후 유지 계획 가이드",
+      "발달 단계별 이해와 기대 조정",
+      "긍정적 훈육 방법 습득",
+      "효과적인 부모-자녀 의사소통",
+      "양육 스트레스 관리",
+      "부모 자신의 정서 건강 관리",
     ],
     theme: "rose",
   },
@@ -169,12 +171,10 @@ export function CounselingCoachingProgramPage() {
             <div className="relative z-10 flex flex-col items-center justify-between gap-8 sm:flex-row">
               <div className="max-w-lg">
                 <h3 className="mb-3 break-keep text-2xl font-bold tracking-tight text-white sm:text-3xl">
-                  어떤 방향이 우리 아이에게 맞을지 고민되시나요?
+                  어떤 프로그램이 우리 아이에게 맞을까요?
                 </h3>
                 <p className="break-keep text-[16px] leading-relaxed text-gray-300">
-                  전문 코치와의 <span className="font-semibold text-white">15분 무료 전화 상담</span>을 통해
-                  <br className="hidden sm:block" />
-                  아이의 현재 상태에 가장 적합한 시작점을 안내해 드립니다.
+                  전문가와 함께 아이에게 맞는 프로그램을 찾아드립니다.
                 </p>
               </div>
 

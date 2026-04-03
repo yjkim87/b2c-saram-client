@@ -5,9 +5,9 @@ export function CommunityReviewsPage() {
   return (
     <>
       <PageHeader
-        label="\uACE0\uAC1D \uD6C4\uAE30"
-        title="\uC2E4\uC81C \uBCC0\uD654 \uACBD\uD5D8\uC744 \uD655\uC778\uD574\uBCF4\uC138\uC694"
-        description="\uC0AC\uBC1C\uBA74 \uC0C1\uB2F4/\uCF54\uCE6D\uC744 \uACBD\uD5D8\uD55C \uBCF4\uD638\uC790\uB4E4\uC758 \uC0DD\uC0DD\uD55C \uD6C4\uAE30\uB97C \uBAA8\uC558\uC2B5\uB2C8\uB2E4."
+        label="고객 후기"
+        title="실제 변화 경험을 확인해보세요"
+        description="사발면 상담/코칭을 경험한 보호자들의 생생한 후기를 모았습니다."
       />
       <ReviewsSection variant="full" />
     </>

@@ -259,7 +259,7 @@ function ReviewsSectionFull() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div ref={headerRef} className="mb-10 text-center">
           <span className="mb-3 inline-flex items-center rounded-full bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary">
-            Parent Reviews
+            부모님 후기
           </span>
           <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">코칭 후 달라진 일상</h2>
           <p className="mx-auto mt-4 max-w-3xl text-base leading-relaxed text-slate-600">

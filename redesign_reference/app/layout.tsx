@@ -1,6 +1,7 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Noto_Sans_KR, Noto_Serif_KR } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import FloatingActionMenu from '@/components/floating-action-menu'
 import './globals.css'
 
 const notoSansKR = Noto_Sans_KR({
@@ -16,9 +17,15 @@ const notoSerifKR = Noto_Serif_KR({
 })
 
 export const metadata: Metadata = {
-  title: "\uc0ac\ubc1c\uba74 \uc13c\ud130 | \ubc1c\ub2ec\uc2ec\ub9ac \uc804\ubb38 \ucf54\uce9c",
-  description: "0\uc138\ubd80\ud130 18\uc138\uae4c\uc9c0, \ubc1c\ub2ec\uc2ec\ub9ac\ud559\uc744 \uae30\ubc18\uc73c\ub85c \ud55c \ub9de\uce61\ud615 \uc2ec\ub9ac \ucf54\uce9c\uc73c\ub85c \uc544\uc774\uc758 \uc7a0\uc7ac\ub825\uc744 \uae68\uc6cc\ub4dc\ub9bd\ub2c8\ub2e4.",
+  title: "사발면 센터 | 발달심리 전문 코칭",
+  description: "0세부터 18세까지, 발달심리학을 기반으로 한 맞춤형 심리 코칭으로 아이의 잠재력을 깨워드립니다.",
   generator: "v0.dev",
+}
+
+export const viewport: Viewport = {
+  themeColor: "#1a2e2a",
+  width: "device-width",
+  initialScale: 1,
 }
 
 export default function RootLayout({
@@ -30,6 +37,7 @@ export default function RootLayout({
     <html lang="ko" className={`${notoSansKR.variable} ${notoSerifKR.variable}`}>
       <body className="font-sans antialiased">
         {children}
+        <FloatingActionMenu />
         <Analytics />
       </body>
     </html>

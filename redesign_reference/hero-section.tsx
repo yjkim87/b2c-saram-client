@@ -91,7 +91,7 @@ export default function HeroSection() {
               }}
             >
               <Compass className="w-5 h-5" />
-              <span>우리 아이 맞춤형 여정 상담하기</span>
+              <span>무료 상담하기</span>
               <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
             </a>
           </div>

@@ -199,6 +199,21 @@ export default function Testimonials() {
             <ReviewCard key={r.name} review={r} />
           ))}
         </div>
+
+        {/* View All Button */}
+        <div className="flex justify-center mt-12">
+          <a
+            href="/reviews"
+            className="inline-flex items-center px-8 py-3.5 rounded-full border font-semibold transition-all hover:shadow-lg hover:bg-white/95"
+            style={{
+              borderColor: "var(--primary)",
+              color: "var(--primary)",
+              background: "white",
+            }}
+          >
+            부모님 생생 후기 전체보기
+          </a>
+        </div>
       </div>
     </section>
   );
