@@ -234,10 +234,10 @@ export function ProcessStepsSection({ tab }: ProcessStepsSectionProps) {
 
         <div className="mt-8 flex justify-center">
           <Link
-            href="/about"
+            href="/about/intro"
             className="inline-flex h-10 items-center gap-2 rounded-full border border-[#0C0C0C] bg-white px-7 text-base font-semibold text-[#0C0C0C] transition-colors hover:bg-[#0C0C0C] hover:text-white"
           >
-            센터 소개 보러가기
+            사발면 소개 보러가기
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
