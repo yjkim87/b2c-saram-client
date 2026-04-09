@@ -1,0 +1,1199 @@
+   1: "use client"
+   2: 
+   3: import Link from "next/link"
+   4: import { useRouter } from "next/navigation"
+   5: import { useEffect, useRef, useState, type ReactNode } from "react"
+   6: import {
+   7:   ArrowUp,
+   8:   Baby,
+   9:   Check,
+  10:   GraduationCap,
+  11:   Heart,
+  12:   MessageCircle,
+  13:   Phone,
+  14:   School,
+  15:   Users,
+  16:   X,
+  17:   type LucideIcon,
+  18: } from "lucide-react"
+  19: import { Button } from "@/shared/ui/button"
+  20: import { FieldLabel } from "@/shared/ui/field-label"
+  21: import { cn } from "@/shared/lib/utils"
+  22: import { Footer } from "@/shared/layout/footer"
+  23: import type { UseReservationFlowReturn } from "../../hooks/use-reservation-flow"
+  24: import { concernData, genders, relationships } from "../../data/reservation.constants"
+  25: import {
+  26:   QUICK_TOPICS,
+  27:   QUICK_TOPIC_ORDER,
+  28:   type QuickTopicAction,
+  29:   type QuickTopicId,
+  30:   type QuickTopicItem,
+  31: } from "../../data/quick-topics"
+  32: import type { Gender, Relationship } from "../../model/reservation.types"
+  33: import { BotMessage, CalendarPicker, ConcernCard, UserMessage } from "../shared/reservation-primitives"
+  34: import { Step1Service } from "./step1-service"
+  35: import { Step2Expert } from "./step2-expert"
+  36: import { Step3Schedule } from "./step3-schedule"
+  37: 
+  38: interface ReservationFlowProps {
+  39:   flow: UseReservationFlowReturn
+  40: }
+  41: 
+  42: interface AttendanceOptionButtonProps {
+  43:   isSelected: boolean
+  44:   onClick: () => void
+  45:   children: ReactNode
+  46: }
+  47: 
+  48: interface EditableUserMessageProps {
+  49:   content: string
+  50:   onEdit: () => void
+  51: }
+  52: 
+  53: interface QuickTopicChatEntry {
+  54:   id: string
+  55:   topicId: QuickTopicId
+  56:   userMessage: string
+  57:   botMessage: string
+  58:   tips?: string[]
+  59:   actions?: QuickTopicAction[]
+  60: }
+  61: 
+  62: const QUICK_TOPIC_ICON_MAP: Record<QuickTopicItem["icon"], LucideIcon> = {
+  63:   baby: Baby,
+  64:   speech: MessageCircle,
+  65:   school: School,
+  66:   teen: GraduationCap,
+  67:   heart: Heart,
+  68:   users: Users,
+  69: }
+  70: 
+  71: const STEP1_TYPING_DELAY_MS = 1200
+  72: const QUICK_TOPIC_GUIDE_MESSAGE = "?êÌïò?úÎäî ?ÅÎã¥ Ï£ºÏ†úÎ•??†ÌÉù?¥Ï£º?∏Ïöî \uD83D\uDE0A"
+  73: 
+  74: function AttendanceOptionButton({ isSelected, onClick, children }: AttendanceOptionButtonProps) {
+  75:   return (
+  76:     <button
+  77:       onClick={onClick}
+  78:       className={cn(
+  79:         "w-full p-4 rounded-xl border-2 text-left transition-all",
+  80:         isSelected ? "border-primary bg-primary/5" : "border-border hover:border-primary/50",
+  81:       )}
+  82:     >
+  83:       {children}
+  84:     </button>
+  85:   )
+  86: }
+  87: 
+  88: function EditableUserMessage({ content, onEdit }: EditableUserMessageProps) {
+  89:   return (
+  90:     <div className="flex justify-end items-end gap-2 animate-in fade-in-0 slide-in-from-right-4 duration-300">
+  91:       <button type="button" onClick={onEdit} className="px-1 text-sm text-[#6E6352] hover:text-[#4F4537]">
+  92:         {"\uc218\uc815"}
+  93:       </button>
+  94:       <div className="bg-[#B1A58F] text-white rounded-[20px] rounded-tr-[5px] px-4 py-3 max-w-[85%]">
+  95:         <p className="text-sm md:text-base leading-relaxed">{content}</p>
+  96:       </div>
+  97:     </div>
+  98:   )
+  99: }
+ 100: 
+ 101: export function ReservationFlow({ flow }: ReservationFlowProps) {
+ 102:   const router = useRouter()
+ 103:   const {
+ 104:     step,
+ 105:     isTyping,
+ 106:     showContent,
+ 107:     messagesEndRef,
+ 108:     userInfo,
+ 109:     birthdateInput,
+ 110:     birthdateError,
+ 111:     ageGroup,
+ 112:     selectedConcerns,
+ 113:     concernLimitMessage,
+ 114:     selectedConcern,
+ 115:     attendance,
+ 116:     showNudge,
+ 117:     selectedSchedules,
+ 118:     phoneNumber,
+ 119:     privacyConsent,
+ 120:     showPrivacyModal,
+ 121:     setUserInfo,
+ 122:     setPhoneNumber,
+ 123:     setPrivacyConsent,
+ 124:     setShowPrivacyModal,
+ 125:     goToNextStep,
+ 126:     resetAll,
+ 127:     handleBirthdateChange,
+ 128:     handleBirthdateBlur,
+ 129:     toggleConcernSelection,
+ 130:     handleAttendanceSelect,
+ 131:     handleNudgeResponse,
+ 132:     handleScheduleSelect,
+ 133:     removeSchedule,
+ 134:     formatScheduleDisplay,
+ 135:     handleSubmit,
+ 136:     getAgeGroupLabel,
+ 137:     formatPhoneNumber,
+ 138:     isStep1Valid,
+ 139:   } = flow
+ 140: 
+ 141:   const [nameDraft, setNameDraft] = useState(userInfo.name)
+ 142:   const headerRef = useRef<HTMLElement>(null)
+ 143:   const mobileQuickTopicsRef = useRef<HTMLDivElement>(null)
+ 144:   const reservationFlowStartRef = useRef<HTMLDivElement>(null)
+ 145:   const step2StartRef = useRef<HTMLDivElement>(null)
+ 146:   const step3StartRef = useRef<HTMLDivElement>(null)
+ 147:   const step4StartRef = useRef<HTMLDivElement>(null)
+ 148:   const step5StartRef = useRef<HTMLDivElement>(null)
+ 149:   const [showExitModal, setShowExitModal] = useState(false)
+ 150:   const [quickTopicHistory, setQuickTopicHistory] = useState<QuickTopicChatEntry[]>([])
+ 151:   const [activeQuickTopicId, setActiveQuickTopicId] = useState<QuickTopicId | null>(null)
+ 152:   const [isReservationFlowStarted, setIsReservationFlowStarted] = useState(false)
+ 153:   const [editingField, setEditingField] = useState<"name" | "relationship" | "birthdate" | "gender" | null>(null)
+ 154:   const [isMobileStepCompact, setIsMobileStepCompact] = useState(false)
+ 155:   const [isRelationshipPromptReady, setIsRelationshipPromptReady] = useState(false)
+ 156:   const [isBirthdatePromptReady, setIsBirthdatePromptReady] = useState(false)
+ 157:   const [isGenderPromptReady, setIsGenderPromptReady] = useState(false)
+ 158:   const relationshipPromptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+ 159:   const birthdatePromptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+ 160:   const genderPromptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+ 161:   const isOnlyKoreanJamo = (value: string) => /^[\u3131-\u314e\u314f-\u3163]+$/.test(value)
+ 162:   const isValidName = (value: string) => {
+ 163:     const trimmed = value.trim()
+ 164:     return trimmed.length >= 2 && !isOnlyKoreanJamo(trimmed)
+ 165:   }
+ 166: 
+ 167:   useEffect(() => {
+ 168:     setNameDraft(userInfo.name)
+ 169:   }, [userInfo.name])
+ 170: 
+ 171:   useEffect(() => {
+ 172:     let frameId: number | null = null
+ 173: 
+ 174:     const updateCompactState = () => {
+ 175:       const isMobile = window.innerWidth < 1024
+ 176:       const shouldCompact = isMobile && window.scrollY > 40
+ 177:       setIsMobileStepCompact((prev) => (prev === shouldCompact ? prev : shouldCompact))
+ 178:       frameId = null
+ 179:     }
+ 180: 
+ 181:     const handleScroll = () => {
+ 182:       if (frameId !== null) {
+ 183:         return
+ 184:       }
+ 185:       frameId = window.requestAnimationFrame(updateCompactState)
+ 186:     }
+ 187: 
+ 188:     updateCompactState()
+ 189:     window.addEventListener("scroll", handleScroll, { passive: true })
+ 190:     window.addEventListener("resize", handleScroll)
+ 191: 
+ 192:     return () => {
+ 193:       window.removeEventListener("scroll", handleScroll)
+ 194:       window.removeEventListener("resize", handleScroll)
+ 195:       if (frameId !== null) {
+ 196:         window.cancelAnimationFrame(frameId)
+ 197:       }
+ 198:     }
+ 199:   }, [])
+ 200: 
+ 201:   const handleNameSubmit = () => {
+ 202:     const trimmedName = nameDraft.trim()
+ 203:     if (!isValidName(trimmedName)) {
+ 204:       return
+ 205:     }
+ 206: 
+ 207:     setUserInfo((prev) => ({ ...prev, name: trimmedName }))
+ 208:     setEditingField(null)
+ 209:   }
+ 210: 
+ 211:   const isBothSelected = attendance === "both"
+ 212:   const concernAgeGroup = ageGroup === "adult" ? "high" : ageGroup
+ 213:   const totalConcernCount = concernAgeGroup ? concernData[concernAgeGroup].cards.length : 5
+ 214:   const hasNameAnswer = isValidName(userInfo.name)
+ 215:   const hasRelationshipAnswer = Boolean(userInfo.relationship)
+ 216:   const hasBirthdateAnswer =
+ 217:     userInfo.birthdate.length === 10 && birthdateError === null && userInfo.birthdate === birthdateInput
+ 218:   const hasGenderAnswer = Boolean(userInfo.gender)
+ 219:   const isEditingName = editingField === "name"
+ 220:   const isEditingRelationship = editingField === "relationship"
+ 221:   const isEditingBirthdate = editingField === "birthdate"
+ 222:   const isEditingGender = editingField === "gender"
+ 223:   const canShowRelationshipQuestion = hasNameAnswer && !isEditingName
+ 224:   const canShowBirthdateQuestion = canShowRelationshipQuestion && hasRelationshipAnswer && !isEditingRelationship
+ 225:   const canShowGenderQuestion = canShowBirthdateQuestion && hasBirthdateAnswer && !isEditingBirthdate
+ 226: 
+ 227:   useEffect(() => {
+ 228:     if (isEditingBirthdate && hasBirthdateAnswer) {
+ 229:       setEditingField(null)
+ 230:     }
+ 231:   }, [isEditingBirthdate, hasBirthdateAnswer])
+ 232: 
+ 233:   useEffect(() => {
+ 234:     if (!canShowRelationshipQuestion) {
+ 235:       setIsRelationshipPromptReady(false)
+ 236:       if (relationshipPromptTimerRef.current) {
+ 237:         clearTimeout(relationshipPromptTimerRef.current)
+ 238:         relationshipPromptTimerRef.current = null
+ 239:       }
+ 240:       return
+ 241:     }
+ 242: 
+ 243:     if (isRelationshipPromptReady) {
+ 244:       return
+ 245:     }
+ 246: 
+ 247:     relationshipPromptTimerRef.current = setTimeout(() => {
+ 248:       setIsRelationshipPromptReady(true)
+ 249:       relationshipPromptTimerRef.current = null
+ 250:     }, STEP1_TYPING_DELAY_MS)
+ 251: 
+ 252:     return () => {
+ 253:       if (relationshipPromptTimerRef.current) {
+ 254:         clearTimeout(relationshipPromptTimerRef.current)
+ 255:         relationshipPromptTimerRef.current = null
+ 256:       }
+ 257:     }
+ 258:   }, [canShowRelationshipQuestion, isRelationshipPromptReady])
+ 259: 
+ 260:   useEffect(() => {
+ 261:     if (!canShowBirthdateQuestion) {
+ 262:       setIsBirthdatePromptReady(false)
+ 263:       if (birthdatePromptTimerRef.current) {
+ 264:         clearTimeout(birthdatePromptTimerRef.current)
+ 265:         birthdatePromptTimerRef.current = null
+ 266:       }
+ 267:       return
+ 268:     }
+ 269: 
+ 270:     if (isBirthdatePromptReady) {
+ 271:       return
+ 272:     }
+ 273: 
+ 274:     birthdatePromptTimerRef.current = setTimeout(() => {
+ 275:       setIsBirthdatePromptReady(true)
+ 276:       birthdatePromptTimerRef.current = null
+ 277:     }, STEP1_TYPING_DELAY_MS)
+ 278: 
+ 279:     return () => {
+ 280:       if (birthdatePromptTimerRef.current) {
+ 281:         clearTimeout(birthdatePromptTimerRef.current)
+ 282:         birthdatePromptTimerRef.current = null
+ 283:       }
+ 284:     }
+ 285:   }, [canShowBirthdateQuestion, isBirthdatePromptReady])
+ 286: 
+ 287:   useEffect(() => {
+ 288:     if (!canShowGenderQuestion) {
+ 289:       setIsGenderPromptReady(false)
+ 290:       if (genderPromptTimerRef.current) {
+ 291:         clearTimeout(genderPromptTimerRef.current)
+ 292:         genderPromptTimerRef.current = null
+ 293:       }
+ 294:       return
+ 295:     }
+ 296: 
+ 297:     if (isGenderPromptReady) {
+ 298:       return
+ 299:     }
+ 300: 
+ 301:     genderPromptTimerRef.current = setTimeout(() => {
+ 302:       setIsGenderPromptReady(true)
+ 303:       genderPromptTimerRef.current = null
+ 304:     }, STEP1_TYPING_DELAY_MS)
+ 305: 
+ 306:     return () => {
+ 307:       if (genderPromptTimerRef.current) {
+ 308:         clearTimeout(genderPromptTimerRef.current)
+ 309:         genderPromptTimerRef.current = null
+ 310:       }
+ 311:     }
+ 312:   }, [canShowGenderQuestion, isGenderPromptReady])
+ 313: 
+ 314:   useEffect(() => {
+ 315:     if (!isReservationFlowStarted || step < 2) {
+ 316:       return
+ 317:     }
+ 318: 
+ 319:     const targetRef =
+ 320:       step === 2
+ 321:         ? step2StartRef
+ 322:         : step === 3
+ 323:           ? step3StartRef
+ 324:           : step === 4
+ 325:             ? step4StartRef
+ 326:             : step === 5
+ 327:               ? step5StartRef
+ 328:               : null
+ 329: 
+ 330:     if (!targetRef?.current) {
+ 331:       return
+ 332:     }
+ 333: 
+ 334:     const target = targetRef.current
+ 335:     const frameId = window.requestAnimationFrame(() => {
+ 336:       const headerHeight = headerRef.current?.offsetHeight ?? (window.innerWidth >= 768 ? 80 : 64)
+ 337:       const isMobileView = window.innerWidth < 1024
+ 338:       const mobileQuickTopicsHeight = isMobileView ? (mobileQuickTopicsRef.current?.offsetHeight ?? 0) : 0
+ 339:       const spacing = isMobileView ? 16 : 24
+ 340:       const contextPeekOffset = isMobileView ? 56 : 72
+ 341:       const top =
+ 342:         target.getBoundingClientRect().top +
+ 343:         window.scrollY -
+ 344:         (headerHeight + mobileQuickTopicsHeight + spacing + contextPeekOffset)
+ 345: 
+ 346:       window.scrollTo({ top: Math.max(0, top), behavior: "smooth" })
+ 347:     })
+ 348: 
+ 349:     return () => {
+ 350:       window.cancelAnimationFrame(frameId)
+ 351:     }
+ 352:   }, [isReservationFlowStarted, step, showContent])
+ 353: 
+ 354:   useEffect(() => {
+ 355:     if (!isReservationFlowStarted || !reservationFlowStartRef.current) {
+ 356:       return
+ 357:     }
+ 358: 
+ 359:     const frameId = window.requestAnimationFrame(() => {
+ 360:       const target = reservationFlowStartRef.current
+ 361:       if (!target) {
+ 362:         return
+ 363:       }
+ 364: 
+ 365:       const headerHeight = headerRef.current?.offsetHeight ?? (window.innerWidth >= 768 ? 80 : 64)
+ 366:       const isMobileView = window.innerWidth < 1024
+ 367:       const mobileQuickTopicsHeight = isMobileView ? (mobileQuickTopicsRef.current?.offsetHeight ?? 0) : 0
+ 368:       const spacing = isMobileView ? 16 : 24
+ 369:       const top = target.getBoundingClientRect().top + window.scrollY - (headerHeight + mobileQuickTopicsHeight + spacing)
+ 370: 
+ 371:       window.scrollTo({ top: Math.max(0, top), behavior: "smooth" })
+ 372:     })
+ 373: 
+ 374:     return () => {
+ 375:       window.cancelAnimationFrame(frameId)
+ 376:     }
+ 377:   }, [isReservationFlowStarted])
+ 378: 
+ 379:   useEffect(() => {
+ 380:     if (quickTopicHistory.length === 0 && !isReservationFlowStarted) {
+ 381:       return
+ 382:     }
+ 383: 
+ 384:     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+ 385:   }, [quickTopicHistory, isReservationFlowStarted, messagesEndRef])
+ 386: 
+ 387:   const handleQuickTopicSelect = (topicId: QuickTopicId) => {
+ 388:     setActiveQuickTopicId(topicId)
+ 389: 
+ 390:     setQuickTopicHistory((previous) => {
+ 391:       if (previous.some((entry) => entry.id === topicId)) {
+ 392:         return previous
+ 393:       }
+ 394: 
+ 395:       const topic = QUICK_TOPICS[topicId]
+ 396:       return [
+ 397:         ...previous,
+ 398:         {
+ 399:           id: topic.id,
+ 400:           topicId: topic.id,
+ 401:           userMessage: topic.userMessage,
+ 402:           botMessage: topic.botMessage,
+ 403:           tips: topic.tips,
+ 404:           actions: topic.actions,
+ 405:         },
+ 406:       ]
+ 407:     })
+ 408:   }
+ 409: 
+ 410:   const handleQuickTopicActionClick = (topicId: QuickTopicId, action: QuickTopicAction) => {
+ 411:     setActiveQuickTopicId(topicId)
+ 412: 
+ 413:     if (action.type === "reservation") {
+ 414:       setQuickTopicHistory((previous) => {
+ 415:         const reservationIntroId = `${topicId}:reservation-intro`
+ 416:         if (previous.some((entry) => entry.id === reservationIntroId)) {
+ 417:           return previous
+ 418:         }
+ 419: 
+ 420:         return [
+ 421:           ...previous,
+ 422:           {
+ 423:             id: reservationIntroId,
+ 424:             topicId,
+ 425:             userMessage: "(?? ?ÑÎ¨∏Í∞Ä ?ÅÎã¥ ?àÏïΩ??ÏßÑÌñâ?òÍ≥† ?∂Ïñ¥??,
+ 426:             botMessage: "Ï¢ãÏïÑ?? ÏßÄÍ∏àÎ????àÏïΩ ?åÎ°ú?∞Î? ?¥Ïñ¥??ÏßÑÌñâ?†Í≤å??",
+ 427:           },
+ 428:         ]
+ 429:       })
+ 430:       setIsReservationFlowStarted(true)
+ 431:       return
+ 432:     }
+ 433: 
+ 434:     if (!action.botReply) {
+ 435:       return
+ 436:     }
+ 437: 
+ 438:     const reservationAction = QUICK_TOPICS[topicId].actions.find((item) => item.type === "reservation")
+ 439:     const followUpEntryId = `${topicId}:${action.id}`
+ 440: 
+ 441:     setQuickTopicHistory((previous) => {
+ 442:       if (previous.some((entry) => entry.id === followUpEntryId)) {
+ 443:         return previous
+ 444:       }
+ 445: 
+ 446:       return [
+ 447:         ...previous,
+ 448:         {
+ 449:           id: followUpEntryId,
+ 450:           topicId,
+ 451:           userMessage: `(?? ${action.label}`,
+ 452:           botMessage: action.botReply ?? "",
+ 453:           actions: reservationAction ? [reservationAction] : [],
+ 454:         },
+ 455:       ]
+ 456:     })
+ 457:   }
+ 458: 
+ 459:   const selectedQuickTopicSet = new Set(quickTopicHistory.map((entry) => entry.topicId))
+ 460: 
+ 461:   const handleExit = () => {
+ 462:     resetAll()
+ 463:     setShowExitModal(false)
+ 464:     router.push("/")
+ 465:   }
+ 466: 
+ 467:   return (
+ 468:     <div className="min-h-screen bg-white">
+ 469:       <header ref={headerRef} className="fixed top-0 left-0 right-0 z-[100] border-b border-[#EDE3D8] bg-[#FFF9F4]">
+ 470:         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+ 471:           <div className="flex h-16 items-center justify-between md:h-20">
+ 472:             <Link
+ 473:               href="/"
+ 474:               className="shrink-0"
+ 475:               onClick={(e) => {
+ 476:                 e.preventDefault()
+ 477:                 setShowExitModal(true)
+ 478:               }}
+ 479:             >
+ 480:               <span className="text-2xl font-bold tracking-tight text-[#0C0C0C] md:text-[2.1rem]">{"\uC0AC\uBC1C\uBA74"}</span>
+ 481:             </Link>
+ 482:             <Button
+ 483:               type="button"
+ 484:               variant="outline"
+ 485:               onClick={() => setShowExitModal(true)}
+ 486:               className="h-10 cursor-pointer rounded-full border-[#0C0C0C] bg-white px-6 text-base font-semibold text-[#0C0C0C] shadow-none hover:bg-[#0C0C0C] hover:text-white"
+ 487:             >
+ 488:               {"\uB098\uAC00\uAE30"}
+ 489:             </Button>
+ 490:           </div>
+ 491:         </div>
+ 492:       </header>
+ 493: 
+ 494:       <main className="pt-28 pb-16">
+ 495:         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+ 496:           <section className="mb-10">
+ 497:             <h1 className="text-[30px] font-bold text-[#1F1F1F]">{"\uC608\uC57D\uD558\uAE30"}</h1>
+ 498:             <p className="mt-2 text-[18px] font-normal text-[#3D372F]">
+ 499:               {"\uc544\uc774\uc758 \uc131\uc7a5 \ub2e8\uacc4\uc5d0 \ub9de\ub294 \uc804\ubb38\uc801\uc778 \uc194\ub8e8\uc158\uc744 \uc81c\uacf5\ud569\ub2c8\ub2e4."}
+ 500:             </p>
+ 501:           </section>
+ 502: 
+ 503:           <div className="grid gap-10 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-16">
+ 504:             <aside className="hidden self-start lg:block lg:sticky lg:top-28">
+ 505:               <div className="rounded-2xl border border-[#D6D9F3] bg-white p-5">
+ 506:                 <p className="text-lg font-bold text-[#6570A5]">Îπ†Î•∏ ?ÅÎã¥ Ï£ºÏ†ú</p>
+ 507:                 <div className="mt-4 space-y-2">
+ 508:                   {QUICK_TOPIC_ORDER.map((topicId) => {
+ 509:                     const topic = QUICK_TOPICS[topicId]
+ 510:                     const Icon = QUICK_TOPIC_ICON_MAP[topic.icon]
+ 511:                     const isActive = activeQuickTopicId === topicId
+ 512:                     const isSelected = selectedQuickTopicSet.has(topicId)
+ 513: 
+ 514:                     return (
+ 515:                       <button
+ 516:                         key={topicId}
+ 517:                         type="button"
+ 518:                         onClick={() => handleQuickTopicSelect(topicId)}
+ 519:                         className={cn(
+ 520:                           "flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors",
+ 521:                           isActive
+ 522:                             ? "bg-[#EEF3FF] text-primary"
+ 523:                             : isSelected
+ 524:                               ? "bg-[#F4F7FF] text-[#4E5D90]"
+ 525:                               : "text-[#4E5D90] hover:bg-[#F6F8FF]",
+ 526:                         )}
+ 527:                       >
+ 528:                         <Icon className="h-5 w-5 shrink-0" />
+ 529:                         <span className="text-[22px] font-medium leading-none">{topic.label}</span>
+ 530:                       </button>
+ 531:                     )
+ 532:                   })}
+ 533:                 </div>
+ 534:               </div>
+ 535:             </aside>
+ 536: 
+ 537:             <div className="space-y-4">
+ 538:               <div
+ 539:                 ref={mobileQuickTopicsRef}
+ 540:                 className={cn(
+ 541:                   "sticky top-[74px] z-30 rounded-2xl border border-[#D6D9F3] bg-white transition-all duration-300 md:top-[90px] lg:hidden",
+ 542:                   isMobileStepCompact ? "p-2.5" : "p-3.5",
+ 543:                 )}
+ 544:               >
+ 545:                 <p
+ 546:                   className={cn(
+ 547:                     "font-semibold leading-none text-[#6570A5] transition-all duration-300",
+ 548:                     isMobileStepCompact ? "text-sm" : "text-base",
+ 549:                   )}
+ 550:                 >
+ 551:                   Îπ†Î•∏ ?ÅÎã¥ Ï£ºÏ†ú
+ 552:                 </p>
+ 553:                 <div className="mt-2 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+ 554:                   {QUICK_TOPIC_ORDER.map((topicId) => {
+ 555:                     const topic = QUICK_TOPICS[topicId]
+ 556:                     const Icon = QUICK_TOPIC_ICON_MAP[topic.icon]
+ 557:                     const isActive = activeQuickTopicId === topicId
+ 558:                     const isSelected = selectedQuickTopicSet.has(topicId)
+ 559: 
+ 560:                     return (
+ 561:                       <button
+ 562:                         key={topicId}
+ 563:                         type="button"
+ 564:                         onClick={() => handleQuickTopicSelect(topicId)}
+ 565:                         className={cn(
+ 566:                           "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-sm font-semibold transition-colors",
+ 567:                           isActive
+ 568:                             ? "border-primary bg-[#EEF3FF] text-primary"
+ 569:                             : isSelected
+ 570:                               ? "border-[#D6D9F3] bg-[#F4F7FF] text-[#4E5D90]"
+ 571:                               : "border-[#D6D9F3] bg-white text-[#4E5D90]",
+ 572:                         )}
+ 573:                       >
+ 574:                         <Icon className="h-4 w-4 shrink-0" />
+ 575:                         <span>{topic.label}</span>
+ 576:                       </button>
+ 577:                     )
+ 578:                   })}
+ 579:                 </div>
+ 580:               </div>
+ 581: 
+ 582:               <BotMessage content={QUICK_TOPIC_GUIDE_MESSAGE} />
+ 583: 
+ 584:               {quickTopicHistory.map((entry) => (
+ 585:                 <div key={entry.id} className="space-y-3">
+ 586:                   <UserMessage content={entry.userMessage} />
+ 587:                   <BotMessage
+ 588:                     content={
+ 589:                       <div className="space-y-3">
+ 590:                         <p className="text-sm leading-relaxed whitespace-pre-line text-foreground md:text-base">
+ 591:                           {entry.botMessage}
+ 592:                         </p>
+ 593:                         {entry.tips && entry.tips.length > 0 && (
+ 594:                           <div className="space-y-1.5">
+ 595:                             <p className="text-sm font-semibold text-[#2F2A23]">?¥Îãπ ?∞Î†π???Ä??Íµ¨Ï≤¥?ÅÏù∏ ??</p>
+ 596:                             <ul className="space-y-1">
+ 597:                               {entry.tips.map((tip) => (
+ 598:                                 <li key={tip} className="text-sm leading-relaxed text-foreground md:text-base">
+ 599:                                   ??{tip}
+ 600:                                 </li>
+ 601:                               ))}
+ 602:                             </ul>
+ 603:                           </div>
+ 604:                         )}
+ 605:                         {entry.actions && entry.actions.length > 0 && (
+ 606:                           <div className="flex flex-wrap gap-2 pt-1">
+ 607:                             {entry.actions.map((action) => (
+ 608:                               <button
+ 609:                                 key={`${entry.id}-${action.id}`}
+ 610:                                 type="button"
+ 611:                                 onClick={() => handleQuickTopicActionClick(entry.topicId, action)}
+ 612:                                 className={cn(
+ 613:                                   "inline-flex items-center rounded-full px-3 py-1.5 text-sm font-semibold transition-colors",
+ 614:                                   action.type === "reservation"
+ 615:                                     ? "bg-primary text-primary-foreground hover:bg-primary/90"
+ 616:                                     : "border border-[#D8CEBC] bg-white text-[#2F2A23] hover:bg-[#F4F0E7]",
+ 617:                                 )}
+ 618:                               >
+ 619:                                 {action.label}
+ 620:                               </button>
+ 621:                             ))}
+ 622:                           </div>
+ 623:                         )}
+ 624:                       </div>
+ 625:                     }
+ 626:                   />
+ 627:                 </div>
+ 628:               ))}
+ 629: 
+ 630:               {isReservationFlowStarted && (
+ 631:                 <>
+ 632:                   <div ref={reservationFlowStartRef} />
+ 633:                   {/* Step 1: Service */}
+ 634:           <Step1Service flow={flow}>
+ 635:             {step >= 1 && (
+ 636:               <>
+ 637:                 {isTyping && step === 1 ? (
+ 638:                   <BotMessage content="" isTyping />
+ 639:                 ) : (
+ 640:                   <>
+ 641:                     <BotMessage content={"\uc548\ub155\ud558\uc138\uc694! \uc5d0\uc138\uc2a4\ud0c0 \ubd80\ubaa8\ucf54\uce6d \ub9e4\ub2c8\uc800\uc785\ub2c8\ub2e4."} />
+ 642:                     <BotMessage content={"\uac00\uc7a5 \ucd5c\uc801\ud654\ub41c \ucf54\uce6d\uc744 \uc704\ud574 \uc608\uc57d\uc790\ubd84\uc758 \uc774\ub984\uacfc \ub300\uc0c1\uc790\uc640\uc758 \uad00\uacc4,\n\uadf8\ub9ac\uace0 \ub300\uc0c1\uc790\uc758 \uc0dd\ub144\uc6d4\uc77c\uc744 \uc785\ub825\ud574 \uc8fc\uc2ed\uc2dc\uc624."} />
+ 643: 
+ 644:                     {showContent && step === 1 && (
+ 645:                       <div className="space-y-4 animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
+ 646:                         <BotMessage content={"\uc608\uc57d\uc790\ubd84 \uc131\ud568\uc744 \uc54c\ub824\uc8fc\uc138\uc694."} />
+ 647:                         {hasNameAnswer && !isEditingName ? (
+ 648:                           <EditableUserMessage
+ 649:                             content={userInfo.name}
+ 650:                             onEdit={() => {
+ 651:                               setNameDraft(userInfo.name)
+ 652:                               setEditingField("name")
+ 653:                             }}
+ 654:                           />
+ 655:                         ) : (
+ 656:                           <div className="flex justify-end animate-in fade-in-0 slide-in-from-right-4 duration-300">
+ 657:                             <div className="w-full max-w-md rounded-[20px] rounded-tr-[5px] bg-white px-4 py-3 border border-[#B1A58F]">
+ 658:                               <div className="flex items-center gap-2">
+ 659:                                 <div className="flex-1 rounded-xl border border-[#D8CEBC] bg-white px-4 py-2.5">
+ 660:                                   <input
+ 661:                                     type="text"
+ 662:                                     value={nameDraft}
+ 663:                                     onChange={(e) => setNameDraft(e.target.value)}
+ 664:                                     onBlur={handleNameSubmit}
+ 665:                                     onKeyDown={(e) => {
+ 666:                                       if (e.key === "Enter") {
+ 667:                                         e.preventDefault()
+ 668:                                         handleNameSubmit()
+ 669:                                       }
+ 670:                                     }}
+ 671:                                     placeholder={"\uC608\uC57D\uC790 \uC774\uB984\uC744 \uC785\uB825\uD574 \uC8FC\uC138\uC694"}
+ 672:                                     className="w-full bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none"
+ 673:                                   />
+ 674:                                 </div>
+ 675:                                 <button
+ 676:                                   type="button"
+ 677:                                   onClick={handleNameSubmit}
+ 678:                                   disabled={!isValidName(nameDraft)}
+ 679:                                   className={cn(
+ 680:                                     "w-9 h-9 rounded-full border flex items-center justify-center transition-all flex-shrink-0",
+ 681:                                     isValidName(nameDraft)
+ 682:                                       ? "bg-[#E7E0D3] border-[#D0C8BB] text-[#544E45] hover:brightness-95"
+ 683:                                       : "bg-muted border-transparent text-muted-foreground cursor-not-allowed",
+ 684:                                   )}
+ 685:                                   aria-label={"\uC774\uB984 \uC804\uC1A1"}
+ 686:                                 >
+ 687:                                   <ArrowUp className="w-4 h-4" />
+ 688:                                 </button>
+ 689:                               </div>
+ 690:                             </div>
+ 691:                           </div>
+ 692:                         )}
+ 693: 
+ 694:                         {canShowRelationshipQuestion && (
+ 695:                           <>
+ 696:                             {isRelationshipPromptReady ? (
+ 697:                               <>
+ 698:                                 <BotMessage content={"\ub300\uc0c1\uc790\uc640\uc758 \uad00\uacc4\ub97c \uc120\ud0dd\ud574 \uc8fc\uc138\uc694."} />
+ 699:                                 {hasRelationshipAnswer && !isEditingRelationship ? (
+ 700:                                   <EditableUserMessage
+ 701:                                     content={userInfo.relationship}
+ 702:                                     onEdit={() => setEditingField("relationship")}
+ 703:                                   />
+ 704:                                 ) : (
+ 705:                                   <div className="flex justify-end animate-in fade-in-0 slide-in-from-right-4 duration-300">
+ 706:                                     <div className="w-full max-w-md rounded-[20px] rounded-tr-[5px] bg-white p-3 border border-[#B1A58F] space-y-2">
+ 707:                                       {relationships.map((rel) => (
+ 708:                                         <button
+ 709:                                           key={rel}
+ 710:                                           onClick={() => {
+ 711:                                             setUserInfo((prev) => ({ ...prev, relationship: rel as Relationship }))
+ 712:                                             setEditingField(null)
+ 713:                                           }}
+ 714:                                           className={cn(
+ 715:                                             "w-full px-4 py-2.5 rounded-xl border text-left transition-all",
+ 716:                                             userInfo.relationship === rel
+ 717:                                               ? "border-[#0B6980] bg-[#0B6980] text-white"
+ 718:                                               : "border-transparent bg-[#DCD8D2] hover:bg-[#D4D0C8] text-foreground",
+ 719:                                           )}
+ 720:                                         >
+ 721:                                           {rel}
+ 722:                                         </button>
+ 723:                                       ))}
+ 724:                                     </div>
+ 725:                                   </div>
+ 726:                                 )}
+ 727:                               </>
+ 728:                             ) : (
+ 729:                               <BotMessage content="" isTyping />
+ 730:                             )}
+ 731:                           </>
+ 732:                         )}
+ 733: 
+ 734:                         {canShowBirthdateQuestion && (
+ 735:                           <>
+ 736:                             {isBirthdatePromptReady ? (
+ 737:                               <>
+ 738:                                 <BotMessage content={"\ub300\uc0c1\uc790\uc758 \uc0dd\ub144\uc6d4\uc77c\uc744 \uc785\ub825\ud574 \uc8fc\uc138\uc694. \uc22b\uc790\ub9cc \uc785\ub825\ud558\uc138\uc694. (\uc608: 20021225)"} />
+ 739:                                 {hasBirthdateAnswer && !isEditingBirthdate ? (
+ 740:                                   <EditableUserMessage
+ 741:                                     content={`${userInfo.birthdate}${ageGroup ? ` (${getAgeGroupLabel(ageGroup)})` : ""}`}
+ 742:                                     onEdit={() => setEditingField("birthdate")}
+ 743:                                   />
+ 744:                                 ) : (
+ 745:                                   <div className="flex justify-end animate-in fade-in-0 slide-in-from-right-4 duration-300">
+ 746:                                     <div className="w-full max-w-md rounded-[20px] rounded-tr-[5px] bg-white p-4 border border-[#B1A58F]">
+ 747:                                       <div className="flex items-center gap-2">
+ 748:                                         <div className="flex-1 rounded-xl border border-[#D8CEBC] bg-white px-4 py-2.5">
+ 749:                                           <input
+ 750:                                             type="text"
+ 751:                                             value={birthdateInput}
+ 752:                                             onChange={(e) => handleBirthdateChange(e.target.value)}
+ 753:                                             onBlur={handleBirthdateBlur}
+ 754:                                             onKeyDown={(e) => {
+ 755:                                               if (e.key === "Enter") {
+ 756:                                                 e.preventDefault()
+ 757:                                                 handleBirthdateBlur()
+ 758:                                               }
+ 759:                                             }}
+ 760:                                             placeholder={"\uc22b\uc790\ub9cc \uc785\ub825\ud558\uc138\uc694 (\uc608: 20021225)"}
+ 761:                                             maxLength={10}
+ 762:                                             className="w-full bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none"
+ 763:                                           />
+ 764:                                         </div>
+ 765:                                         <button
+ 766:                                           type="button"
+ 767:                                           onClick={handleBirthdateBlur}
+ 768:                                           disabled={birthdateInput.trim().length === 0}
+ 769:                                           className={cn(
+ 770:                                             "w-9 h-9 rounded-full border flex items-center justify-center transition-all flex-shrink-0",
+ 771:                                             birthdateInput.trim().length > 0
+ 772:                                               ? "bg-[#E7E0D3] border-[#D0C8BB] text-[#544E45] hover:brightness-95"
+ 773:                                               : "bg-muted border-transparent text-muted-foreground cursor-not-allowed",
+ 774:                                           )}
+ 775:                                           aria-label={"\uC0DD\uB144\uC6D4\uC77C \uC804\uC1A1"}
+ 776:                                         >
+ 777:                                           <ArrowUp className="w-4 h-4" />
+ 778:                                         </button>
+ 779:                                       </div>
+ 780:                                       {birthdateError && <p className="mt-1.5 text-sm text-destructive">{birthdateError}</p>}
+ 781:                                     </div>
+ 782:                                   </div>
+ 783:                                 )}
+ 784:                               </>
+ 785:                             ) : (
+ 786:                               <BotMessage content="" isTyping />
+ 787:                             )}
+ 788:                           </>
+ 789:                         )}
+ 790: 
+ 791:                         {canShowGenderQuestion && (
+ 792:                           <>
+ 793:                             {isGenderPromptReady ? (
+ 794:                               <>
+ 795:                                 <BotMessage content={"\ub300\uc0c1\uc790 \uc131\ubcc4\uc744 \uc120\ud0dd\ud574 \uc8fc\uc138\uc694."} />
+ 796:                                 {hasGenderAnswer && !isEditingGender ? (
+ 797:                                   <>
+ 798:                                     <EditableUserMessage
+ 799:                                       content={userInfo.gender}
+ 800:                                       onEdit={() => setEditingField("gender")}
+ 801:                                     />
+ 802:                                     <div className="w-full animate-in fade-in-0 slide-in-from-right-4 duration-300">
+ 803:                                       <Button
+ 804:                                         onClick={goToNextStep}
+ 805:                                         disabled={!isStep1Valid}
+ 806:                                         className="w-full h-[50px] text-[18px] font-semibold mt-5"
+ 807:                                       >
+ 808:                                         {"\ub2e4\uc74c\uc73c\ub85c"}
+ 809:                                       </Button>
+ 810:                                     </div>
+ 811:                                   </>
+ 812:                                 ) : (
+ 813:                                   <div className="flex justify-end animate-in fade-in-0 slide-in-from-right-4 duration-300">
+ 814:                                     <div className="w-full max-w-md rounded-[20px] rounded-tr-[5px] bg-white p-3 border border-[#B1A58F] grid grid-cols-2 gap-2">
+ 815:                                       {genders.map((gender) => (
+ 816:                                         <button
+ 817:                                           key={gender}
+ 818:                                           onClick={() => {
+ 819:                                             setUserInfo((prev) => ({ ...prev, gender: gender as Gender }))
+ 820:                                             setEditingField(null)
+ 821:                                           }}
+ 822:                                           className={cn(
+ 823:                                             "px-4 py-2.5 rounded-xl border text-center transition-all",
+ 824:                                             userInfo.gender === gender
+ 825:                                               ? "border-[#0B6980] bg-[#0B6980] text-white"
+ 826:                                               : "border-transparent bg-[#DCD8D2] hover:bg-[#D4D0C8] text-foreground",
+ 827:                                           )}
+ 828:                                         >
+ 829:                                           {gender}
+ 830:                                         </button>
+ 831:                                       ))}
+ 832:                                     </div>
+ 833:                                   </div>
+ 834:                                 )}
+ 835:                               </>
+ 836:                             ) : (
+ 837:                               <BotMessage content="" isTyping />
+ 838:                             )}
+ 839:                           </>
+ 840:                         )}
+ 841:                       </div>
+ 842:                     )}
+ 843:                   </>
+ 844:                 )}
+ 845: 
+ 846:                 {step > 1 && (
+ 847:                   <UserMessage content={`${userInfo.name} / ${userInfo.relationship} / ${userInfo.birthdate} / ${userInfo.gender}`} />
+ 848:                 )}
+ 849:               </>
+ 850:             )}
+ 851:           </Step1Service>
+ 852: 
+ 853:           {/* Step 2: Expert */}
+ 854:           <Step2Expert flow={flow}>
+ 855:             {step >= 2 && concernAgeGroup && (
+ 856:             <>
+ 857:               <div ref={step2StartRef} />
+ 858:               {isTyping && step === 2 ? (
+ 859:                 <BotMessage content="" isTyping />
+ 860:               ) : (
+ 861:                 <>
+ 862:                   <BotMessage content={"\ud604\uc7ac \uac00\uc7a5 \uace0\ubbfc\ub418\ub294 \ubd80\ubd84\uc740 \ubb34\uc5c7\uc778\uac00\uc694?"} />
+ 863: 
+ 864:                   {showContent && step === 2 && (
+ 865:                     <div className="space-y-4 animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
+ 866:                       {/* Slogan Card */}
+ 867:                       <div className="rounded-xl border border-[#B1A58F] bg-[#F8F6F1] p-4">
+ 868:                         <p className="text-sm text-center font-medium leading-relaxed text-[#2F2A23]">
+ 869:                           {concernData[concernAgeGroup].slogan}
+ 870:                         </p>
+ 871:                         <p className="mt-2 text-xs text-center text-[#6B6256]">{concernData[concernAgeGroup].intro}</p>
+ 872:                       </div>
+ 873: 
+ 874:                       {/* Concern Cards */}
+ 875:                       <div className="space-y-3">
+ 876:                         {concernData[concernAgeGroup].cards.map((card) => (
+ 877:                           <ConcernCard
+ 878:                             key={card.title}
+ 879:                             card={card}
+ 880:                             isSelected={selectedConcerns.some((item) => item.id === card.title)}
+ 881:                             selectionOrder={selectedConcerns.find((item) => item.id === card.title)?.order}
+ 882:                             onSelect={() => toggleConcernSelection(card.title)}
+ 883:                           />
+ 884:                         ))}
+ 885:                       </div>
+ 886: 
+ 887:                       {concernLimitMessage && <p className="text-sm text-destructive">{concernLimitMessage}</p>}
+ 888:                       <p className="text-sm text-[#5D5549]">{"\uc120\ud0dd\ub41c \uace0\ubbfc:"} {selectedConcerns.length}/{totalConcernCount}</p>
+ 889: 
+ 890:                       <Button
+ 891:                         onClick={goToNextStep}
+ 892:                         disabled={selectedConcerns.length === 0}
+ 893:                         className="w-full h-[50px] text-[18px] font-semibold mt-5"
+ 894:                       >
+ 895:                         {"\ub2e4\uc74c\uc73c\ub85c"}
+ 896:                       </Button>
+ 897:                     </div>
+ 898:                   )}
+ 899:                 </>
+ 900:               )}
+ 901: 
+ 902:               {step > 2 && selectedConcern && <UserMessage content={selectedConcern} />}
+ 903:             </>
+ 904:             )}
+ 905: 
+ 906:             {/* Step 3: Attendance */}
+ 907:             {step >= 3 && (
+ 908:             <>
+ 909:               <div ref={step3StartRef} />
+ 910:               {isTyping && step === 3 ? (
+ 911:                 <BotMessage content="" isTyping />
+ 912:               ) : (
+ 913:                 <>
+ 914:                   <BotMessage content={"\uc774\ubc88 \ucf54\uce6d/\uc0c1\ub2f4\uc5d0\ub294 \ub204\uac00 \ucc38\uc11d\ud558\uc2dc\ub098\uc694?"} />
+ 915: 
+ 916:                   {showContent && step === 3 && !showNudge && attendance !== "both" && (
+ 917:                     <div className="space-y-3 animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
+ 918:                       <AttendanceOptionButton isSelected={isBothSelected} onClick={() => handleAttendanceSelect("both")}>
+ 919:                         <div className="flex items-center justify-between">
+ 920:                           <span className="font-medium">{"\uBD80\uBAA8\uC640 \uC790\uB140 \uBAA8\uB450 \uCC38\uC11D"}</span>
+ 921:                           <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full">{"\uAC15\uB825 \uCD94\uCC9C"}</span>
+ 922:                         </div>
+ 923:                       </AttendanceOptionButton>
+ 924:                       <AttendanceOptionButton isSelected={attendance === "child"} onClick={() => handleAttendanceSelect("child")}>
+ 925:                         <span className="font-medium">{"\uC790\uB140\uB9CC \uCC38\uC11D"}</span>
+ 926:                       </AttendanceOptionButton>
+ 927:                       <AttendanceOptionButton isSelected={attendance === "parent"} onClick={() => handleAttendanceSelect("parent")}>
+ 928:                         <span className="font-medium">{"\uBD80\uBAA8\uB9CC \uCC38\uC11D"}</span>
+ 929:                       </AttendanceOptionButton>
+ 930:                     </div>
+ 931:                   )}
+ 932: 
+ 933:                   {/* Nudge Message */}
+ 934:                   {showNudge && (
+ 935:                     <>
+ 936:                       <BotMessage
+ 937:                         content={
+ 938:                           <div className="space-y-3">
+ 939:                             <p className="leading-relaxed">
+ 940:                               {"\ubb3c\ub860 \ud640\ub85c \ucc38\uc11d\ub3c4 \uac00\ub2a5\ud569\ub2c8\ub2e4. \ud558\uc9c0\ub9cc \uc5d0\uc138\uc2a4\ud0c0 \ub9de\ucda4\ud615 \ucf54\uce6d\uc740 \ubd80\ubaa8\ub2d8\uacfc \uc790\ub140\uac00 \ud568\uaed8 \uc624\uc2e4 \ub54c \uc11c\ub85c\uc758 \uc131\ud5a5\uc744 \ud655\uc778\ud558\uace0 \uc18c\ud1b5\ud558\ub294 \ud6a8\uacfc\uac00 \ud6e8\uc52c \ucee4\uc9d1\ub2c8\ub2e4."}
+ 941:                             </p>
+ 942:                             <p className="leading-relaxed">
+ 943:                               {"\uc544\uc774\uc758 \ud604\uc7ac \uc0c1\ud0dc\uc640 \ubd80\ubaa8\ub2d8\uc758 \uc591\uc721 \uc131\ud5a5\uc744 \ud568\uaed8 \uc810\uac80\ud558\ub294 \uacfc\uc815\uc740 \ucf54\uce6d \ubc29\ud5a5\uc744 \ub354 \uc815\ud655\ud558\uac8c \uc7a1\ub294 \ub370 \ud070 \ub3c4\uc6c0\uc774 \ub429\ub2c8\ub2e4."}
+ 944:                             </p>
+ 945:                             <p className="font-medium">{"\uc0c1\ub2f4 \ud6a8\uacfc\ub97c \uc704\ud574 \ub450 \ubd84\uc774 \ud568\uaed8 \ucc38\uc11d\ud558\uc2dc\ub294 \uc77c\uc815\uc73c\ub85c \uc7a1\uc544\ubcfc\uae4c\uc694?"}</p>
+ 946:                           </div>
+ 947:                         }
+ 948:                       />
+ 949:                       <div className="flex gap-3 animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
+ 950:                         <Button onClick={() => handleNudgeResponse(true)} className="flex-1">
+ 951:                           {"\ub124, \ud568\uaed8 \ucc38\uc11d\ud560\uac8c\uc694"}                        </Button>
+ 952:                         <Button variant="outline" onClick={() => handleNudgeResponse(false)} className="flex-1">
+ 953:                           {"\uc774\ubc88\uc5d0\ub294 \ud640\ub85c \ucc38\uc11d\ud560\uac8c\uc694"}                        </Button>
+ 954:                       </div>
+ 955:                     </>
+ 956:                   )}
+ 957:                 </>
+ 958:               )}
+ 959: 
+ 960:               {step > 3 && attendance && (
+ 961:                 <UserMessage
+ 962:                   content={
+ 963:                     attendance === "both" ? "\uBD80\uBAA8\uC640 \uC790\uB140 \uBAA8\uB450 \uCC38\uC11D" : attendance === "child" ? "\uC790\uB140\uB9CC \uCC38\uC11D" : "\uBD80\uBAA8\uB9CC \uCC38\uC11D"
+ 964:                   }
+ 965:                 />
+ 966:               )}
+ 967:             </>
+ 968:             )}
+ 969:           </Step2Expert>
+ 970: 
+ 971:           {/* Step 3: Schedule */}
+ 972:           <Step3Schedule flow={flow}>
+ 973:             {step >= 4 && (
+ 974:             <>
+ 975:               <div ref={step4StartRef} />
+ 976:               {isTyping && step === 4 ? (
+ 977:                 <BotMessage content="" isTyping />
+ 978:               ) : (
+ 979:                 <>
+ 980:                   <BotMessage
+ 981:                     content={
+ 982:                       <div className="space-y-2">
+ 983:                         <p>
+ 984:                           {"\uC77C\uC815 \uC870\uC728\uC744 \uC704\uD574 \uD76C\uB9DD \uC77C\uC815\uC740 "}<strong>{"\uCD5C\uC18C 2\uAC1C \uC774\uC0C1"}</strong>{" \uC120\uD0DD\uD574 \uC8FC\uC138\uC694."}
+ 985:                         </p>
+ 986:                         <p className="text-sm text-muted-foreground">
+ 987:                           {"\uC120\uD0DD\uD558\uC2E0 \uC77C\uC815 \uC911 \uC804\uBB38\uAC00 \uC2A4\uCF00\uC904\uACFC \uAD50\uCC28 \uD655\uC778\uD558\uC5EC \uCD5C\uC885 \uC77C\uC815\uC744 \uD655\uC815\uD574 \uB4DC\uB9BD\uB2C8\uB2E4. \uAC00\uB2A5\uD55C \uC2DC\uAC04\uC744 \uB109\uB109\uD788 \uC120\uD0DD\uD574 \uC8FC\uC2DC\uBA74 \uC608\uC57D\uC774 \uB354 \uBE60\uB974\uAC8C \uC9C4\uD589\uB429\uB2C8\uB2E4."}
+ 988:                         </p>
+ 989:                       </div>
+ 990:                     }
+ 991:                   />
+ 992: 
+ 993:                   {showContent && step === 4 && (
+ 994:                     <div className="space-y-4 animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
+ 995:                       <CalendarPicker selectedDates={selectedSchedules} onDateSelect={handleScheduleSelect} />
+ 996: 
+ 997:                       {/* Selected Schedules Chips */}
+ 998:                       {selectedSchedules.length > 0 && (
+ 999:                         <div className="bg-card rounded-xl p-4 border border-border">
+1000:                           <p className="text-sm font-medium text-muted-foreground mb-3">{"\uc120\ud0dd\ud55c \uc77c\uc815"} ({selectedSchedules.length}{"\uac1c"})</p>
+1001:                           <div className="flex flex-wrap gap-2">
+1002:                             {selectedSchedules.map((schedule, index) => (
+1003:                               <div
+1004:                                 key={index}
+1005:                                 className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm"
+1006:                               >
+1007:                                 <span>{formatScheduleDisplay(schedule)}</span>
+1008:                                 <button
+1009:                                   onClick={() => removeSchedule(index)}
+1010:                                   className="hover:bg-primary/20 rounded-full p-0.5"
+1011:                                 >
+1012:                                   <X className="w-3 h-3" />
+1013:                                 </button>
+1014:                               </div>
+1015:                             ))}
+1016:                           </div>
+1017:                         </div>
+1018:                       )}
+1019: 
+1020:                       <Button
+1021:                         onClick={goToNextStep}
+1022:                         disabled={selectedSchedules.length < 2}
+1023:                         className="w-full h-[50px] text-[18px] font-semibold mt-5"
+1024:                       >
+1025:                         {"\ub2e4\uc74c\uc73c\ub85c"} {selectedSchedules.length < 2 && `(${2 - selectedSchedules.length}\uac1c \ub354 \uc120\ud0dd)`}
+1026:                       </Button>
+1027:                     </div>
+1028:                   )}
+1029:                 </>
+1030:               )}
+1031: 
+1032:               {step > 4 && selectedSchedules.length > 0 && (
+1033:                 <UserMessage content={`\ud76c\ub9dd \uc77c\uc815: ${selectedSchedules.map((s) => formatScheduleDisplay(s)).join(", ")}`} />
+1034:               )}
+1035:             </>
+1036:             )}
+1037: 
+1038:             {/* Step 5: Phone Number */}
+1039:             {step >= 5 && (
+1040:             <>
+1041:               <div ref={step5StartRef} />
+1042:               {isTyping && step === 5 ? (
+1043:                 <BotMessage content="" isTyping />
+1044:               ) : (
+1045:                 <>
+1046:                   <BotMessage content={"\uac70\uc758 \uc644\ub8cc\ub418\uc5c8\uc2b5\ub2c8\ub2e4. \uc608\uc57d\uc790\ubd84\uc758 \uc5f0\ub77d\ucc98\ub97c \ub0a8\uaca8\uc8fc\uc2dc\uba74 \uc13c\ud130\uc5d0\uc11c \uc77c\uc815 \ud655\uc778 \ud6c4 \uce74\uce74\uc624 \uc54c\ub9bc\ud1a1\uc73c\ub85c \ucd5c\uc885 \ud655\uc815 \uc548\ub0b4\ub97c \ubcf4\ub0b4\ub4dc\ub9bd\ub2c8\ub2e4."} />
+1047: 
+1048:                   {showContent && step === 5 && (
+1049:                     <div className="bg-card rounded-2xl p-5 shadow-sm border border-border animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
+1050:                       <div className="space-y-4">
+1051:                         <div>
+1052:                           <FieldLabel icon={<Phone className="w-4 h-4 inline mr-1" />}>{"\uD734\uB300\uD3F0 \uBC88\uD638"}</FieldLabel>
+1053:                           <input
+1054:                             type="tel"
+1055:                             value={phoneNumber}
+1056:                             onChange={(e) => setPhoneNumber(formatPhoneNumber(e.target.value))}
+1057:                             placeholder="010-0000-0000"
+1058:                             maxLength={13}
+1059:                             className="w-full px-4 py-2.5 rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+1060:                           />
+1061:                         </div>
+1062: 
+1063:                         {/* Privacy Consent */}
+1064:                         <div className="pt-2 border-t border-border">
+1065:                           <div className="flex items-start gap-3">
+1066:                             <button
+1067:                               type="button"
+1068:                               onClick={() => setPrivacyConsent(!privacyConsent)}
+1069:                               className={cn(
+1070:                                 "mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all",
+1071:                                 privacyConsent ? "bg-primary border-primary" : "border-muted-foreground/40 hover:border-primary/60",
+1072:                               )}
+1073:                             >
+1074:                               {privacyConsent && <Check className="w-3 h-3 text-primary-foreground" />}
+1075:                             </button>
+1076:                             <div className="flex-1">
+1077:                               <p className="text-sm text-foreground leading-relaxed">
+1078:                                 {"\uac1c\uc778\uc815\ubcf4 \uc218\uc9d1 \ubc0f \uc774\uc6a9\uc5d0 \ub3d9\uc758\ud569\ub2c8\ub2e4"} <span className="text-destructive font-medium">({"\ud544\uc218"})</span>
+1079:                               </p>
+1080:                               <button
+1081:                                 type="button"
+1082:                                 onClick={() => setShowPrivacyModal(true)}
+1083:                                 className="text-xs text-primary hover:text-primary/80 underline underline-offset-2 mt-1"
+1084:                               >
+1085:                                 [{"\uc804\ubb38 \ubcf4\uae30"}]
+1086:                               </button>
+1087:                             </div>
+1088:                           </div>
+1089:                         </div>
+1090: 
+1091:                         <Button onClick={handleSubmit} disabled={phoneNumber.length < 13 || !privacyConsent} className="w-full">
+1092:                           {"\ucd5c\uc885 \uc608\uc57d \uc811\uc218\ud558\uae30"}
+1093:                         </Button>
+1094:                       </div>
+1095:                     </div>
+1096:                   )}
+1097: 
+1098:                   {/* Privacy Modal */}
+1099:                   {showPrivacyModal && (
+1100:                     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 animate-in fade-in-0 duration-200">
+1101:                       <div className="bg-card rounded-2xl max-w-lg w-full max-h-[80vh] overflow-hidden shadow-xl animate-in zoom-in-95 duration-200">
+1102:                                                 <div className="flex items-center justify-between p-4 border-b border-border">
+1103:                           <h3 className="font-semibold text-foreground">{"\uac1c\uc778\uc815\ubcf4 \uc218\uc9d1 \ubc0f \uc774\uc6a9 \ub3d9\uc758"}</h3>
+1104:                           <button
+1105:                             onClick={() => setShowPrivacyModal(false)}
+1106:                             className="p-1 hover:bg-muted rounded-lg transition-colors"
+1107:                           >
+1108:                             <X className="w-5 h-5 text-muted-foreground" />
+1109:                           </button>
+1110:                         </div>
+1111:                         <div className="p-5 overflow-y-auto max-h-[60vh]">
+1112:                           <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
+1113:                             <div>
+1114:                               <h4 className="font-medium text-foreground mb-2">{"1. \uc218\uc9d1\ud558\ub294 \uac1c\uc778\uc815\ubcf4 \ud56d\ubaa9"}</h4>
+1115:                               <p>{"\uc5d0\uc138\uc2a4\ud0c0 \ubd80\ubaa8\ucf54\uce6d\uc740 \uc0c1\ub2f4 \uc608\uc57d \ubc0f \uc11c\ube44\uc2a4 \uc81c\uacf5\uc744 \uc704\ud574 \uc544\ub798\uc640 \uac19\uc740 \uac1c\uc778\uc815\ubcf4\ub97c \uc218\uc9d1\ud569\ub2c8\ub2e4."}</p>
+1116:                               <ul className="list-disc list-inside mt-2 space-y-1">
+1117:                                 <li>{"\ud544\uc218 \ud56d\ubaa9: \uc608\uc57d\uc790 \uc774\ub984, \ub300\uc0c1\uc790\uc640\uc758 \uad00\uacc4, \ub300\uc0c1\uc790 \uc0dd\ub144\uc6d4\uc77c, \ub300\uc0c1\uc790 \uc131\ubcc4, \ud734\ub300\ud3f0 \ubc88\ud638"}</li>
+1118:                                 <li>{"\uc120\ud0dd \ud56d\ubaa9: \uc0c1\ub2f4 \ud76c\ub9dd \uc77c\uc815, \uc0c1\ub2f4 \uace0\ubbfc \ub0b4\uc6a9"}</li>
+1119:                               </ul>
+1120:                             </div>
+1121:                             <div>
+1122:                               <h4 className="font-medium text-foreground mb-2">{"2. \uac1c\uc778\uc815\ubcf4 \uc218\uc9d1 \ubc0f \uc774\uc6a9 \ubaa9\uc801"}</h4>
+1123:                               <ul className="list-disc list-inside space-y-1">
+1124:                                 <li>{"\uc0c1\ub2f4 \uc608\uc57d \uc811\uc218 \ubc0f \uc77c\uc815 \uc870\uc728"}</li>
+1125:                                 <li>{"\uce74\uce74\uc624 \uc54c\ub9bc\ud1a1\uc744 \ud1b5\ud55c \uc608\uc57d \ud655\uc815 \uc548\ub0b4"}</li>
+1126:                                 <li>{"\ub9de\ucda4\ud615 \uc0c1\ub2f4 \uc11c\ube44\uc2a4 \uc81c\uacf5\uc744 \uc704\ud55c \uc0ac\uc804 \uc815\ubcf4 \ud30c\uc545"}</li>
+1127:                                 <li>{"\uc11c\ube44\uc2a4 \uac1c\uc120\uc744 \uc704\ud55c \ud1b5\uacc4 \ubd84\uc11d (\ube44\uc2dd\ubcc4 \ucc98\ub9ac)"}</li>
+1128:                               </ul>
+1129:                             </div>
+1130:                             <div>
+1131:                               <h4 className="font-medium text-foreground mb-2">{"3. \uac1c\uc778\uc815\ubcf4 \ubcf4\uc720 \ubc0f \uc774\uc6a9 \uae30\uac04"}</h4>
+1132:                               <p>
+1133:                                 {"\uc218\uc9d1\ub41c \uac1c\uc778\uc815\ubcf4\ub294 "}<strong className="text-foreground">{"\uc0c1\ub2f4 \uc644\ub8cc \ud6c4 1\ub144\uac04"}</strong>{" \ubcf4\uad00\ub418\uba70, \uc774\ud6c4 \uc9c0\uccb4 \uc5c6\uc774"}
+1134:                                 {"\ud30c\uae30\ub429\ub2c8\ub2e4. \ub2e8, \uad00\uacc4 \ubc95\ub839\uc5d0 \ub530\ub77c \ubcf4\uc874\uc774 \ud544\uc694\ud55c \uacbd\uc6b0 \ud574\ub2f9 \uae30\uac04 \ub3d9\uc548 \ubcf4\uad00\ub420 \uc218 \uc788\uc2b5\ub2c8\ub2e4."}
+1135:                               </p>
+1136:                             </div>
+1137:                             <div>
+1138:                               <h4 className="font-medium text-foreground mb-2">{"4. \ub3d9\uc758 \uac70\ubd80\uad8c \ubc0f \ubd88\uc774\uc775"}</h4>
+1139:                               <p>
+1140:                                 {"\uadc0\ud558\ub294 \uac1c\uc778\uc815\ubcf4 \uc218\uc9d1 \ubc0f \uc774\uc6a9 \ub3d9\uc758\ub97c \uac70\ubd80\ud560 \uad8c\ub9ac\uac00 \uc788\uc2b5\ub2c8\ub2e4. \ub2e4\ub9cc, \ud544\uc218 \ud56d\ubaa9\uc5d0 \ub300\ud55c \ub3d9\uc758\ub97c \uac70\ubd80\ud558\uc2e4 \uacbd\uc6b0 \uc0c1\ub2f4"}
+1141:                                 {"\uc608\uc57d \uc11c\ube44\uc2a4 \uc774\uc6a9\uc774 \uc81c\ud55c\ub420 \uc218 \uc788\uc2b5\ub2c8\ub2e4."}
+1142:                               </p>
+1143:                             </div>
+1144:                           </div>
+1145:                         </div>                        <div className="p-4 border-t border-border">
+1146:                           <Button
+1147:                             onClick={() => {
+1148:                               setPrivacyConsent(true)
+1149:                               setShowPrivacyModal(false)
+1150:                             }}
+1151:                             className="w-full"
+1152:                           >
+1153:                             {"\ub3d9\uc758\ud558\uace0 \ub2eb\uae30"}
+1154:                           </Button>
+1155:                         </div>
+1156:                       </div>
+1157:                     </div>
+1158:                   )}
+1159:                 </>
+1160:               )}
+1161:             </>
+1162:             )}
+1163:           </Step3Schedule>
+1164:                 </>
+1165:               )}
+1166: 
+1167:               <div ref={messagesEndRef} />
+1168:             </div>
+1169:           </div>
+1170:         </div>
+1171:       </main>
+1172: 
+1173:       {showExitModal && (
+1174:         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/45 p-4">
+1175:           <div className="w-full max-w-sm rounded-2xl border border-[#E4DBCC] bg-white p-6 shadow-xl">
+1176:             <p className="whitespace-pre-line text-base font-medium leading-relaxed text-[#2F2A23]">
+1177:               {"\uc791\uc131 \uc911\uc778 \ub0b4\uc6a9\uc774 \ubaa8\ub450 \uc0ac\ub77c\uc9d1\ub2c8\ub2e4.\n\uc815\ub9d0 \ub098\uac00\uc2dc\uaca0\uc5b4\uc694?"}
+1178:             </p>
+1179:             <div className="mt-6 grid grid-cols-2 gap-3">
+1180:               <Button
+1181:                 type="button"
+1182:                 variant="outline"
+1183:                 onClick={() => setShowExitModal(false)}
+1184:                 className="h-11 cursor-pointer rounded-xl border-[#D4CBB9] bg-white text-[#3D372F] hover:bg-white hover:text-[#3D372F]"
+1185:               >
+1186:                 {"\uacc4\uc18d \uc9c4\ud589"}              </Button>
+1187:               <Button type="button" onClick={handleExit} className="h-11 cursor-pointer rounded-xl bg-[#0B6980] text-white hover:bg-[#0B6980] hover:text-white">
+1188:                 {"\ub098\uac00\uae30"}              </Button>
+1189:             </div>
+1190:           </div>
+1191:         </div>
+1192:       )}
+1193: 
+1194:       <Footer />
+1195:     </div>
+1196:   )
+1197: }
+1198: 
+1199: 
