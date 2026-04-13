@@ -1,22 +1,25 @@
-export type NavigationItem = {
+export type NavigationChild = {
   title: string
   href: string
 }
 
 export type NavigationGroup = {
+  type: "group"
   title: string
-  children: NavigationItem[]
+  children: NavigationChild[]
 }
 
-export const NAVIGATION: NavigationGroup[] = [
+export type NavigationLink = {
+  type: "link"
+  title: string
+  href: string
+}
+
+export type NavigationEntry = NavigationGroup | NavigationLink
+
+export const NAVIGATION: NavigationEntry[] = [
   {
-    title: "맞춤형 프로그램",
-    children: [
-      { title: "연령별 발달 가이드", href: "/program/age-guide" },
-      { title: "상담/코칭 프로그램", href: "/program/counseling-coaching" },
-    ],
-  },
-  {
+    type: "group",
     title: "사발면 스토리",
     children: [
       { title: "사발면 소개", href: "/about/intro" },
@@ -25,11 +28,8 @@ export const NAVIGATION: NavigationGroup[] = [
     ],
   },
   {
-    title: "커뮤니티",
-    children: [
-      { title: "고객 후기", href: "/community/reviews" },
-      { title: "전문가 칼럼/인터뷰", href: "/community/insights" },
-      { title: "FAQ", href: "/community/faq" },
-    ],
+    type: "link",
+    title: "양육 코칭 인사이트",
+    href: "/community/insights",
   },
 ]

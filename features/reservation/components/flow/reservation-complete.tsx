@@ -18,6 +18,8 @@ interface ReservationCompleteProps {
   flow: UseReservationFlowReturn
 }
 
+const LOGO_IMAGE_URL = "/saramme_logo.png"
+
 interface InfoRowProps {
   label: string
   value: string
@@ -64,20 +66,22 @@ export function ReservationComplete({ flow }: ReservationCompleteProps) {
       <div className="pointer-events-none absolute top-0 left-1/2 h-96 w-96 -translate-x-[150%] rounded-full bg-blue-400/15 blur-[100px]" />
       <div className="pointer-events-none absolute top-40 left-1/2 h-80 w-80 translate-x-[50%] rounded-full bg-emerald-400/10 blur-[100px]" />
 
-      <header className="fixed top-0 left-0 right-0 z-[100] border-b border-[#e6ebf7] bg-[#ffffff]">
-        <div className="mx-auto flex h-16 max-w-7xl items-center px-4 sm:px-6 lg:h-20 lg:px-8">
-          <Link href="/" className="shrink-0">
-            <span className="text-2xl font-bold tracking-tight text-[#0C0C0C] lg:text-[2.1rem]">사발면</span>
-          </Link>
+      <header className="fixed left-0 right-0 top-0 z-[100] border-b border-[#E3D5C7] bg-[#fff]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex h-[64px] items-center md:h-[78px]">
+            <Link href="/" className="flex shrink-0 items-center">
+              <img src={LOGO_IMAGE_URL} alt="사람ME 로고" className="h-10 w-auto md:h-11" />
+            </Link>
+          </div>
         </div>
       </header>
 
       <main className="relative z-10 px-4 pb-12 pt-24 md:pt-28">
         <div className="mx-auto max-w-2xl">
           <div className="mb-10 text-center animate-in fade-in-0 slide-in-from-bottom-4 duration-700">
-            <div className="relative mb-6 inline-flex h-20 w-20 items-center justify-center rounded-[28px] bg-emerald-500 text-white shadow-lg shadow-emerald-200">
-              <div className="absolute inset-0 rounded-[28px] bg-emerald-500 opacity-20 animate-ping" />
-              <Check className="relative z-10 h-10 w-10" strokeWidth={3} />
+            <div className="relative mb-6 inline-flex h-[66px] w-[66px] items-center justify-center rounded-[22px] bg-emerald-500 text-white shadow-lg shadow-emerald-200">
+              <div className="absolute inset-0 rounded-[22px] bg-emerald-500 opacity-20 animate-ping" />
+              <Check className="relative z-10 h-8 w-8" strokeWidth={3} />
             </div>
 
             <h1 className="mb-2 text-3xl font-extrabold tracking-tight text-gray-900">예약 접수 완료</h1>
@@ -117,7 +121,7 @@ export function ReservationComplete({ flow }: ReservationCompleteProps) {
                     <MessageCircle className="h-5 w-5 text-[#3C1E1E]" />
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">에세스타 부모코칭</p>
+                    <p className="font-semibold text-gray-900">어세스타 부모코칭</p>
                     <p className="text-xs text-gray-500">알림톡</p>
                   </div>
                 </div>

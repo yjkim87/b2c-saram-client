@@ -1,8 +1,9 @@
 ﻿"use client"
 
-import { useState, type ReactNode } from "react"
-import { ChevronDown, ChevronLeft, ChevronRight, Sprout } from "lucide-react"
+import { useMemo, useState, type ReactNode } from "react"
+import { CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Clock, Sprout } from "lucide-react"
 import { Button } from "@/shared/ui/button"
+import { Calendar } from "@/shared/ui/calendar"
 import { cn } from "@/shared/lib/utils"
 import { timeSlots } from "../../data/reservation.constants"
 import type { ConcernCardItem, SelectedSchedule } from "../../model/reservation.types"
@@ -157,146 +158,210 @@ export function CalendarPicker({
   selectedDates,
   onDateSelect,
 }: CalendarPickerProps) {
-  const [currentMonth, setCurrentMonth] = useState(new Date())
-  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [currentMonth, setCurrentMonth] = useState(() => {
+    const now = new Date()
+    return new Date(now.getFullYear(), now.getMonth(), 1)
+  })
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
   const [selectedTime, setSelectedTime] = useState<string | null>(null)
 
-  const getDaysInMonth = (date: Date) => {
-    const year = date.getFullYear()
-    const month = date.getMonth()
-    const firstDay = new Date(year, month, 1)
-    const lastDay = new Date(year, month + 1, 0)
-    const daysInMonth = lastDay.getDate()
-    const startingDay = firstDay.getDay()
-
-    const days: (number | null)[] = []
-    for (let i = 0; i < startingDay; i++) {
-      days.push(null)
-    }
-    for (let i = 1; i <= daysInMonth; i++) {
-      days.push(i)
-    }
-    return days
+  const handlePrevMonth = () => {
+    setCurrentMonth((previous) => new Date(previous.getFullYear(), previous.getMonth() - 1, 1))
   }
 
-  const formatDateString = (day: number) => {
-    const year = currentMonth.getFullYear()
-    const month = String(currentMonth.getMonth() + 1).padStart(2, "0")
-    const dayStr = String(day).padStart(2, "0")
+  const handleNextMonth = () => {
+    setCurrentMonth((previous) => new Date(previous.getFullYear(), previous.getMonth() + 1, 1))
+  }
+
+  const toDateKey = (date: Date) => {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, "0")
+    const dayStr = String(date.getDate()).padStart(2, "0")
     return `${year}-${month}-${dayStr}`
   }
 
-  const formatDisplayDate = (dateStr: string) => {
-    const [, month, day] = dateStr.split("-")
-    return `${parseInt(month)}/${parseInt(day)}`
+  const formatDisplayDate = (date: Date) => {
+    return `${date.getMonth() + 1}/${date.getDate()}`
   }
 
-  const isDatePast = (day: number) => {
-    const today = new Date()
-    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)
-    today.setHours(0, 0, 0, 0)
-    return date < today
+  const formatSelectedDateDetail = (date: Date) => {
+    return new Intl.DateTimeFormat("ko-KR", {
+      month: "long",
+      day: "numeric",
+      weekday: "long",
+    }).format(date)
   }
 
-  const isDateSelected = (day: number) => {
-    const dateStr = formatDateString(day)
-    return selectedDates.some((s) => s.date === dateStr)
+  const formatReservationDate = (date: Date) => {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, "0")
+    const day = String(date.getDate()).padStart(2, "0")
+    return `${year}. ${month}. ${day}`
   }
+
+  const today = useMemo(() => {
+    const value = new Date()
+    value.setHours(0, 0, 0, 0)
+    return value
+  }, [])
+
+  const selectedDateKey = selectedDate ? toDateKey(selectedDate) : null
+  const selectedScheduleDateSet = useMemo(() => new Set(selectedDates.map((schedule) => schedule.date)), [selectedDates])
 
   const handleAddSchedule = () => {
-    if (selectedDate && selectedTime) {
-      onDateSelect(selectedDate, selectedTime)
+    if (selectedDateKey && selectedTime) {
+      onDateSelect(selectedDateKey, selectedTime)
       setSelectedTime(null)
     }
   }
 
-  const days = getDaysInMonth(currentMonth)
-  const weekDays = ["일", "월", "화", "수", "목", "금", "토"]
-
   return (
-    <div className="bg-card rounded-xl border border-border overflow-hidden">
-      <div className="flex items-center justify-between p-4 border-b border-border">
-        <button
-          onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
-          className="p-2 hover:bg-muted rounded-lg transition-colors"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-        <span className="font-semibold">
-          {currentMonth.getFullYear()}년 {currentMonth.getMonth() + 1}월
-        </span>
-        <button
-          onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
-          className="p-2 hover:bg-muted rounded-lg transition-colors"
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
-      </div>
-
-      <div className="grid grid-cols-7 border-b border-border">
-        {weekDays.map((day, i) => (
-          <div
-            key={day}
-            className={cn(
-              "py-2 text-center text-sm font-medium",
-              i === 0 ? "text-red-500" : i === 6 ? "text-blue-500" : "text-muted-foreground",
-            )}
-          >
-            {day}
+    <div className="overflow-hidden rounded-[24px] border border-[#D6D9F3] bg-[#FBF7F1]">
+      <div className="grid lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]">
+        <div className="relative p-4 md:p-6 lg:border-r lg:border-[#E7DCCB]">
+          <div className="mb-3">
+            <p className="text-xs font-bold tracking-[0.2em] text-[#D2893B]">STEP 1</p>
+            <h3 className="mt-1 text-[22px] font-extrabold leading-none text-[#2E2822]">날짜 선택</h3>
           </div>
-        ))}
-      </div>
 
-      <div className="grid grid-cols-7 p-2 gap-1">
-        {days.map((day, index) => (
-          <button
-            key={index}
-            disabled={!day || isDatePast(day)}
-            onClick={() => day && !isDatePast(day) && setSelectedDate(formatDateString(day))}
-            className={cn(
-              "aspect-square flex items-center justify-center text-sm rounded-lg transition-all",
-              !day && "invisible",
-              day && isDatePast(day) && "text-muted-foreground/30 cursor-not-allowed",
-              day && !isDatePast(day) && "hover:bg-[#FEA847]/15 cursor-pointer",
-              day && selectedDate === formatDateString(day) && "bg-[#FEA847] text-white",
-              day && isDateSelected(day) && selectedDate !== formatDateString(day) && "bg-[#FEA847]/20 text-[#B26A09] font-medium",
-            )}
-          >
-            {day}
-          </button>
-        ))}
-      </div>
+          <div className="mb-3 flex items-center justify-center gap-3 border-b border-[#E7DCCB] pb-3 md:gap-4">
+            <button
+              type="button"
+              onClick={handlePrevMonth}
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-[#DCCCB8] bg-[#FFF8EF] text-[#4E4438] hover:bg-[#F5EBDD] md:h-9 md:w-9"
+              aria-label="이전 달"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <p className="text-[28px] font-bold leading-none tracking-tight text-[#2E2822]">
+              {currentMonth.getFullYear()}년 {currentMonth.getMonth() + 1}월
+            </p>
+            <button
+              type="button"
+              onClick={handleNextMonth}
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-[#DCCCB8] bg-[#FFF8EF] text-[#4E4438] hover:bg-[#F5EBDD] md:h-9 md:w-9"
+              aria-label="다음 달"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
 
-      {selectedDate && (
-        <div className="p-4 border-t border-border animate-in fade-in-0 slide-in-from-top-2 duration-300">
-          <p className="text-sm font-medium text-muted-foreground mb-3">{formatDisplayDate(selectedDate)} 시간 선택</p>
-          <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
+          <Calendar
+            mode="single"
+            month={currentMonth}
+            onMonthChange={setCurrentMonth}
+            selected={selectedDate}
+            showOutsideDays={false}
+            fixedWeeks
+            hideNavigation
+            disabled={(date) => date < today}
+            onSelect={(date) => {
+              if (!date) {
+                return
+              }
+              setSelectedDate(date)
+              setSelectedTime(null)
+            }}
+            modifiers={{
+              hasSchedule: (date) => selectedScheduleDateSet.has(toDateKey(date)),
+            }}
+            formatters={{
+              formatCaption: (date) => `${date.getFullYear()}년 ${date.getMonth() + 1}월`,
+              formatWeekdayName: (date) => ["일", "월", "화", "수", "목", "금", "토"][date.getDay()],
+            }}
+            className="w-full p-0"
+            classNames={{
+              root: "w-full",
+              months: "w-full",
+              month: "w-full gap-0",
+              month_caption: "hidden",
+              caption_label: "text-base font-semibold tracking-tight text-[#2E2822] md:text-[30px]",
+              month_grid: "w-full table-fixed border-collapse",
+              weekdays: "border-b border-[#E7DCCB]",
+              weekday:
+                "h-9 px-0 text-center align-middle text-sm font-semibold text-[#74695A] [&:first-child]:text-[#D85E49] [&:last-child]:text-[#D2893B]",
+              week: "",
+              day: "relative h-[74px] w-full p-0 text-center sm:h-[86px] md:h-[96px]",
+              day_button:
+                "!min-w-0 !w-[56px] !h-[56px] !rounded-[12px] sm:!w-[60px] sm:!h-[60px] md:!w-[64px] md:!h-[64px] mx-auto my-auto relative border-0 bg-transparent text-base font-medium text-[#322D27] shadow-none hover:bg-[#FFF1E3] hover:text-[#C2712A] data-[selected-single=true]:bg-[#F08B49] data-[selected-single=true]:text-white data-[selected-single=true]:shadow-none",
+              today: "bg-transparent text-[#322D27] font-semibold",
+              disabled: "text-[#CFC3B1] opacity-100",
+            }}
+            modifiersClassNames={{
+              hasSchedule:
+                "after:pointer-events-none after:absolute after:bottom-2 after:left-1/2 after:h-1.5 after:w-1.5 after:-translate-x-1/2 after:rounded-full after:bg-[#F08B49]",
+            }}
+          />
+        </div>
+
+        <div className="border-t border-[#E7DCCB] bg-[#F6F1E9] p-4 md:p-6 lg:border-t-0">
+          <div className="mb-4">
+            <p className="text-xs font-bold tracking-[0.2em] text-[#D2893B]">STEP 2</p>
+            <h3 className="mt-1 text-[22px] font-extrabold leading-none text-[#2E2822]">시간 선택</h3>
+            <p className="mt-2 text-sm font-semibold text-[#7A6A55]">
+              {selectedDate ? formatSelectedDateDetail(selectedDate) : "날짜를 먼저 선택해 주세요"}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2.5">
             {timeSlots.map((time) => {
-              const isAlreadySelected = selectedDates.some((s) => s.date === selectedDate && s.time === time)
+              const isAlreadySelected =
+                selectedDateKey !== null &&
+                selectedDates.some((schedule) => schedule.date === selectedDateKey && schedule.time === time)
+              const isDisabled = !selectedDateKey || isAlreadySelected
+
               return (
                 <button
                   key={time}
-                  disabled={isAlreadySelected}
+                  disabled={isDisabled}
                   onClick={() => setSelectedTime(time)}
                   className={cn(
-                    "py-2 px-3 text-sm rounded-lg border transition-all",
-                    isAlreadySelected && "bg-muted text-muted-foreground cursor-not-allowed border-muted",
-                    !isAlreadySelected && selectedTime === time && "bg-[#FEA847] text-white border-[#FEA847]",
-                    !isAlreadySelected && selectedTime !== time && "border-border hover:border-[#FEA847]/60",
+                    "flex items-center justify-center gap-2 rounded-xl border px-3 py-3 text-[17px] font-semibold transition-all",
+                    isDisabled && "cursor-not-allowed border-[#E4DACA] bg-[#F4EEE6] text-[#B7AB97]",
+                    selectedDateKey && selectedTime === time && !isAlreadySelected && "border-[#F08B49] bg-[#F08B49] text-white shadow-md shadow-[#F08B49]/20",
+                    selectedDateKey && selectedTime !== time && !isAlreadySelected && "border-[#DCCEBB] bg-white text-[#3F372D] hover:border-[#F0A870] hover:text-[#A85F21]",
                   )}
                 >
+                  <Clock className="h-4 w-4" />
                   {time}
                 </button>
               )
             })}
           </div>
-          {selectedTime && (
-            <Button onClick={handleAddSchedule} className="w-full mt-4 bg-[#FEA847] text-white hover:bg-[#EA9738]">
+
+          <div className="mt-5 rounded-2xl border border-[#DCCEBB] bg-white p-4">
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center justify-between">
+                <span className="inline-flex items-center gap-1 text-[#8B7D69]">
+                  <CheckCircle2 className="h-4 w-4 text-[#2AA873]" />
+                  예약 일시
+                </span>
+                <span className="font-semibold text-[#2E2822]">
+                  {selectedDate ? formatReservationDate(selectedDate) : "----.--.--"} / {selectedTime ?? "--:--"}
+                </span>
+              </div>
+            </div>
+
+            <Button
+              onClick={handleAddSchedule}
+              disabled={!selectedDateKey || !selectedTime}
+              className={cn(
+                "mt-4 w-full",
+                selectedDateKey && selectedTime
+                  ? "bg-[#171717] text-white hover:bg-[#111111]"
+                  : "bg-[#E6E0D4] text-[#A89C8A] hover:bg-[#E6E0D4] hover:text-[#A89C8A]",
+              )}
+            >
               일정 추가하기
             </Button>
-          )}
+            {!selectedDateKey || !selectedTime ? (
+              <p className="mt-2 text-center text-xs font-medium text-[#A99984]">
+                날짜와 시간을 모두 선택해야 일정 추가가 가능합니다.
+              </p>
+            ) : null}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   )
 }

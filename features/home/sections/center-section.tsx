@@ -15,22 +15,22 @@ const CENTER_IMAGE_PLACEHOLDERS = [
   {
     key: "center-temp-1",
     label: "임시 센터 이미지 01",
-    background: "linear-gradient(140deg, #dcecff 0%, #c2d8ff 100%)",
+    background: "linear-gradient(140deg, #F2DFCC 0%, #E8C8AE 100%)",
   },
   {
     key: "center-temp-2",
     label: "임시 센터 이미지 02",
-    background: "linear-gradient(140deg, #e8f3ff 0%, #d3e8ff 100%)",
+    background: "linear-gradient(140deg, #F4E6D8 0%, #E9D1BA 100%)",
   },
   {
     key: "center-temp-3",
     label: "임시 센터 이미지 03",
-    background: "linear-gradient(140deg, #d9e8ff 0%, #b8d3ff 100%)",
+    background: "linear-gradient(140deg, #EEDCCB 0%, #E2C1A5 100%)",
   },
   {
     key: "center-temp-4",
     label: "임시 센터 이미지 04",
-    background: "linear-gradient(140deg, #e7f1ff 0%, #c9ddff 100%)",
+    background: "linear-gradient(140deg, #F5E7DA 0%, #E7CCB4 100%)",
   },
 ] as const
 
@@ -46,7 +46,7 @@ function MapButtons({ className }: { className?: string }) {
         target="_blank"
         rel="noreferrer"
         className={cn(
-          "inline-flex min-w-0 w-full items-center justify-center bg-[#03C75A] text-[#ffffff] transition-colors hover:bg-[#03C75A]",
+          "inline-flex min-w-0 w-full items-center justify-center bg-[#F07C33] text-[#ffffff] transition-colors hover:bg-[#DA6727]",
           landingRadiusTokens.mapButton,
           landingSpaceTokens.mapButtonHeight,
           landingSpaceTokens.mapButtonPadding,
@@ -61,7 +61,7 @@ function MapButtons({ className }: { className?: string }) {
         target="_blank"
         rel="noreferrer"
         className={cn(
-          "inline-flex min-w-0 w-full items-center justify-center bg-[#fee500] text-[#181818] transition-colors hover:bg-[#fee500]",
+          "inline-flex min-w-0 w-full items-center justify-center bg-[#F7E3D1] text-[#6E4A32] transition-colors hover:bg-[#ECD4BD]",
           landingRadiusTokens.mapButton,
           landingSpaceTokens.mapButtonHeight,
           landingSpaceTokens.mapButtonPadding,
@@ -77,7 +77,7 @@ function MapButtons({ className }: { className?: string }) {
 
 export function CenterSection() {
   return (
-    <section id="center" className={cn("relative overflow-hidden bg-white", landingSectionTokens.roomy)}>
+    <section id="center" className={cn("relative overflow-hidden bg-[#FFFFFF]", landingSectionTokens.roomy)}>
       <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-[320px] overflow-hidden md:hidden">
         <div
           className="absolute"
@@ -86,7 +86,7 @@ export function CenterSection() {
             height: 684,
             left: -650,
             top: -400,
-            background: "radial-gradient(50% 50%, rgb(188, 219, 255) 0%, rgba(255, 255, 255, 0) 100%)",
+            background: "radial-gradient(50% 50%, rgb(249, 219, 191) 0%, rgba(255, 255, 255, 0) 100%)",
           }}
         />
       </div>
@@ -99,7 +99,7 @@ export function CenterSection() {
           height: 1240,
           left: -920,
           top: -470,
-          background: "radial-gradient(50% 50% at 50% 50%, #BCDBFF 0%, rgba(255, 255, 255, 0) 100%)",
+          background: "radial-gradient(50% 50% at 50% 50%, #F9DBBF 0%, rgba(255, 255, 255, 0) 100%)",
         }}
       />
 
@@ -107,11 +107,11 @@ export function CenterSection() {
         <span className={cn("mb-4 inline-flex", landingTypeTokens.eyebrow)}>CENTER GUIDE</span>
 
         <h2 className={landingTypeTokens.sectionTitle}>
-          <span className="text-[#3391FF]">사</span>람의 <span className="text-[#3391FF]">발</span>견을 원하
-          <span className="text-[#3391FF]">면</span>
+          <span className="text-[#F07C33]">사</span>람의 <span className="text-[#F07C33]">발</span>견을 원하
+          <span className="text-[#F07C33]">면</span>
         </h2>
 
-        <p className={cn("mx-auto mt-6 max-w-2xl text-[#111827]", landingTypeTokens.bodyRelaxed)}>
+        <p className={cn("mx-auto mt-6 max-w-2xl text-[#3A2F27]", landingTypeTokens.bodyRelaxed)}>
           사람의 발견을 지향하는 '사발면' 센터입니다.
         </p>
 
@@ -140,7 +140,7 @@ export function CenterSection() {
                           "radial-gradient(65% 65% at 20% 20%, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 100%)",
                       }}
                     />
-                    <span className={cn("relative z-10 text-[#1f2f4f]", landingTypeTokens.stepDescription)}>
+                    <span className={cn("relative z-10 text-[#714D36]", landingTypeTokens.stepDescription)}>
                       {image.label}
                     </span>
                   </div>
@@ -149,14 +149,14 @@ export function CenterSection() {
             </Swiper>
           </div>
 
-          <div className="w-full min-w-0 text-left text-[#111827]">
+          <div className="w-full min-w-0 text-left text-[#2E251E]">
             <div className="space-y-[var(--landing-space-grid-sm)] md:hidden">
               <div className="space-y-[var(--landing-space-chip-y)]">
-                <p className={cn(landingTypeTokens.stepDescription, "text-[#0C0C0C] font-bold")}>운영시간</p>
+                <p className={cn(landingTypeTokens.stepDescription, "text-[#1E1611] font-bold")}>운영시간</p>
                 <p className={landingTypeTokens.stepDescription}>평일 09:00 ~ 20:00, 주말 09:00 ~ 17:00</p>
                 <p
                   className={cn(
-                    "inline-block w-fit bg-[#ECECEC] text-[#111827]",
+                    "inline-block w-fit bg-[#F1E4D8] text-[#5A4433]",
                     landingTypeTokens.noteText,
                     landingRadiusTokens.note,
                     landingSpaceTokens.notePadding
@@ -166,16 +166,16 @@ export function CenterSection() {
                 </p>
               </div>
 
-              <div className="h-px bg-[#DDE3EC]" />
+              <div className="h-px bg-[#D8C8B8]" />
 
               <div className="space-y-[var(--landing-space-chip-y)]">
-                <p className={cn(landingTypeTokens.stepDescription, "text-[#0C0C0C] font-bold")}>오시는 길</p>
+                <p className={cn(landingTypeTokens.stepDescription, "text-[#1E1611] font-bold")}>오시는 길</p>
                 <p className={cn("break-words", landingTypeTokens.stepDescription)}>
                   부산시 해운대구 센텀동로 99, 백산센텀클래스원(1차) 406호
                 </p>
                 <p
                   className={cn(
-                    "inline-block w-fit bg-[#D9EDFF] text-[#365B7C]",
+                    "inline-block w-fit bg-[#F8E5D2] text-[#8A5A3C]",
                     landingTypeTokens.noteText,
                     landingRadiusTokens.note,
                     landingSpaceTokens.notePadding
@@ -190,18 +190,18 @@ export function CenterSection() {
             <div className="hidden space-y-[var(--landing-space-grid-sm)] md:block">
               <article
                 className={cn(
-                  "border border-[#E4E8EE] bg-white shadow-[0_6px_20px_rgba(15,23,42,0.06)]",
+                  "border border-[#DDCEBF] bg-[#F7F1EB] shadow-[0_6px_20px_rgba(91,64,44,0.08)]",
                   landingRadiusTokens.card,
                   landingSpaceTokens.cardPaddingResponsive
                 )}
               >
-                <p className={cn(landingTypeTokens.stepDescription, "text-[#0C0C0C] font-bold")}>오시는 길</p>
+                <p className={cn(landingTypeTokens.stepDescription, "text-[#1E1611] font-bold")}>오시는 길</p>
                 <p className={cn("mt-[var(--landing-space-chip-y)] break-words", landingTypeTokens.stepDescription)}>
                   부산시 해운대구 센텀동로 99, 백산센텀클래스원(1차) 406호
                 </p>
                 <p
                   className={cn(
-                    "mt-[var(--landing-space-chip-y)] inline-block w-fit bg-[#D9EDFF] text-[#365B7C]",
+                    "mt-[var(--landing-space-chip-y)] inline-block w-fit bg-[#F8E5D2] text-[#8A5A3C]",
                     landingTypeTokens.noteText,
                     landingRadiusTokens.note,
                     landingSpaceTokens.notePadding
@@ -215,18 +215,18 @@ export function CenterSection() {
 
               <article
                 className={cn(
-                  "border border-[#E4E8EE] bg-white shadow-[0_6px_20px_rgba(15,23,42,0.06)]",
+                  "border border-[#DDCEBF] bg-[#F7F1EB] shadow-[0_6px_20px_rgba(91,64,44,0.08)]",
                   landingRadiusTokens.card,
                   landingSpaceTokens.cardPaddingResponsive
                 )}
               >
-                <p className={cn(landingTypeTokens.stepDescription, "text-[#0C0C0C] font-bold")}>운영시간</p>
+                <p className={cn(landingTypeTokens.stepDescription, "text-[#1E1611] font-bold")}>운영시간</p>
                 <p className={cn("mt-[var(--landing-space-chip-y)]", landingTypeTokens.stepDescription)}>
                   평일 09:00 ~ 20:00, 주말 09:00 ~ 17:00
                 </p>
                 <p
                   className={cn(
-                    "mt-[var(--landing-space-chip-y)] inline-block w-fit bg-[#ECECEC] text-[#111827]",
+                    "mt-[var(--landing-space-chip-y)] inline-block w-fit bg-[#F1E4D8] text-[#5A4433]",
                     landingTypeTokens.noteText,
                     landingRadiusTokens.note,
                     landingSpaceTokens.notePadding
@@ -243,7 +243,7 @@ export function CenterSection() {
           <Link
             href="/center"
             className={cn(
-              "inline-flex min-w-[280px] items-center justify-center bg-[#05070d] text-white shadow-[0_14px_30px_rgba(5,7,13,0.24)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#0f1119]",
+              "inline-flex min-w-[280px] items-center justify-center bg-[#25170F] text-white shadow-[0_14px_30px_rgba(37,23,15,0.24)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#1B110B]",
               landingRadiusTokens.pill,
               landingSpaceTokens.buttonPaddingLg,
               landingTypeTokens.buttonLg

@@ -15,15 +15,15 @@ export const landingLayoutTokens = {
 
 export const landingTypeTokens = {
   eyebrow:
-    "font-sans text-[length:var(--landing-font-eyebrow)] font-bold leading-[1] tracking-[0] text-[#3391FF]",
+    "font-sans text-[18px] font-bold leading-[1] tracking-[0] text-[#F07C33]",
   heroTitle:
     "text-[length:var(--landing-font-title-hero)] font-bold leading-[1.2] tracking-[-0.02em]",
   displayTitle:
     "text-[length:var(--landing-font-title-display)] font-extrabold leading-[1.2] tracking-[-0.02em]",
   sectionTitle:
-    "font-sans text-[length:var(--landing-font-title-section)] font-bold leading-[1.25] tracking-[0] text-[#0C0C0C]",
+    "font-sans text-[length:var(--landing-font-title-section)] font-bold leading-[1.25] tracking-[0] text-[#1A1410]",
   reviewTitle:
-    "font-sans text-[length:var(--landing-font-title-review)] font-bold leading-[1.25] tracking-[0] text-[#0C0C0C]",
+    "font-sans text-[length:var(--landing-font-title-review)] font-bold leading-[1.25] tracking-[0] text-[#1A1410]",
   cardTitle:
     "text-[length:var(--landing-font-title-card)] font-extrabold leading-none tracking-[-0.02em]",
   stepTitle:
@@ -35,7 +35,7 @@ export const landingTypeTokens = {
   serviceCardTitle:
     "font-sans text-[length:var(--landing-font-service-card-title)] font-bold leading-[1] tracking-[0]",
   serviceCardNote:
-    "font-sans text-[length:var(--landing-font-service-note)] font-normal leading-[1] tracking-[0] text-[#707070]",
+    "font-sans text-[length:var(--landing-font-service-note)] font-normal leading-[1] tracking-[0] text-[#7A6656]",
   noteText:
     "font-sans text-[length:var(--landing-font-service-note)] font-normal leading-[1] tracking-[0]",
   mapButton:

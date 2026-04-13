@@ -1,5 +1,6 @@
 ﻿"use client"
 
+import { useEffect, useRef, useState } from "react"
 import { Autoplay } from "swiper/modules"
 import { Swiper, SwiperSlide } from "swiper/react"
 import { cn } from "@/shared/lib/utils"
@@ -12,118 +13,264 @@ import {
 } from "@/features/home/styles/landing-tokens"
 
 interface ReviewItem {
-  category: string
-  guardian: string
-  child: string
-  leadPrefix: string
-  emphasis: string
-  leadSuffix: string
-  tail: string
+  key: string
+  ageLabel: string
+  reviewType: "부모님 후기" | "학생 후기"
+  name: string
+  meta: string
+  summary: string
+  quote: string
+  tone: {
+    ageBadge: string
+    accentBar: string
+  }
 }
 
 const REVIEW_SUMMARY: ReviewItem[] = [
   {
-    category: "사회성 발달 코칭",
-    guardian: "김OO 어머니",
-    child: "7세 자녀",
-    leadPrefix: "7살 아이가 친구 사귀기를 너무 어려워했는데, 6개월 코칭 후 반에서 ",
-    emphasis: "리더 역할",
-    leadSuffix: "을 하게 되었어요.",
-    tail: "아이가 스스로 달라졌다는 게 느껴집니다.",
+    key: "elementary-lower-parent",
+    ageLabel: "초등 저학년",
+    reviewType: "부모님 후기",
+    name: "박OO 어머니",
+    meta: "만 7세 자녀 · 비대면",
+    summary:
+      "3회 코칭만으로도 아이의 성향 파악이 잘 되었고, 비대면이었지만 충분한 소통이 가능했습니다.",
+    quote:
+      "몰랐던 관심 분야를 알게 되었습니다. 아이와 부모의 성향을 함께 알아갈 수 있어서 좋았습니다.",
+    tone: {
+      ageBadge: "bg-[#F07C33] text-white",
+      accentBar: "bg-[#F07C33]",
+    },
   },
   {
-    category: "정서 안정 상담",
-    guardian: "박OO 보호자",
-    child: "9세 자녀",
-    leadPrefix: "감정 기복이 큰 편이었지만 4개월 상담 이후 학교에서 ",
-    emphasis: "자기표현",
-    leadSuffix: "을 차분히 하게 되었어요.",
-    tail: "집에서도 대화가 부드러워지고 갈등이 줄었습니다.",
+    key: "elementary-upper-student",
+    ageLabel: "초등 고학년",
+    reviewType: "학생 후기",
+    name: "이OO 학생",
+    meta: "만 11세 · 대면",
+    summary:
+      "진로 상담 선생님이 잘 이끌어주셨습니다. 한 번쯤 이런 경험을 하는 것도 중요하다고 생각해요.",
+    quote: "코칭을 한 후 앞으로의 방향이 조금 더 확고해졌습니다. 추천하고 싶어요.",
+    tone: {
+      ageBadge: "bg-[#D6783F] text-white",
+      accentBar: "bg-[#D6783F]",
+    },
   },
   {
-    category: "학습 태도 코칭",
-    guardian: "최OO 아버지",
-    child: "12세 자녀",
-    leadPrefix: "목표를 세우고 실천하는 습관이 생기면서 스스로 ",
-    emphasis: "시간 관리",
-    leadSuffix: "를 하기 시작했어요.",
-    tail: "성적보다 아이의 자신감이 먼저 올라온 점이 가장 만족스럽습니다.",
+    key: "middle-parent",
+    ageLabel: "중학생",
+    reviewType: "부모님 후기",
+    name: "김OO 어머니",
+    meta: "만 14세 자녀 · 대면",
+    summary:
+      "직장맘으로 자녀에 대해 많이 무심했던 것 같았는데, 이번 상담을 통해 많은 것을 듣고 자녀를 다시 한번 되돌아보는 시간이었습니다.",
+    quote:
+      "정확한 데이터를 통해 아이를 보게 되어 더욱 좋았습니다. 사춘기 자녀에게 본인을 돌아볼 수 있는 시간이었습니다.",
+    tone: {
+      ageBadge: "bg-[#A76843] text-white",
+      accentBar: "bg-[#A76843]",
+    },
+  },
+  {
+    key: "high-student",
+    ageLabel: "고등학생",
+    reviewType: "학생 후기",
+    name: "김OO 학생",
+    meta: "만 18세 · 대면",
+    summary:
+      "부모님이 아는 나와 내가 생각하는 나의 차이를 알아가며, 미래의 나를 그릴 때 도움을 잘 조율해볼 수 있었습니다.",
+    quote:
+      "나를 좀 더 알게 되었고, 내가 진정으로 원하는 것이 무엇인지 앞으로의 진로 설정에 큰 도움이 되었습니다.",
+    tone: {
+      ageBadge: "bg-[#7E543A] text-white",
+      accentBar: "bg-[#7E543A]",
+    },
   },
 ]
 
-function ReviewCard({ item }: { item: ReviewItem }) {
+function ReviewCard({
+  item,
+  index,
+  animate,
+  mobileMinHeight,
+  cardRef,
+}: {
+  item: ReviewItem
+  index: number
+  animate: boolean
+  mobileMinHeight?: number | null
+  cardRef?: (node: HTMLElement | null) => void
+}) {
   return (
     <article
+      ref={cardRef}
       className={cn(
-        "h-full bg-[#FFFFFF]",
+        "h-full transform-gpu border border-[#DCCEBF] bg-[#F6EFE8] shadow-[0_1px_0_rgba(57,40,28,0.05)] transition-[transform,box-shadow,border-color,opacity] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform md:hover:-translate-y-1.5 md:hover:border-[#CDB79F] md:hover:shadow-[0_16px_30px_rgba(95,67,43,0.16)]",
         landingRadiusTokens.cardLg,
         landingSpaceTokens.cardPaddingLarge
       )}
+      style={{
+        opacity: animate ? 1 : 0,
+        transform: animate ? undefined : "translateY(20px)",
+        transitionDuration: animate ? "420ms" : "560ms",
+        transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+        transitionDelay: animate ? "0ms" : `${index * 100}ms`,
+        minHeight: mobileMinHeight ? `${mobileMinHeight}px` : undefined,
+      }}
     >
-      <span
-        className={cn(
-          "inline-flex w-fit bg-[#E5E5E5] text-[#777777]",
-          landingRadiusTokens.pill,
-          landingSpaceTokens.notePadding,
-          landingTypeTokens.noteText
-        )}
-      >
-        {item.category}
-      </span>
+      <div className="flex items-center justify-between gap-3">
+        <span
+          className={cn(
+            "inline-flex w-fit px-3 py-1 text-xs font-bold",
+            item.tone.ageBadge,
+            landingRadiusTokens.pill
+          )}
+        >
+          {item.ageLabel}
+        </span>
+        <span className={cn("inline-flex w-fit bg-[#EEE2D6] px-3 py-1 text-xs font-semibold text-[#8B7561]", landingRadiusTokens.pill)}>
+          {item.reviewType}
+        </span>
+      </div>
 
-      <p className={cn("mt-[var(--landing-space-grid-sm)] flex flex-wrap items-center gap-[var(--landing-space-chip-y)] text-[#0C0C0C]") }>
-        <strong className={landingTypeTokens.serviceCardTitle}>{item.guardian}</strong>
-        <span className={cn("text-[#9CA3AF]", landingTypeTokens.stepDescription)}>|</span>
-        <strong className={cn("text-[#3391FF]", landingTypeTokens.stepDescription)}>{item.child}</strong>
+      <h3 className={cn("mt-4 text-[#1E1611]", landingTypeTokens.serviceCardTitle)}>{item.name}</h3>
+      <p className={cn("mt-1 text-[#887361]", landingTypeTokens.bodySm)}>{item.meta}</p>
+
+      <p className={cn("mt-[var(--landing-space-grid-md)] text-[#3A2F27]", landingTypeTokens.body)}>
+        {item.summary}
       </p>
 
-      <p className={cn("mt-[var(--landing-space-grid-md)] text-[#1F2937]", landingTypeTokens.body)}>
-        {item.leadPrefix}
-        <strong className="font-bold text-[#0C0C0C]">{item.emphasis}</strong>
-        {item.leadSuffix}
-        <br />
-        {item.tail}
+      <div className={cn("relative mt-4 rounded-[12px] bg-[#EFE4DA] p-4 pl-5")}>
+        <span className={cn("absolute bottom-3 left-0 top-3 w-[3px] rounded-full", item.tone.accentBar)} aria-hidden />
+        <p className={cn("text-[#4A3B30]", landingTypeTokens.bodySm)}>{item.quote}</p>
+      </div>
+
+      <p
+        className="mt-4 text-[18px] leading-none tracking-[2px] text-[#E9A03C]"
+        style={
+          animate
+            ? {
+                animation: `review-star-twinkle 820ms ease ${240 + index * 110}ms 1 both`,
+              }
+            : undefined
+        }
+        aria-label="별점 5점"
+      >
+        ★★★★★
       </p>
     </article>
   )
 }
 
 export function ReviewsSection() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const mobileCardRefs = useRef<Record<string, HTMLElement | null>>({})
+  const [animateCards, setAnimateCards] = useState(false)
+  const [mobileCardMinHeight, setMobileCardMinHeight] = useState<number | null>(null)
+
+  useEffect(() => {
+    const section = sectionRef.current
+    if (!section) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setAnimateCards(true)
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.2 }
+    )
+
+    observer.observe(section)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    let rafId = 0
+
+    const measureMobileCardHeight = () => {
+      if (window.innerWidth >= 768) {
+        setMobileCardMinHeight(null)
+        return
+      }
+
+      const cards = Object.values(mobileCardRefs.current).filter((card): card is HTMLElement => Boolean(card))
+      if (!cards.length) return
+
+      cards.forEach((card) => {
+        card.style.minHeight = "0px"
+      })
+
+      const maxHeight = Math.ceil(Math.max(...cards.map((card) => card.getBoundingClientRect().height)))
+      setMobileCardMinHeight((prev) => (prev === maxHeight ? prev : maxHeight))
+    }
+
+    const scheduleMeasure = () => {
+      if (rafId) {
+        window.cancelAnimationFrame(rafId)
+      }
+
+      rafId = window.requestAnimationFrame(() => {
+        measureMobileCardHeight()
+      })
+    }
+
+    scheduleMeasure()
+    window.addEventListener("resize", scheduleMeasure)
+
+    return () => {
+      if (rafId) {
+        window.cancelAnimationFrame(rafId)
+      }
+      window.removeEventListener("resize", scheduleMeasure)
+    }
+  }, [animateCards])
+
   return (
-    <section id="reviews" className={cn("bg-[#F4FAFF]", landingSectionTokens.base)}>
+    <section ref={sectionRef} id="reviews" className={cn("bg-[#FFF7EF]", landingSectionTokens.base)}>
       <div className={landingLayoutTokens.containerWide}>
         <div className={cn("text-center", landingLayoutTokens.sectionHeaderGap)}>
-          <span className={cn("mb-4 inline-flex", landingTypeTokens.eyebrow)}>부모님 후기</span>
-          <h2 className={landingTypeTokens.reviewTitle}>실제 변화를 경험하셨습니다</h2>
-          <p className={cn("mx-auto mt-5 max-w-2xl text-[#111827]", landingTypeTokens.body)}>
-            심리 진단에서 사후 관리까지,
-            <br />
-            전 과정을 책임지는 전문 상담 시스템
+          <span className={cn("mb-4 inline-flex", landingTypeTokens.eyebrow)}>부모님 · 학생 후기</span>
+          <h2 className={landingTypeTokens.reviewTitle}>직접 들어보세요</h2>
+          <p className={cn("mx-auto mt-5 max-w-2xl text-[#3A2F27]", landingTypeTokens.body)}>
+            초등학교부터 고등학교까지, 상담/코칭을 경험한 부모님과 학생들의 이야기입니다.
           </p>
         </div>
 
         <div className="md:hidden">
           <Swiper
+            className="reviews-swiper-motion"
             modules={[Autoplay]}
             slidesPerView={1.08}
             spaceBetween={14}
+            speed={520}
+            resistanceRatio={0.82}
             autoplay={{
               delay: 3000,
               disableOnInteraction: false,
               pauseOnMouseEnter: false,
             }}
           >
-            {REVIEW_SUMMARY.map((item) => (
-              <SwiperSlide key={`${item.guardian}-${item.child}`}>
-                <ReviewCard item={item} />
+            {REVIEW_SUMMARY.map((item, index) => (
+              <SwiperSlide key={item.key}>
+                <ReviewCard
+                  item={item}
+                  index={index}
+                  animate={animateCards}
+                  mobileMinHeight={mobileCardMinHeight}
+                  cardRef={(node) => {
+                    mobileCardRefs.current[item.key] = node
+                  }}
+                />
               </SwiperSlide>
             ))}
           </Swiper>
         </div>
 
-        <div className="hidden gap-5 md:grid md:grid-cols-3">
-          {REVIEW_SUMMARY.map((item) => (
-            <ReviewCard key={`${item.guardian}-${item.child}-desktop`} item={item} />
+        <div className="hidden gap-5 md:grid md:grid-cols-2">
+          {REVIEW_SUMMARY.map((item, index) => (
+            <ReviewCard key={`${item.key}-desktop`} item={item} index={index} animate={animateCards} />
           ))}
         </div>
 
