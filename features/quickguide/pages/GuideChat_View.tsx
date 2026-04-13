@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback } from "react"
+import { getGuideChatInfo } from "@/features/quickguide/actions/QuickGuide_Actions"
 
 // ── Typing hook ────────────────────────────────────────────────────────────
 // key가 바뀔 때마다 msgs를 처음부터 한 글자씩 타이핑, 완료 시 onDone 호출
@@ -38,17 +39,6 @@ function useTyping(msgs: string[], key: number, onDone: () => void) {
   return { typedMsgs, currentTyping }
 }
 
-// ── API call (Ajax_Guide_Chat_Info 대응) ───────────────────────────────────
-async function fetchChat(Step: number, Select_Num: number) {
-  const res = await fetch("/api/quickguide/chat-info", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ Step, Select_Num }),
-  })
-  if (!res.ok) throw new Error("채팅 정보 조회 오류")
-  return res.json() as Promise<{ guideChat: string[]; guideButton: string[] }>
-}
-
 // ── Chat Session Block ─────────────────────────────────────────────────────
 // GuideChat.cshtml(isRoot=true) + GuideChatView.cshtml(isRoot=false) 대응
 interface ChatSessionProps {
@@ -68,11 +58,13 @@ function ChatSessionBlock({
 }: ChatSessionProps) {
 
   // ── Show/Hide 플래그 (jQuery .show() / .hide() 대응) ────────────────────
-  const [showList01, setShowList01] = useState(false)  // 학생/부모 버튼
-  const [showList02, setShowList02] = useState(false)  // 학생 세부 버튼
-  const [showList03, setShowList03] = useState(false)  // 부모 세부 버튼
-  const [showList04, setShowList04] = useState(false)  // 상세 제목
-  const [showDetail, setShowDetail] = useState(false)  // 하단 반복 버튼
+  const [showList01,  setShowList01]  = useState(false)  // Guide_List_01: 학생/부모 버튼
+  const [showList02,  setShowList02]  = useState(false)  // Guide_List_02: 학생 세부 버튼
+  const [showList03,  setShowList03]  = useState(false)  // Guide_List_03: 부모 세부 버튼
+  const [showList04,  setShowList04]  = useState(false)  // Guide_List_04: 상세 영역
+  const [showTitle2,  setShowTitle2]  = useState(false)  // Detail_Title2: 전체보기 버튼
+  const [showDetail,  setShowDetail]  = useState(false)  // Detail_Title4: 하단 반복 버튼
+  const [showModal,   setShowModal]   = useState(false)  // detail_03 모달
 
   // ── 선택 텍스트 (select_01, select_02) ──────────────────────────────────
   const [select01, setSelect01] = useState<string | null>(
@@ -81,15 +73,18 @@ function ChatSessionBlock({
   const [select02, setSelect02] = useState<string | null>(null)
 
   // ── 데이터 ──────────────────────────────────────────────────────────────
-  const [p2Msgs,  setP2Msgs]  = useState<string[]>([])
-  const [p2Btns,  setP2Btns]  = useState<string[]>([])
-  const [p2Step,  setP2Step]  = useState<number | null>(isRoot ? null : (autoStep ?? null))
-  const [p3Msgs,  setP3Msgs]  = useState<string[]>([])
-  const [p3Title, setP3Title] = useState<string | null>(null)
+  const [p2Msgs,    setP2Msgs]    = useState<string[]>([])
+  const [p2Btns,    setP2Btns]    = useState<string[]>([])
+  const [p2Step,    setP2Step]    = useState<number | null>(isRoot ? null : (autoStep ?? null))
+  const [p3Msgs,    setP3Msgs]    = useState<string[]>([])
+  const [p3Title,   setP3Title]   = useState<string | null>(null)   // Detail_Title1 타이핑 텍스트
+  const [p3Content, setP3Content] = useState<string | null>(null)   // Detail_Content (모달 본문)
 
   // ── Typing 키 (단계 진입마다 +1 → 처음부터 다시 타이핑) ────────────────
-  const [p2Key, setP2Key] = useState(0)
-  const [p3Key, setP3Key] = useState(0)
+  const [p2Key,       setP2Key]       = useState(0)
+  const [p3Key,       setP3Key]       = useState(0)
+  const [p3TitleKey,  setP3TitleKey]  = useState(0)  // Detail_Title1 타이핑 키
+  const [p3Title3Key, setP3Title3Key] = useState(0)  // Detail_Title3 타이핑 키
 
   // ── useTyping: chatList1 → 완료 시 Guide_List_01 표시 ───────────────────
   const { typedMsgs: p1Typed, currentTyping: p1Cur } = useTyping(
@@ -109,11 +104,35 @@ function ChatSessionBlock({
     }, [])
   )
 
-  // ── useTyping: chatList3 → 완료 시 Guide_List_04 + Detail_Title4 표시 ───
+  // ── useTyping: chatList3 → 완료 시 Guide_List_04 표시 ───────────────────
   const { typedMsgs: p3Typed, currentTyping: p3Cur } = useTyping(
     p3Msgs, p3Key,
-    useCallback(() => { setShowList04(true); setShowDetail(true) }, [])
+    useCallback(() => setShowList04(true), [])
   )
+
+  // ── useTyping: Detail_Title1 타이핑 → 완료 시 Detail_Title2(전체보기) 표시
+  const { typedMsgs: p3TitleTyped, currentTyping: p3TitleCur } = useTyping(
+    p3Title ? [p3Title] : [],
+    p3TitleKey,
+    useCallback(() => setShowTitle2(true), [])
+  )
+
+  // ── useTyping: Detail_Title3 타이핑 → 완료 시 Detail_Title4(하단 버튼) 표시
+  const { typedMsgs: p3Title3Typed, currentTyping: p3Title3Cur } = useTyping(
+    showTitle2 && defaultBtns[6] ? [defaultBtns[6]] : [],
+    p3Title3Key,
+    useCallback(() => setShowDetail(true), [])
+  )
+
+  // ── Guide_List_04 표시되면 Detail_Title1 타이핑 시작 ────────────────────
+  useEffect(() => {
+    if (showList04 && p3Title) setP3TitleKey(k => k + 1)
+  }, [showList04]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Detail_Title2 표시되면 Detail_Title3 타이핑 시작 ────────────────────
+  useEffect(() => {
+    if (showTitle2) setP3Title3Key(k => k + 1)
+  }, [showTitle2])
 
   // ── non-root: 마운트 시 자동으로 chatList2 로드 ──────────────────────────
   useEffect(() => {
@@ -124,16 +143,17 @@ function ChatSessionBlock({
   const loadP2 = async (step: number, selectNum: number) => {
     setP2Step(step)
     setShowList02(false); setShowList03(false)
-    const data = await fetchChat(step, selectNum)
+    const data = await getGuideChatInfo(step, selectNum)
     setP2Msgs(data.guideChat.slice(0, 1))
     setP2Btns(data.guideButton)
     setP2Key(k => k + 1)
   }
 
   const loadP3 = async (step: number, selectNum: number) => {
-    const data = await fetchChat(step, selectNum)
+    const data = await getGuideChatInfo(step, selectNum)
     setP3Msgs(data.guideChat.slice(0, 1))
-    setP3Title(data.guideChat[1] ?? null)
+    setP3Title(data.guideChat[1] ?? null)    // Detail_Title1 텍스트
+    setP3Content(data.guideChat[2] ?? null)  // Detail_Content (모달 본문)
     setP3Key(k => k + 1)
   }
 
@@ -158,6 +178,24 @@ function ChatSessionBlock({
 
   return (
     <div>
+      {/* ── detail_03 모달 ───────────────────────────────────────────────── */}
+      {showModal && p3Content && (
+        <div className="modal" id={`detail_03_${id}`} onClick={() => setShowModal(false)}>
+          <div className="modal_form" onClick={e => e.stopPropagation()}>
+            <div className="modal_header">
+              <div>
+                <span className="material-icons-outlined close" onClick={() => setShowModal(false)}>
+                  arrow_back_ios
+                </span>
+              </div>
+            </div>
+            <div className="modal_body">
+              <div id={`Detail_Content_${id}`} dangerouslySetInnerHTML={{ __html: p3Content }} />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── chatList1: 첫 메시지 타이핑 (root only) ──────────────────────── */}
       {isRoot && (
         <div className="chat_guide">
@@ -168,7 +206,7 @@ function ChatSessionBlock({
             </ul>
           </div>
 
-          {/* Guide_List_01: 학생/부모 버튼 — showList01 일 때만 표시 */}
+          {/* Guide_List_01: 학생/부모 버튼 */}
           {showList01 && (
             <div className="guide_list_01" id={`Guide_List_01_${id}`}>
               <ul>
@@ -195,7 +233,7 @@ function ChatSessionBlock({
         </div>
       )}
 
-      {/* ── chatList2: 2단계 메시지 — 데이터가 있을 때만 표시 ────────────── */}
+      {/* ── chatList2: 2단계 메시지 ──────────────────────────────────────── */}
       {p2Msgs.length > 0 && (
         <div className="chat_guide">
           <div className="guide guide_02">
@@ -244,7 +282,7 @@ function ChatSessionBlock({
         </div>
       )}
 
-      {/* ── chatList3: 3단계 메시지 — 데이터가 있을 때만 표시 ────────────── */}
+      {/* ── chatList3: 3단계 메시지 ──────────────────────────────────────── */}
       {p3Msgs.length > 0 && (
         <div className="guide chat_guide">
           <div className="guide guide_03">
@@ -253,12 +291,32 @@ function ChatSessionBlock({
               {p3Cur && <li className="chat"><p>{p3Cur}</p></li>}
             </ul>
 
-            {/* Guide_List_04: 상세 제목 */}
+            {/* Guide_List_04: Detail_Title1 + Detail_Title2 + Detail_Title3 */}
             {showList04 && p3Title && (
               <div id={`Guide_List_04_${id}`}>
+
+                {/* Detail_Title1: 제목 타이핑 + 전체보기 버튼 */}
                 <div className="chat" id={`Detail_Title1_${id}`}>
-                  <p>{p3Title}</p>
+                  <p>{p3TitleTyped[0] ?? p3TitleCur}</p>
+                  {/* Detail_Title2: 전체보기 버튼 — showTitle2 일 때만 표시 */}
+                  {showTitle2 && p3Content && (
+                    <button
+                      className="detailBtn"
+                      id={`Detail_Title2_${id}`}
+                      onClick={() => setShowModal(true)}
+                    >
+                      전체보기<span className="material-icons-outlined">chevron_right</span>
+                    </button>
+                  )}
                 </div>
+
+                {/* Detail_Title3: defaultBtns[6] 타이핑 */}
+                <div className="chat" id={`Detail_Title3_${id}`}>
+                  {(p3Title3Typed.length > 0 || p3Title3Cur) && (
+                    <p>{p3Title3Typed[0] ?? p3Title3Cur}</p>
+                  )}
+                </div>
+
               </div>
             )}
 
@@ -282,8 +340,8 @@ function ChatSessionBlock({
   )
 }
 
-// ── QuickGuideChatUI ───────────────────────────────────────────────────────
-export interface QuickGuideChatUIProps {
+// ── GuideChat_View ────────────────────────────────────────────────────────
+export interface GuideChat_ViewProps {
   guideChat:          string[]
   guideButton:        string[]
   defaultGuideButton: string[]
@@ -291,7 +349,7 @@ export interface QuickGuideChatUIProps {
 
 interface ExtraSession { id: number; step: number; sel: string }
 
-export function QuickGuideChatUI({ guideChat, guideButton, defaultGuideButton }: QuickGuideChatUIProps) {
+export function GuideChat_View({ guideChat, guideButton, defaultGuideButton }: GuideChat_ViewProps) {
   const [extras, setExtras] = useState<ExtraSession[]>([])
   const nextId              = useRef(1)
   const areaRef             = useRef<HTMLDivElement>(null)

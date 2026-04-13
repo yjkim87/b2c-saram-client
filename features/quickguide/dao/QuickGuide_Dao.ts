@@ -5,7 +5,7 @@
 
 import sql from "mssql"
 import { DatabaseConnLIB, DatabaseConnType, ParameterDirection, SqlParameter } from "@/shared/dao/common/DatabaseConnLIB"
-import { GuideChatInfoRow, GuideChatInfoDS } from "@/features/quickguide/model/QuickGuideModel"
+import { GuideChatInfoRow, GuideChatInfoDS } from "@/features/quickguide/model/QuickGuide_Model"
 
 const databaseConnLIB = new DatabaseConnLIB()
 const conn = "real"
