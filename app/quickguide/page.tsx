@@ -1,3 +1,5 @@
+// Next.js는 빌드 시점에 페이지를 정적으로 pre-render 하려 하지만 이 페이지는 LF_Guide_Chat_Info()로 DB를 직접 조회하므로 빌드 시점에는 DB 연결 컨텍스트가 없어 prerender 에러가 발생함.
+// "force-dynamic"으로 설정하면 빌드 시 정적 생성을 건너뛰고 매 요청 시마다 서버에서 렌더링하여 DB 조회가 정상 동작함.
 export const dynamic = "force-dynamic";
 
 // GuideChat() 대응 — Server Component
