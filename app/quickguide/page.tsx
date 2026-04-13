@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 // GuideChat() 대응 — Server Component
 import { QuickGuideDao } from "@/features/quickguide/dao/QuickGuide_Dao"
 import { GuideChat_View } from "@/features/quickguide/pages/GuideChat_View"
