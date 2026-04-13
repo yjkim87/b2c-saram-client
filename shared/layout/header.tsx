@@ -23,8 +23,6 @@ export function Header() {
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mobileOpenGroup, setMobileOpenGroup] = useState<string | null>(null)
-  const quickCoachingGuideHref = "/quick-coaching-guide"
-  const isQuickCoachingGuideActive = isPathActive(pathname, quickCoachingGuideHref)
 
   const toggleMobileGroup = (title: string) => {
     setMobileOpenGroup((prev) => (prev === title ? null : title))
@@ -145,20 +143,6 @@ export function Header() {
               })}
             </nav>
 
-            <Link href={quickCoachingGuideHref}>
-              <Button
-                variant="outline"
-                className={cn(
-                  "cursor-pointer h-10 rounded-full px-5 text-sm font-semibold shadow-none",
-                  isQuickCoachingGuideActive
-                    ? "border-[#F07C33] bg-[#FBEBDD] text-[#D46728] hover:bg-[#F4DFC9]"
-                    : "border-[#D9C8B9] bg-[#FBF6F1] text-[#5A4637] hover:bg-[#F3E8DC]",
-                )}
-              >
-                퀵코칭가이드
-              </Button>
-            </Link>
-
             <Link href="/reservation">
               <Button
                 className="cursor-pointer h-10 rounded-full border-0 bg-[#F07C33] px-7 text-base font-semibold text-[#FFF] shadow-none hover:bg-[#DA6727]"
@@ -250,24 +234,6 @@ export function Header() {
               </div>
             )
           })}
-
-          <Link
-            href={quickCoachingGuideHref}
-            onClick={() => {
-              setMobileMenuOpen(false)
-              setMobileOpenGroup(null)
-            }}
-          >
-            <Button
-              variant="outline"
-              className={cn(
-                "cursor-pointer mt-2 w-full rounded-full border text-[#5A4637] shadow-none hover:bg-[#F3E8DC]",
-                isQuickCoachingGuideActive ? "border-[#F07C33] bg-[#FBEBDD] text-[#D46728]" : "border-[#D9C8B9] bg-[#FBF6F1]",
-              )}
-            >
-              퀵코칭가이드
-            </Button>
-          </Link>
 
           <Link
             href="/reservation"

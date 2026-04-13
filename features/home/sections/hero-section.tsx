@@ -4,7 +4,8 @@ import { useEffect, useRef } from "react"
 import { cn } from "@/shared/lib/utils"
 import { landingLayoutTokens } from "@/features/home/styles/landing-tokens"
 
-const HERO_BG_IMAGE_URL = "https://img.assesta.com/saram-me/main_mw_bg.png"
+const HERO_BG_IMAGE_URL_MOBILE = "https://img.assesta.com/saram-me/main_mw_bg.png"
+const HERO_BG_IMAGE_URL_DESKTOP = "https://img.assesta.com/saram-me/main_bg.png"
 
 function useFadeInUp(delay = 0) {
   const ref = useRef<HTMLDivElement>(null)
@@ -31,13 +32,40 @@ function useFadeInUp(delay = 0) {
 export function HeroSection() {
   const headingRef = useFadeInUp(140)
   const descRef = useFadeInUp(240)
+  const indicatorRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const indicator = indicatorRef.current
+    if (!indicator) return
+
+    const updateVisibility = () => {
+      indicator.classList.toggle("opacity-0", window.scrollY > 50)
+      indicator.classList.toggle("invisible", window.scrollY > 50)
+      indicator.classList.toggle("pointer-events-none", window.scrollY > 50)
+    }
+
+    updateVisibility()
+    window.addEventListener("scroll", updateVisibility, { passive: true })
+
+    return () => window.removeEventListener("scroll", updateVisibility)
+  }, [])
+
+  const handleScrollIndicatorClick = () => {
+    const nextSection = document.getElementById("features")
+    if (nextSection) {
+      nextSection.scrollIntoView({ behavior: "smooth", block: "start" })
+      return
+    }
+
+    window.scrollTo({ top: window.innerHeight * 0.9, behavior: "smooth" })
+  }
 
   return (
-    <section className="relative overflow-hidden bg-[#F2D8C0] pt-[64px] md:pt-[78px]">
+    <section className="relative h-[500px] overflow-hidden bg-[#F2D8C0] pt-[64px] md:h-[890px] md:pt-[78px]">
       <div className="absolute inset-0">
         <div className="h-full w-full pt-[62px] md:hidden">
           <img
-            src={HERO_BG_IMAGE_URL}
+            src={HERO_BG_IMAGE_URL_MOBILE}
             alt=""
             aria-hidden="true"
             fetchPriority="high"
@@ -46,12 +74,12 @@ export function HeroSection() {
           />
         </div>
 
-        <div className="hidden h-full w-full md:flex">
+        <div className="hidden h-full w-full pt-[60px] md:block">
           <img
-            src={HERO_BG_IMAGE_URL}
+            src={HERO_BG_IMAGE_URL_DESKTOP}
             alt=""
             aria-hidden="true"
-            className="ml-auto h-full w-auto max-w-none object-contain object-right-top"
+            className="h-full w-full object-cover object-top"
           />
         </div>
 
@@ -75,13 +103,13 @@ export function HeroSection() {
 
       <div
         className={cn(
-          "relative mx-auto flex h-[500px] w-full items-start md:h-auto md:min-h-[calc(100vh-4.875rem)]",
+          "relative mx-auto flex h-full w-full items-start",
           landingLayoutTokens.containerWide
         )}
       >
-        <div className="w-full px-8 pb-16 pt-[90px] sm:px-10 sm:pt-[90px] md:px-14 md:pb-20 md:pt-[110px] lg:px-16 lg:pt-[124px]">
+        <div className="w-full px-8 pb-16 pt-[90px] sm:px-10 sm:pt-[90px] md:px-14 md:pb-20 md:pt-[230px] lg:px-16 lg:pt-[230px]">
           <div ref={headingRef} className="max-w-[min(88vw,560px)] md:max-w-[620px]">
-            <h1 className="text-[36px] font-extrabold leading-[1.16] tracking-[-0.035em] text-[#17120F] md:leading-[1.12]">
+            <h1 className="text-[clamp(36px,6vw,70px)] font-extrabold leading-[1.16] tracking-[-0.035em] text-[#17120F] md:leading-[1.12]">
               부모의 고민에서,
               <br />
               아이의 발견으로
@@ -89,16 +117,42 @@ export function HeroSection() {
           </div>
 
           <div ref={descRef} className="mt-8 max-w-[min(86vw,440px)] md:mt-10 md:max-w-[520px]">
-            <p className="text-[18px] font-medium leading-[1.5] tracking-[-0.01em] text-[#2F251D]">
+            <p className="text-[clamp(18px,2.2vw,24px)] font-medium leading-[1.5] tracking-[-0.01em] text-[#2F251D]">
               초등 저학년부터 고등학생까지,
               <br />
               발달 단계에 맞춘
             </p>
-            <p className="mt-1 text-[18px] font-extrabold leading-[1.35] tracking-[-0.02em] text-[#1F1712]">
+            <p className="mt-1 text-[clamp(18px,2.2vw,24px)] font-extrabold leading-[1.35] tracking-[-0.02em] text-[#1F1712]">
               맞춤형 성장 코칭
             </p>
           </div>
         </div>
+      </div>
+
+      <div
+        ref={indicatorRef}
+        className="fixed bottom-8 left-1/2 z-[96] hidden -translate-x-1/2 transition-[opacity,visibility] duration-400 ease-out md:block md:bottom-10"
+      >
+        <button
+          type="button"
+          onClick={handleScrollIndicatorClick}
+          className="flex cursor-pointer flex-col items-center gap-2"
+          aria-label="아래로 스크롤"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            className="h-6 w-6 animate-bounce text-[#F18D5C] [animation-duration:1.5s] motion-reduce:animate-none"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M7 13l5 5 5-5M7 6l5 5 5-5" />
+          </svg>
+          <span className="text-[13px] font-medium tracking-[0.05em] text-[#666666]">SCROLL DOWN</span>
+        </button>
       </div>
     </section>
   )
