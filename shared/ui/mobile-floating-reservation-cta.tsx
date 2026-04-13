@@ -224,13 +224,13 @@ export function MobileFloatingReservationCTA() {
         href="/reservation"
         className={cn(
           "pointer-events-auto inline-flex h-14 w-[90%] max-w-[420px] items-center justify-center gap-2 rounded-full",
-          "bg-[#2B66F6] px-6 text-[15px] font-semibold text-white",
-          "shadow-[0_16px_36px_rgba(43,102,246,0.34)]",
+          "bg-[#F07C33] px-6 text-[15px] font-semibold text-white",
+          "shadow-[0_16px_36px_rgba(240,124,51,0.34)]",
           "transition-[transform,box-shadow,background-color] duration-200 ease-out",
-          "active:scale-[0.95] active:shadow-[0_10px_26px_rgba(43,102,246,0.3)]",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2B66F6]/40",
+          "active:scale-[0.95] active:shadow-[0_10px_26px_rgba(240,124,51,0.3)]",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F07C33]/40",
           "motion-reduce:transition-none",
-          config.emphasis === "high" && "shadow-[0_18px_40px_rgba(43,102,246,0.42)]"
+          config.emphasis === "high" && "shadow-[0_18px_40px_rgba(240,124,51,0.42)]"
         )}
         aria-label={config.label}
       >

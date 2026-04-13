@@ -2,10 +2,8 @@
 
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
-import { ArrowRight } from "lucide-react"
 import { cn } from "@/shared/lib/utils"
 import type { HomeServiceTab } from "@/features/home/model/home-tab"
-import { COACHING_AGE_DATA, COUNSELING_AGE_DATA, type AgeSummaryItem } from "@/features/home/data/age-summary"
 import {
   landingLayoutTokens,
   landingRadiusTokens,
@@ -14,90 +12,101 @@ import {
   landingTypeTokens,
 } from "@/features/home/styles/landing-tokens"
 
-interface AgeCardPreset {
+interface AgeGuideCard {
   key: string
-  sourceType: AgeSummaryItem["type"]
   routeType: string
   title: string
   range: string
+  mainQuote: string
+  quotes: string[]
+  tone: {
+    badge: string
+    mainQuote: string
+    hoverBorder: string
+  }
 }
 
-interface AgeGuideDisplayCard extends AgeSummaryItem {
-  key: string
-  routeType: string
-}
-
-const AGE_CARD_PRESETS: AgeCardPreset[] = [
-  {
-    key: "infant",
-    sourceType: "infant",
-    routeType: "infant",
-    title: "\uC601\uC544",
-    range: "0-2\uC138",
-  },
-  {
-    key: "preschool",
-    sourceType: "preschool",
-    routeType: "preschool",
-    title: "\uC720\uC544",
-    range: "3-6\uC138",
-  },
+const AGE_GUIDE_CARDS: AgeGuideCard[] = [
   {
     key: "elementary-lower",
-    sourceType: "school-age",
     routeType: "school-age",
-    title: "\uCD08\uB4F1\uD559\uAD50(\uC800\uD559\uB144)",
-    range: "7-9\uC138",
+    title: "초등 저학년",
+    range: "7-9세",
+    mainQuote: "내가 잘 하고 있는 건지 모르겠어요",
+    quotes: [
+      "도와주면 의존하고, 혼자 하라니 더 느려지고",
+      "매일 같이 있는데 우리 아이가 뭘 좋아하는지 모르겠어요",
+      "학원은 다 보내는데, 이게 맞는 건지 모르겠어요",
+    ],
+    tone: {
+      badge: "bg-[#F8E8DA] text-[#F07C33]",
+      mainQuote: "text-[#1B140F]",
+      hoverBorder: "hover:border-[#DDBB9A]",
+    },
   },
   {
     key: "elementary-upper",
-    sourceType: "school-age",
     routeType: "school-age",
-    title: "\uCD08\uB4F1\uD559\uAD50(\uACE0\uD559\uB144)",
-    range: "10-12\uC138",
+    title: "초등 고학년",
+    range: "10-12세",
+    mainQuote: "아이는 알고 있는데 내가 모르는 것 같아요",
+    quotes: [
+      "좋아하는 건 알겠는데, 그게 직업이 될 수 있는 건지 모르겠어요",
+      "아이가 뭔가 좋아하는 건 있는데, 공부랑 어떻게 연결해야 할지 모르겠어요",
+      "어떻게 반응해줬어야 했는데 그냥 넘긴 게 있는 것 같아요",
+    ],
+    tone: {
+      badge: "bg-[#F8E8DA] text-[#F07C33]",
+      mainQuote: "text-[#1B140F]",
+      hoverBorder: "hover:border-[#DDBB9A]",
+    },
   },
   {
     key: "middle-school",
-    sourceType: "teen",
     routeType: "teen",
-    title: "\uC911\uD559\uC0DD",
-    range: "13-15\uC138",
+    title: "중학생",
+    range: "13-15세",
+    mainQuote: "아이와 점점 멀어지는 것 같아요",
+    quotes: [
+      "제가 도와주려 하면 간섭이래요. 그렇다고 놔두면 아무것도 안 해요",
+      "목표는 생겼는데 어떻게 준비해야 하는지 정보가 없어요",
+      "열심히 하는 것 같은데 성적이 안 올라요. 방법이 문제인지 의지가 문제인지",
+    ],
+    tone: {
+      badge: "bg-[#F8E8DA] text-[#F07C33]",
+      mainQuote: "text-[#1B140F]",
+      hoverBorder: "hover:border-[#DDBB9A]",
+    },
   },
   {
     key: "high-school",
-    sourceType: "teen",
     routeType: "teen",
-    title: "\uACE0\uB4F1\uD559\uC0DD",
-    range: "16-18\uC138",
+    title: "고등학생",
+    range: "16-18세",
+    mainQuote: "이제 제가 해줄 수 있는 게 없는 것 같아요",
+    quotes: [
+      "지금이라도 늦지 않은 건지, 이미 늦은 건지 모르겠어요",
+      "제 방식으로 도와주려 하면 아이가 답답해해요",
+      "방향은 정한 것 같은데, 그게 정말 맞는 건지 충분히 고민한 건지 모르겠어요",
+    ],
+    tone: {
+      badge: "bg-[#F8E8DA] text-[#F07C33]",
+      mainQuote: "text-[#1B140F]",
+      hoverBorder: "hover:border-[#DDBB9A]",
+    },
   },
 ]
 
 interface AgeGuideSectionProps {
   tab: HomeServiceTab
-  showViewAllButton?: boolean
 }
 
-export function AgeGuideSection({ tab, showViewAllButton = true }: AgeGuideSectionProps) {
+export function AgeGuideSection({ tab }: AgeGuideSectionProps) {
   const sectionRef = useRef<HTMLElement>(null)
   const [isInView, setIsInView] = useState(false)
   const [animateCards, setAnimateCards] = useState(false)
 
-  const data = tab === "counseling" ? COUNSELING_AGE_DATA : COACHING_AGE_DATA
-  const displayCards = AGE_CARD_PRESETS.reduce<AgeGuideDisplayCard[]>((acc, preset) => {
-    const sourceCard = data.find((card) => card.type === preset.sourceType)
-    if (!sourceCard) return acc
-
-    acc.push({
-      ...sourceCard,
-      key: preset.key,
-      routeType: preset.routeType,
-      title: preset.title,
-      range: preset.range,
-    })
-
-    return acc
-  }, [])
-  const sectionBgClassName = tab === "counseling" ? "bg-[#F4FAFF]" : "bg-[#FFF7EF]"
+  const sectionBgClassName = "bg-[#FFF7EF]"
 
   useEffect(() => {
     const section = sectionRef.current
@@ -135,25 +144,23 @@ export function AgeGuideSection({ tab, showViewAllButton = true }: AgeGuideSecti
     <section ref={sectionRef} id="age-guide" className={cn(sectionBgClassName, landingSectionTokens.base)}>
       <div className={landingLayoutTokens.containerWide}>
         <div className={cn("text-center", landingLayoutTokens.sectionHeaderGap)}>
-          <span className={cn("mb-4 inline-flex", landingTypeTokens.eyebrow)}>연령별 발달 가이드</span>
+          <span className={cn("mb-4 inline-flex", landingTypeTokens.eyebrow)}>부모님의 마음</span>
           <h2 className={cn("mobile-auto-phrase", landingTypeTokens.sectionTitle)}>
-            시기마다 고민은 다르니까
+            이런 고민, 혼자 하고 계셨나요?
           </h2>
-          <p className={cn("mx-auto mt-5 max-w-2xl text-[#111827]", landingTypeTokens.body)}>
-            영유아부터 고등학생까지,
-            <br />
-            지금 우리 아이에게 맞는 고민부터 찾아보세요.
+          <p className={cn("mx-auto mt-5 max-w-2xl text-[#3A2F27]", landingTypeTokens.body)}>
+            연령대별로 부모님들이 가장 많이 하시는 고민들입니다.
           </p>
         </div>
 
         <div key={`age-${tab}`} className="animate-in fade-in duration-200">
-          <div className={cn("grid grid-cols-2 md:grid-cols-3", landingSpaceTokens.gridGapSmToMd)}>
-            {displayCards.map((card, index) => (
-              <Link
+          <div className={cn("grid grid-cols-1 md:grid-cols-2", landingSpaceTokens.gridGapSmToMd)}>
+            {AGE_GUIDE_CARDS.map((card, index) => (
+              <div
                 key={`${tab}-${card.key}`}
-                href={`/age/${card.routeType}`}
                 className={cn(
-                  "group flex h-full flex-col bg-[#FFFFFF]",
+                  "flex h-full flex-col border border-[#DCCEC0] bg-[#F5EEE7] transition-colors duration-200",
+                  card.tone.hoverBorder,
                   landingRadiusTokens.card,
                   landingSpaceTokens.cardPaddingResponsive
                 )}
@@ -164,47 +171,50 @@ export function AgeGuideSection({ tab, showViewAllButton = true }: AgeGuideSecti
                   transitionDelay: `${index * 90}ms`,
                 }}
               >
-                <div className="mb-3">
+                <div className="mb-4 flex items-center gap-2">
                   <span
                     className={cn(
-                      "inline-flex bg-[#E6F4FF] text-[#2b66f6]",
+                      "inline-flex",
+                      card.tone.badge,
                       landingRadiusTokens.pill,
                       landingSpaceTokens.chipPadding,
                       landingTypeTokens.ageRangeLabel
                     )}
                   >
-                    {card.range}
+                    {card.title}
                   </span>
+                  <span className="text-sm font-semibold text-[#907865]">{card.range}</span>
                 </div>
 
-                <h3 className={cn("text-[#05070d]", landingTypeTokens.ageCardTitle)}>{card.title}</h3>
+                <h3 className={cn("text-balance text-[20px] font-semibold leading-[1.5] md:text-[24px]", card.tone.mainQuote)}>
+                  {card.mainQuote}
+                </h3>
 
-                <ul className="mt-3 space-y-1.5">
-                  {card.highlights.slice(0, 3).map((highlight) => (
-                    <li key={highlight} className={cn("font-medium text-[#111827]", landingTypeTokens.bodySm, "text-[15px] md:text-[16px]")}>
-                      • {highlight}
+                <ul className="mt-4 space-y-2.5">
+                  {card.quotes.map((quote) => (
+                    <li key={quote} className={cn("text-[#5C4D42] italic", landingTypeTokens.bodySm)}>
+                      "{quote}"
                     </li>
                   ))}
                 </ul>
-                <span className="mt-5 ml-auto inline-flex items-center gap-1 text-sm font-semibold text-[#52a9ff] transition-transform duration-200 group-hover:translate-x-0.5">
-                  자세히 보기
-                  <ArrowRight className="h-4 w-4" />
-                </span>
-              </Link>
+                <div className="mt-6 flex flex-wrap gap-2 border-t border-[#E7DACE] pt-5">
+                  <Link
+                    href="/quick-coaching-guide"
+                    className="inline-flex items-center justify-center rounded-full bg-[#F07C33] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#DA6727]"
+                  >
+                    퀵코칭상담
+                  </Link>
+                  <Link
+                    href="/reservation"
+                    className="inline-flex items-center justify-center rounded-full border border-[#F07C33] px-4 py-2 text-sm font-semibold text-[#D46728] transition-colors hover:bg-[#FBEADD]"
+                  >
+                    빠른상담예약
+                  </Link>
+                </div>
+              </div>
             ))}
           </div>
 
-          {showViewAllButton ? (
-            <div className="mt-8 flex justify-center">
-              <Link
-                href="/program/age-guide"
-                className="inline-flex h-10 items-center gap-2 rounded-full border border-[#0C0C0C] bg-white px-7 text-base font-semibold text-[#0C0C0C] transition-colors hover:bg-[#0C0C0C] hover:text-white"
-              >
-                전체 연령 가이드 보기
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-          ) : null}
         </div>
       </div>
     </section>

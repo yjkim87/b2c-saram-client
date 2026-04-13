@@ -88,10 +88,10 @@ function MobileStepItem({
             landingTypeTokens.stepNumberSm
           )}
           style={{
-            background: isActive ? "#05070d" : "#c6ccd5",
-            color: isActive ? "#ffffff" : "#596171",
+            background: isActive ? "#5B402C" : "#D2C3B4",
+            color: isActive ? "#ffffff" : "#725F4F",
             transform: isActive ? "scale(1.08)" : "scale(1)",
-            boxShadow: isActive ? "0 8px 18px rgba(5,7,13,0.24)" : "none",
+            boxShadow: isActive ? "0 8px 18px rgba(91,64,44,0.24)" : "none",
           }}
         >
           {step.num}
@@ -102,7 +102,7 @@ function MobileStepItem({
             className="pointer-events-none absolute left-1/2 top-8 block w-px -translate-x-1/2"
             style={{
               bottom: "-1rem",
-              background: "repeating-linear-gradient(to bottom, #c5ccd5 0px, #c5ccd5 4px, transparent 4px, transparent 8px)",
+              background: "repeating-linear-gradient(to bottom, #D0C0B0 0px, #D0C0B0 4px, transparent 4px, transparent 8px)",
             }}
           />
         )}
@@ -111,14 +111,14 @@ function MobileStepItem({
       <article
         className={cn("mb-4 border transition-all duration-300", landingRadiusTokens.card, landingSpaceTokens.cardPaddingResponsive)}
         style={{
-          background: isActive ? "#FFFFFF" : "transparent",
-          borderColor: isActive ? "#d5deea" : "transparent",
+          background: isActive ? "#F8F2EC" : "transparent",
+          borderColor: isActive ? "#D8C8B8" : "transparent",
           transform: isActive ? "translateY(-2px)" : "translateY(0)",
           opacity: isActive ? 1 : 0.75,
         }}
       >
-        <h3 className={cn("text-[#05070d]", landingTypeTokens.serviceCardTitle)}>{step.title}</h3>
-        <p className={cn("mt-2 text-[#111827]", landingTypeTokens.stepDescription)}>{step.desc}</p>
+        <h3 className={cn("text-[#1E1611]", landingTypeTokens.serviceCardTitle)}>{step.title}</h3>
+        <p className={cn("mt-2 text-[#3A2F27]", landingTypeTokens.stepDescription)}>{step.desc}</p>
       </article>
     </div>
   )
@@ -133,9 +133,9 @@ function DesktopStepItem({ step, isActive }: { step: ProcessStep; isActive: bool
         landingSpaceTokens.cardPadding
       )}
       style={{
-        background: isActive ? "#FFFFFF" : "#e8edf3",
-        borderColor: isActive ? "#d2dce8" : "#dce3ea",
-        boxShadow: isActive ? "0 18px 36px rgba(15,23,42,0.11)" : "none",
+        background: isActive ? "#F8F2EC" : "#ECE2D7",
+        borderColor: isActive ? "#D5C4B2" : "#DDD0C2",
+        boxShadow: isActive ? "0 18px 36px rgba(91,64,44,0.12)" : "none",
         transform: isActive ? "translateY(-4px)" : "translateY(0)",
       }}
     >
@@ -147,8 +147,8 @@ function DesktopStepItem({ step, isActive }: { step: ProcessStep; isActive: bool
             landingTypeTokens.stepNumberLg
           )}
           style={{
-            background: isActive ? "#05070d" : "#c9d0da",
-            color: isActive ? "#ffffff" : "#5b6472",
+            background: isActive ? "#5B402C" : "#D1C2B4",
+            color: isActive ? "#ffffff" : "#725F4F",
             transition: "all 0.3s ease",
           }}
         >
@@ -157,8 +157,8 @@ function DesktopStepItem({ step, isActive }: { step: ProcessStep; isActive: bool
       </div>
 
       <div>
-        <h3 className={cn("text-[#05070d]", landingTypeTokens.serviceCardTitle)}>{step.title}</h3>
-        <p className={cn("mt-2 text-[#111827]", landingTypeTokens.stepDescription)}>{step.desc}</p>
+        <h3 className={cn("text-[#1E1611]", landingTypeTokens.serviceCardTitle)}>{step.title}</h3>
+        <p className={cn("mt-2 text-[#3A2F27]", landingTypeTokens.stepDescription)}>{step.desc}</p>
       </div>
     </article>
   )
@@ -207,12 +207,12 @@ export function ProcessStepsSection({ tab }: ProcessStepsSectionProps) {
   }, [isInView, steps.length])
 
   return (
-    <section ref={sectionRef} id="process-steps" className={cn("bg-[#F4FAFF]", landingSectionTokens.base)}>
+    <section ref={sectionRef} id="process-steps" className={cn("bg-[#FFF7EF]", landingSectionTokens.base)}>
       <div className={landingLayoutTokens.containerMedium}>
         <div className={cn("text-center", landingLayoutTokens.sectionHeaderGap)}>
           <span className={cn("mb-4 inline-flex", landingTypeTokens.eyebrow)}>{badgeLabel}</span>
           <h2 className={landingTypeTokens.sectionTitle}>{headline}</h2>
-          <p className={cn("mx-auto mt-5 max-w-2xl text-[#111827]", landingTypeTokens.body)}>{description}</p>
+          <p className={cn("mx-auto mt-5 max-w-2xl text-[#3A2F27]", landingTypeTokens.body)}>{description}</p>
         </div>
 
         <div className="md:hidden">
@@ -235,7 +235,7 @@ export function ProcessStepsSection({ tab }: ProcessStepsSectionProps) {
         <div className="mt-8 flex justify-center">
           <Link
             href="/about/intro"
-            className="inline-flex h-10 items-center gap-2 rounded-full border border-[#0C0C0C] bg-white px-7 text-base font-semibold text-[#0C0C0C] transition-colors hover:bg-[#0C0C0C] hover:text-white"
+            className="inline-flex h-10 items-center gap-2 rounded-full border border-[#6B4A32] bg-[#F8F2EC] px-7 text-base font-semibold text-[#6B4A32] transition-colors hover:bg-[#6B4A32] hover:text-white"
           >
             사발면 소개 보러가기
             <ArrowRight className="h-4 w-4" />

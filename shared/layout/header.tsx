@@ -8,6 +8,8 @@ import { Button } from "@/shared/ui/button"
 import { cn } from "@/shared/lib/utils"
 import { NAVIGATION } from "@/shared/navigation"
 
+const LOGO_IMAGE_URL = "/saramme_logo.png"
+
 function isPathActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`)
 }
@@ -21,6 +23,8 @@ export function Header() {
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mobileOpenGroup, setMobileOpenGroup] = useState<string | null>(null)
+  const quickCoachingGuideHref = "/quick-coaching-guide"
+  const isQuickCoachingGuideActive = isPathActive(pathname, quickCoachingGuideHref)
 
   const toggleMobileGroup = (title: string) => {
     setMobileOpenGroup((prev) => (prev === title ? null : title))
@@ -50,15 +54,15 @@ export function Header() {
   }, [pathname])
 
   return (
-    <header className="fixed left-0 right-0 top-0 z-[100] border-b border-[#e6ebf7] bg-[#ffffff]">
+    <header className="fixed left-0 right-0 top-0 z-[100] border-b border-[#E3D5C7] bg-[#fff]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between md:hidden">
+        <div className="flex h-[64px] items-center justify-between md:hidden">
           <Link href="/" className="flex items-center">
-            <span className="text-2xl font-bold tracking-tight text-[#0C0C0C]">LOGO</span>
+            <img src={LOGO_IMAGE_URL} alt="사람ME 로고" className="h-10 w-auto" />
           </Link>
 
           <button
-            className="cursor-pointer p-2 text-[#0C0C0C]"
+            className="cursor-pointer p-2 text-[#1A1410]"
             onClick={() => {
               setMobileMenuOpen((prev) => {
                 const next = !prev
@@ -68,20 +72,38 @@ export function Header() {
                 return next
               })
             }}
-            aria-label={mobileMenuOpen ? "硫붾돱 ?リ린" : "硫붾돱 ?닿린"}
+            aria-label={mobileMenuOpen ? "메뉴 닫기" : "메뉴 열기"}
           >
             {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
 
-        <div className="hidden h-20 items-center md:flex">
-          <Link href="/" className="shrink-0">
-            <span className="text-[2.1rem] font-bold tracking-tight text-[#0C0C0C]">LOGO</span>
+        <div className="hidden h-[78px] items-center md:flex">
+          <Link href="/" className="shrink-0 flex items-center">
+            <img src={LOGO_IMAGE_URL} alt="사람ME 로고" className="h-11 w-auto" />
           </Link>
 
           <div className="ml-auto flex items-center gap-8">
             <nav className="flex items-center gap-6">
-              {NAVIGATION.map((group) => {
+              {NAVIGATION.map((entry) => {
+                if (entry.type === "link") {
+                  const linkActive = isPathActive(pathname, entry.href)
+
+                  return (
+                    <Link
+                      key={entry.title}
+                      href={entry.href}
+                      className={cn(
+                        "inline-flex items-center gap-1 text-[1.05rem] font-semibold transition-colors",
+                        linkActive ? "text-[#F07C33]" : "text-[#1A1410] hover:opacity-70"
+                      )}
+                    >
+                      {entry.title}
+                    </Link>
+                  )
+                }
+
+                const group = entry
                 const groupActive = isGroupActive(group.children)
 
                 return (
@@ -90,7 +112,7 @@ export function Header() {
                       type="button"
                       className={cn(
                         "inline-flex items-center gap-1 text-[1.05rem] font-semibold transition-colors",
-                        groupActive ? "text-[#2b66f6]" : "text-[#0C0C0C] hover:opacity-70"
+                        groupActive ? "text-[#F07C33]" : "text-[#1A1410] hover:opacity-70"
                       )}
                       aria-haspopup="menu"
                       aria-expanded={groupActive}
@@ -99,7 +121,7 @@ export function Header() {
                       <ChevronDown className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180" />
                     </button>
 
-                    <div className="pointer-events-none absolute left-1/2 top-full z-[120] w-56 -translate-x-1/2 translate-y-2 scale-[0.98] rounded-xl border border-[#e6ebf7] bg-white p-2 opacity-0 shadow-[0_16px_36px_rgba(12,12,12,0.12)] transition-[opacity,transform] duration-200 ease-out group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:scale-100 group-focus-within:opacity-100">
+                    <div className="pointer-events-none absolute left-1/2 top-full z-[120] w-56 -translate-x-1/2 translate-y-2 scale-[0.98] rounded-xl border border-[#E3D5C7] bg-[#FBF6F1] p-2 opacity-0 shadow-[0_16px_36px_rgba(37,23,15,0.12)] transition-[opacity,transform] duration-200 ease-out group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:scale-100 group-focus-within:opacity-100">
                       <ul className="space-y-1">
                         {group.children.map((item) => (
                           <li key={item.href}>
@@ -108,8 +130,8 @@ export function Header() {
                               className={cn(
                                 "block rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                                 isChildActive(item.href)
-                                  ? "bg-[#eff6ff] text-slate-900"
-                                  : "text-slate-700 hover:bg-[#eff6ff] hover:text-slate-900"
+                                  ? "bg-[#F8E9DB] text-[#1E1611]"
+                                  : "text-[#5F4E42] hover:bg-[#F8E9DB] hover:text-[#1E1611]"
                               )}
                             >
                               {item.title}
@@ -123,9 +145,23 @@ export function Header() {
               })}
             </nav>
 
+            <Link href={quickCoachingGuideHref}>
+              <Button
+                variant="outline"
+                className={cn(
+                  "cursor-pointer h-10 rounded-full px-5 text-sm font-semibold shadow-none",
+                  isQuickCoachingGuideActive
+                    ? "border-[#F07C33] bg-[#FBEBDD] text-[#D46728] hover:bg-[#F4DFC9]"
+                    : "border-[#D9C8B9] bg-[#FBF6F1] text-[#5A4637] hover:bg-[#F3E8DC]",
+                )}
+              >
+                퀵코칭가이드
+              </Button>
+            </Link>
+
             <Link href="/reservation">
               <Button
-                className="cursor-pointer h-10 rounded-full border-0 bg-[#3391FF] px-7 text-base font-semibold text-[#FFF] shadow-none hover:bg-[#2b7de0]"
+                className="cursor-pointer h-10 rounded-full border-0 bg-[#F07C33] px-7 text-base font-semibold text-[#FFF] shadow-none hover:bg-[#DA6727]"
               >
                 무료 상담 예약
               </Button>
@@ -136,12 +172,34 @@ export function Header() {
 
       <div
         className={cn(
-          "absolute left-0 right-0 top-full overflow-hidden border-b border-[#e6ebf7] bg-[#ffffff] transition-all duration-300 md:hidden",
+          "absolute left-0 right-0 top-full overflow-hidden border-b border-[#E3D5C7] bg-[#fff] transition-all duration-300 md:hidden",
           mobileMenuOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0"
         )}
       >
         <nav className="flex flex-col gap-2 p-4">
-          {NAVIGATION.map((group) => {
+          {NAVIGATION.map((entry) => {
+            if (entry.type === "link") {
+              const linkActive = isPathActive(pathname, entry.href)
+
+              return (
+                <Link
+                  key={entry.title}
+                  href={entry.href}
+                  className={cn(
+                    "rounded-xl border bg-white px-4 py-3 text-base font-semibold transition-colors",
+                    linkActive ? "border-[#E3D5C7] text-[#F07C33]" : "border-[#E3D5C7] text-[#1A1410]"
+                  )}
+                  onClick={() => {
+                    setMobileMenuOpen(false)
+                    setMobileOpenGroup(null)
+                  }}
+                >
+                  {entry.title}
+                </Link>
+              )
+            }
+
+            const group = entry
             const isOpen = mobileOpenGroup === group.title
             const groupActive = isGroupActive(group.children)
 
@@ -150,14 +208,14 @@ export function Header() {
                 key={group.title}
                 className={cn(
                   "rounded-xl border bg-white transition-colors",
-                  groupActive ? "border-[#e6ebf7]" : "border-[#e6ebf7]"
+                  groupActive ? "border-[#E3D5C7]" : "border-[#E3D5C7]"
                 )}
               >
                 <button
                   type="button"
                   className={cn(
                     "flex w-full items-center justify-between px-4 py-3 text-left text-base font-semibold",
-                    groupActive ? "text-[#2b66f6]" : "text-[#0C0C0C]"
+                    groupActive ? "text-[#F07C33]" : "text-[#1A1410]"
                   )}
                   onClick={() => toggleMobileGroup(group.title)}
                   aria-expanded={isOpen}
@@ -175,8 +233,8 @@ export function Header() {
                           className={cn(
                             "block rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                             isChildActive(item.href)
-                              ? "bg-[#eff6ff] text-slate-900"
-                              : "text-slate-700 hover:bg-[#eff6ff]"
+                              ? "bg-[#F8E9DB] text-[#1E1611]"
+                              : "text-[#5F4E42] hover:bg-[#F8E9DB]"
                           )}
                           onClick={() => {
                             setMobileMenuOpen(false)
@@ -194,6 +252,24 @@ export function Header() {
           })}
 
           <Link
+            href={quickCoachingGuideHref}
+            onClick={() => {
+              setMobileMenuOpen(false)
+              setMobileOpenGroup(null)
+            }}
+          >
+            <Button
+              variant="outline"
+              className={cn(
+                "cursor-pointer mt-2 w-full rounded-full border text-[#5A4637] shadow-none hover:bg-[#F3E8DC]",
+                isQuickCoachingGuideActive ? "border-[#F07C33] bg-[#FBEBDD] text-[#D46728]" : "border-[#D9C8B9] bg-[#FBF6F1]",
+              )}
+            >
+              퀵코칭가이드
+            </Button>
+          </Link>
+
+          <Link
             href="/reservation"
             onClick={() => {
               setMobileMenuOpen(false)
@@ -201,7 +277,7 @@ export function Header() {
             }}
           >
             <Button
-              className="cursor-pointer mt-2 w-full rounded-full border-0 bg-[#3391FF] text-[#FFF] hover:bg-[#2b7de0] hover:text-[#FFF]"
+              className="cursor-pointer mt-2 w-full rounded-full border-0 bg-[#F07C33] text-[#FFF] hover:bg-[#DA6727] hover:text-[#FFF]"
             >
               무료 상담 예약
             </Button>

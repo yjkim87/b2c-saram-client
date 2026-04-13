@@ -7,25 +7,25 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(0.97 0.01 85);
-  --foreground: oklch(0.25 0.02 50);
-  --card: oklch(0.99 0.005 85);
-  --card-foreground: oklch(0.25 0.02 50);
-  --popover: oklch(0.99 0.005 85);
-  --popover-foreground: oklch(0.25 0.02 50);
-  --primary: oklch(0.45 0.08 220);
+  --background: oklch(0.95 0.012 82);
+  --foreground: oklch(0.24 0.02 48);
+  --card: oklch(0.98 0.008 80);
+  --card-foreground: oklch(0.24 0.02 48);
+  --popover: oklch(0.98 0.008 80);
+  --popover-foreground: oklch(0.24 0.02 48);
+  --primary: oklch(0.72 0.16 53);
   --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.93 0.015 80);
-  --secondary-foreground: oklch(0.30 0.02 50);
-  --muted: oklch(0.92 0.02 80);
-  --muted-foreground: oklch(0.45 0.02 50);
-  --accent: oklch(0.55 0.12 45);
+  --secondary: oklch(0.92 0.018 78);
+  --secondary-foreground: oklch(0.31 0.03 46);
+  --muted: oklch(0.90 0.015 76);
+  --muted-foreground: oklch(0.44 0.03 50);
+  --accent: oklch(0.82 0.08 67);
   --accent-foreground: oklch(0.99 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.88 0.02 80);
-  --input: oklch(0.95 0.01 85);
-  --ring: oklch(0.45 0.08 220);
+  --border: oklch(0.86 0.02 74);
+  --input: oklch(0.94 0.01 80);
+  --ring: oklch(0.72 0.16 53);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -191,6 +191,21 @@
   }
 }
 
+@keyframes review-star-twinkle {
+  0% {
+    opacity: 0.55;
+    transform: translateY(1px) scale(0.98);
+  }
+  45% {
+    opacity: 1;
+    transform: translateY(0) scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @layer utilities {
   .mobile-auto-phrase {
     word-break: keep-all;
@@ -207,7 +222,7 @@
     height: 7px;
     margin: 0 4px !important;
     border-radius: 9999px;
-    background: #b6c1cf;
+    background: #cab7a4;
     opacity: 1;
     transition: all 0.25s ease;
   }
@@ -216,7 +231,7 @@
   .reviews-swiper-dots .swiper-pagination-bullet-active,
   .center-swiper-dots .swiper-pagination-bullet-active {
     width: 18px;
-    background: #2b66f6;
+    background: #f07c33;
   }
 
   .service-program-swiper-dots.swiper-pagination {
@@ -229,6 +244,18 @@
     align-items: center;
     gap: 0.375rem;
     text-align: right;
+  }
+
+  @media (max-width: 767px) {
+    .reviews-swiper-motion .swiper-slide {
+      transform: scaleX(0.98);
+      transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+      transform-origin: center center;
+    }
+
+    .reviews-swiper-motion .swiper-slide-active {
+      transform: scaleX(1);
+    }
   }
 
   @supports (word-break: auto-phrase) {

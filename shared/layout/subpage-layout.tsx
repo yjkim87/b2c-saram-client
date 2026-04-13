@@ -10,7 +10,7 @@ export function SubpageLayout({ children }: SubpageLayoutProps) {
   return (
     <>
       <Header />
-      <div className="pt-16 md:pt-20">{children}</div>
+      <div className="pt-[64px] md:pt-[78px]">{children}</div>
       <Footer />
     </>
   )

@@ -74,7 +74,7 @@ export function ServiceProgramSection({ tab }: ServiceProgramSectionProps) {
     <section
       ref={sectionRef}
       id="service-program"
-      className={cn("relative overflow-hidden bg-white", landingSectionTokens.base)}
+      className={cn("relative overflow-hidden bg-[#FFFFFF]", landingSectionTokens.base)}
     >
       <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-[320px] overflow-hidden md:hidden">
         <div
@@ -85,7 +85,7 @@ export function ServiceProgramSection({ tab }: ServiceProgramSectionProps) {
             left: -650,
             top: -400,
             background:
-              "radial-gradient(50% 50%, rgb(188, 219, 255) 0%, rgba(255, 255, 255, 0) 100%)",
+              "radial-gradient(50% 50%, rgb(249, 219, 191) 0%, rgba(255, 255, 255, 0) 100%)",
           }}
         />
       </div>
@@ -99,7 +99,7 @@ export function ServiceProgramSection({ tab }: ServiceProgramSectionProps) {
           left: -920,
           top: -470,
           background:
-            "radial-gradient(50% 50% at 50% 50%, #BCDBFF 0%, rgba(255, 255, 255, 0) 100%)",
+            "radial-gradient(50% 50% at 50% 50%, #F9DBBF 0%, rgba(255, 255, 255, 0) 100%)",
         }}
       />
 
@@ -109,7 +109,7 @@ export function ServiceProgramSection({ tab }: ServiceProgramSectionProps) {
           <h2 className={cn("mobile-auto-phrase", landingTypeTokens.sectionTitle)}>
             과학적 접근, 따뜻한 마음으로
           </h2>
-          <p className={cn("mx-auto mt-5 max-w-2xl text-[#111827]", landingTypeTokens.body)}>
+          <p className={cn("mx-auto mt-5 max-w-2xl text-[#3A2F27]", landingTypeTokens.body)}>
             발달심리학 이론을 바탕으로 아이 개개인의 특성을 존중하는 맞춤형 서비스를 제공합니다.
           </p>
         </div>
@@ -135,8 +135,8 @@ export function ServiceProgramSection({ tab }: ServiceProgramSectionProps) {
                   <SwiperSlide key={`${tab}-${card.type}`}>
                     <article
                       className={cn(
-                        "block transform-gpu will-change-transform transition-[background-color,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[#DCEBFF] hover:scale-[1.02]",
-                        "bg-[#F4FAFF]",
+                        "block transform-gpu will-change-transform transition-[background-color,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[#F0E4D7] hover:scale-[1.02]",
+                        "bg-[#F7F1EA]",
                         landingRadiusTokens.card,
                         landingSpaceTokens.cardPadding
                       )}
@@ -155,9 +155,9 @@ export function ServiceProgramSection({ tab }: ServiceProgramSectionProps) {
                         {card.tag}
                       </span>
 
-                      <h3 className={cn("mt-4 text-[#0C0C0C]", landingTypeTokens.serviceCardTitle)}>{card.title}</h3>
+                      <h3 className={cn("mt-4 text-[#1E1611]", landingTypeTokens.serviceCardTitle)}>{card.title}</h3>
 
-                      <p className={cn("mt-4 text-[#111827]", landingTypeTokens.body)}>{card.description}</p>
+                      <p className={cn("mt-4 text-[#3A2F27]", landingTypeTokens.body)}>{card.description}</p>
 
                       {detailNote ? <p className={cn("mt-5", landingTypeTokens.serviceCardNote)}>{detailNote}</p> : null}
                     </article>
@@ -175,7 +175,7 @@ export function ServiceProgramSection({ tab }: ServiceProgramSectionProps) {
                   onClick={() => mobileSwiperRef.current?.slideToLoop(dotIndex)}
                   className={cn(
                     "h-2.5 w-2.5 rounded-full transition-colors duration-200",
-                    mobileActiveIndex === dotIndex ? "bg-[#2B66F6]" : "bg-[#B8C8DA]"
+                    mobileActiveIndex === dotIndex ? "bg-[#F07C33]" : "bg-[#CDB8A5]"
                   )}
                 />
               ))}
@@ -199,7 +199,7 @@ export function ServiceProgramSection({ tab }: ServiceProgramSectionProps) {
               >
                 <article
                   className={cn(
-                    "group flex h-full flex-col transform-gpu will-change-transform bg-[#F4FAFF] transition-[background-color,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[#DCEBFF] hover:scale-[1.02]",
+                    "group flex h-full flex-col transform-gpu will-change-transform bg-[#F7F1EA] transition-[background-color,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[#F0E4D7] hover:scale-[1.02]",
                     landingRadiusTokens.card,
                     landingSpaceTokens.cardPadding
                   )}
@@ -218,9 +218,9 @@ export function ServiceProgramSection({ tab }: ServiceProgramSectionProps) {
                     {card.tag}
                   </span>
 
-                  <h3 className={cn("mt-4 text-[#0C0C0C]", landingTypeTokens.serviceCardTitle)}>{card.title}</h3>
+                  <h3 className={cn("mt-4 text-[#1E1611]", landingTypeTokens.serviceCardTitle)}>{card.title}</h3>
 
-                  <p className={cn("mt-4 text-[#111827]", landingTypeTokens.body)}>{card.description}</p>
+                  <p className={cn("mt-4 text-[#3A2F27]", landingTypeTokens.body)}>{card.description}</p>
 
                   {detailNote ? <p className={cn("mt-5", landingTypeTokens.serviceCardNote)}>{detailNote}</p> : null}
                 </article>
@@ -232,7 +232,7 @@ export function ServiceProgramSection({ tab }: ServiceProgramSectionProps) {
         <div className="mt-8 flex justify-center">
           <Link
             href="/program"
-            className="inline-flex h-10 items-center gap-2 rounded-full border border-[#0C0C0C] bg-white px-7 text-base font-semibold text-[#0C0C0C] transition-colors hover:bg-[#0C0C0C] hover:text-white"
+            className="inline-flex h-10 items-center gap-2 rounded-full border border-[#6B4A32] bg-[#F8F2EC] px-7 text-base font-semibold text-[#6B4A32] transition-colors hover:bg-[#6B4A32] hover:text-white"
           >
             상담/코칭 프로그램 보러가기
             <ArrowRight className="h-4 w-4" />

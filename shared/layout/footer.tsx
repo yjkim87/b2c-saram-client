@@ -65,13 +65,13 @@ function openExternalSite(url: string) {
 
 export function Footer() {
   return (
-    <footer className="bg-[#4a4a4a] py-12 md:py-16">
+    <footer className="bg-[#15171B] py-12 md:py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid md:grid-cols-2 gap-8 md:gap-12">
           {/* Company Info */}
           <div className="space-y-4">
             <h3 className="text-white font-bold text-xl mb-4">사발면</h3>
-            <div className="space-y-2 text-[#94a3b8] text-sm">
+            <div className="space-y-2 text-[#C5CBD4] text-sm">
               <p>대표이사 김명준</p>
               <p>개인정보관리자: · 손성훈</p>
               <p>사업자등록번호: 123-45-67890</p>
@@ -88,7 +88,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   aria-label={channel.label}
                   title={channel.label}
-                  className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[#A8AFBC] text-white transition-colors hover:bg-[#BCC2CC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#4a4a4a]"
+                  className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[#2D323A] text-white transition-colors hover:bg-[#3C424B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#15171B]"
                 >
                   <svg
                     aria-hidden="true"
@@ -104,13 +104,13 @@ export function Footer() {
             <div className="flex gap-4 pt-4">
               <Link
                 href="/policy?type=terms"
-                className="text-[#94a3b8] hover:text-white transition-colors text-sm"
+                className="text-[#C5CBD4] hover:text-white transition-colors text-sm"
               >
                 이용약관
               </Link>
               <Link
                 href="/policy?type=privacy"
-                className="text-[#94a3b8] hover:text-white transition-colors text-sm font-semibold"
+                className="text-[#C5CBD4] hover:text-white transition-colors text-sm font-semibold"
               >
                 개인정보처리방침
               </Link>
@@ -120,9 +120,9 @@ export function Footer() {
           {/* Site Links */}
           <div className="footer-select-theme space-y-4 md:justify-self-end">
             <div className="space-y-3">
-              <label className="text-[#94a3b8] text-sm block">관련기관 사이트</label>
+              <label className="text-[#C5CBD4] text-sm block">관련기관 사이트</label>
               <Select onValueChange={openExternalSite}>
-                <SelectTrigger className="h-12 w-full rounded-[10px] border-[#6A6A6A] bg-[#5B5B5B] px-4 text-base font-normal text-[#F1F5F9] data-[placeholder]:text-[#F1F5F9] md:w-64">
+                <SelectTrigger className="h-12 w-full rounded-[10px] border-[#4A505A] bg-[#21262E] px-4 text-base font-normal text-[#F1F5F9] data-[placeholder]:text-[#F1F5F9] md:w-64">
                   <SelectValue placeholder="사이트 선택" />
                 </SelectTrigger>
                 <SelectContent>
@@ -135,9 +135,9 @@ export function Footer() {
               </Select>
             </div>
             <div className="space-y-3">
-              <label className="text-[#94a3b8] text-sm block">어세스타 패밀리사이트</label>
+              <label className="text-[#C5CBD4] text-sm block">어세스타 패밀리사이트</label>
               <Select onValueChange={openExternalSite}>
-                <SelectTrigger className="h-12 w-full rounded-[10px] border-[#6A6A6A] bg-[#5B5B5B] px-4 text-base font-normal text-[#F1F5F9] data-[placeholder]:text-[#F1F5F9] md:w-64">
+                <SelectTrigger className="h-12 w-full rounded-[10px] border-[#4A505A] bg-[#21262E] px-4 text-base font-normal text-[#F1F5F9] data-[placeholder]:text-[#F1F5F9] md:w-64">
                   <SelectValue placeholder="사이트 선택" />
                 </SelectTrigger>
                 <SelectContent>
@@ -153,8 +153,8 @@ export function Footer() {
         </div>
 
         {/* Copyright */}
-        <div className="border-t border-[#5a5a5a] mt-8 pt-8 text-center">
-          <p className="text-[#94a3b8] text-xs">
+        <div className="border-t border-[#2D323A] mt-8 pt-8 text-center">
+          <p className="text-[#C5CBD4] text-xs">
             copyright © 2026 ASSESTAHRC All Rights Reserved
           </p>
         </div>

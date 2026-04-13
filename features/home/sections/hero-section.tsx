@@ -1,15 +1,10 @@
 "use client"
 
-import Link from "next/link"
 import { useEffect, useRef } from "react"
 import { cn } from "@/shared/lib/utils"
-import {
-  landingLayoutTokens,
-  landingRadiusTokens,
-  landingSectionTokens,
-  landingSpaceTokens,
-  landingTypeTokens,
-} from "@/features/home/styles/landing-tokens"
+import { landingLayoutTokens } from "@/features/home/styles/landing-tokens"
+
+const HERO_BG_IMAGE_URL = "https://img.assesta.com/saram-me/main_mw_bg.png"
 
 function useFadeInUp(delay = 0) {
   const ref = useRef<HTMLDivElement>(null)
@@ -36,50 +31,72 @@ function useFadeInUp(delay = 0) {
 export function HeroSection() {
   const headingRef = useFadeInUp(140)
   const descRef = useFadeInUp(240)
-  const ctaRef = useFadeInUp(340)
 
   return (
-    <section
-      className="relative overflow-hidden pt-20"
-      style={{
-        background:
-          "linear-gradient(180deg, #bfd4e7 0%, #c7d7e8 28%, #d9ccdc 58%, #d5e9e3 100%)",
-      }}
-    >
+    <section className="relative overflow-hidden bg-[#F2D8C0] pt-[64px] md:pt-[78px]">
+      <div className="absolute inset-0">
+        <div className="h-full w-full pt-[62px] md:hidden">
+          <img
+            src={HERO_BG_IMAGE_URL}
+            alt=""
+            aria-hidden="true"
+            fetchPriority="high"
+            className="h-full w-full object-cover"
+            style={{ objectPosition: "50% 0%" }}
+          />
+        </div>
+
+        <div className="hidden h-full w-full md:flex">
+          <img
+            src={HERO_BG_IMAGE_URL}
+            alt=""
+            aria-hidden="true"
+            className="ml-auto h-full w-auto max-w-none object-contain object-right-top"
+          />
+        </div>
+
+        <div
+          className="pointer-events-none absolute inset-0 md:hidden"
+          aria-hidden="true"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(250, 238, 224, 0.12) 0%, rgba(250, 238, 224, 0.05) 44%, rgba(250, 238, 224, 0) 100%)",
+          }}
+        />
+        <div
+          className="pointer-events-none absolute inset-0 hidden md:block"
+          aria-hidden="true"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(248, 236, 218, 0.82) 0%, rgba(248, 236, 218, 0.64) 34%, rgba(248, 236, 218, 0.22) 58%, rgba(248, 236, 218, 0) 78%)",
+          }}
+        />
+      </div>
+
       <div
         className={cn(
-          "relative flex min-h-[calc(100vh-5rem)] w-full items-center justify-center",
-          landingLayoutTokens.containerWide,
-          landingSectionTokens.base
+          "relative mx-auto flex h-[500px] w-full items-start md:h-auto md:min-h-[calc(100vh-4.875rem)]",
+          landingLayoutTokens.containerWide
         )}
       >
-        <div className="mx-auto w-full max-w-[760px] text-center">
-          <div ref={headingRef}>
-            <h1 className={cn(landingTypeTokens.heroTitle, "text-[#080A11]")}>
+        <div className="w-full px-8 pb-16 pt-[90px] sm:px-10 sm:pt-[90px] md:px-14 md:pb-20 md:pt-[110px] lg:px-16 lg:pt-[124px]">
+          <div ref={headingRef} className="max-w-[min(88vw,560px)] md:max-w-[620px]">
+            <h1 className="text-[36px] font-extrabold leading-[1.16] tracking-[-0.035em] text-[#17120F] md:leading-[1.12]">
               부모의 고민에서,
               <br />
               아이의 발견으로
             </h1>
           </div>
 
-          <div ref={descRef}>
-            <p className={cn("mx-auto mt-8 max-w-[640px] text-[#0E1726] md:mt-9", landingTypeTokens.body)}>
-              0세부터 18세까지, 발달 단계에 맞춘 맞춤형 성장 코칭
+          <div ref={descRef} className="mt-8 max-w-[min(86vw,440px)] md:mt-10 md:max-w-[520px]">
+            <p className="text-[18px] font-medium leading-[1.5] tracking-[-0.01em] text-[#2F251D]">
+              초등 저학년부터 고등학생까지,
+              <br />
+              발달 단계에 맞춘
             </p>
-          </div>
-
-          <div ref={ctaRef} className="mt-12 flex justify-center">
-            <Link
-              href="/reservation"
-              className={cn(
-                "inline-flex min-w-[260px] items-center justify-center bg-[#05070D] text-white shadow-[0_14px_30px_rgba(5,7,13,0.26)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#0f1119]",
-                landingRadiusTokens.pill,
-                landingSpaceTokens.buttonPaddingLg,
-                landingTypeTokens.buttonLg
-              )}
-            >
-              무료 상담 시작하기
-            </Link>
+            <p className="mt-1 text-[18px] font-extrabold leading-[1.35] tracking-[-0.02em] text-[#1F1712]">
+              맞춤형 성장 코칭
+            </p>
           </div>
         </div>
       </div>
