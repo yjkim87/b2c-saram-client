@@ -28,7 +28,7 @@ export function AgeGuideSection({ tab }: AgeGuideSectionProps) {
           </p>
         </div>
 
-        <div key={`age-${tab}`} className="animate-in fade-in duration-200">
+        <div key={`age-${tab}`}>
           <CounselingCoachingCards bubbleAlign="left" buttonWidth="full" useAgePresetQuickGuide />
         </div>
       </div>

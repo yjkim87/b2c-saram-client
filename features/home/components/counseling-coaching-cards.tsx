@@ -165,8 +165,16 @@ export function CounselingCoachingCards({
   buttonWidth = "compact",
   useAgePresetQuickGuide = false,
 }: CounselingCoachingCardsProps = {}) {
+  const cardRefs = useRef<Record<FeatureCardKey, HTMLElement | null>>({
+    counseling: null,
+    coaching: null,
+  })
   const [expandedCardKey, setExpandedCardKey] = useState<ExpandedCardState>(null)
   const [isDesktop, setIsDesktop] = useState(false)
+  const [visibleCards, setVisibleCards] = useState<Record<FeatureCardKey, boolean>>({
+    counseling: false,
+    coaching: false,
+  })
   const [openAgeByCard, setOpenAgeByCard] = useState<Record<FeatureCardKey, string | null>>({
     counseling: null,
     coaching: null,
@@ -195,6 +203,45 @@ export function CounselingCoachingCards({
     }
   }, [expandedCardKey, isDesktop])
 
+  useEffect(() => {
+    const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
+    if (reduceMotionQuery.matches) {
+      setVisibleCards({
+        counseling: true,
+        coaching: true,
+      })
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return
+
+          const cardKey = entry.target.getAttribute("data-feature-card") as FeatureCardKey | null
+          if (!cardKey) return
+
+          setVisibleCards((prev) => {
+            if (prev[cardKey]) return prev
+            return { ...prev, [cardKey]: true }
+          })
+
+          observer.unobserve(entry.target)
+        })
+      },
+      { threshold: 0.2 }
+    )
+
+    ;(["counseling", "coaching"] as const).forEach((cardKey) => {
+      const cardElement = cardRefs.current[cardKey]
+      if (cardElement) {
+        observer.observe(cardElement)
+      }
+    })
+
+    return () => observer.disconnect()
+  }, [])
+
   const toggleCard = (cardKey: FeatureCardKey) => {
     if (isDesktop) {
       return
@@ -217,11 +264,24 @@ export function CounselingCoachingCards({
     <div className="grid grid-cols-1 gap-4 md:gap-5">
       {FEATURE_CARDS.map((card) => {
         const isExpanded = isDesktop || expandedCardKey === "all" || expandedCardKey === card.key
+        const isVisible = visibleCards[card.key]
 
         return (
           <article
             key={card.key}
-            className={cn("bg-[#FFF] px-6 py-10 text-[#1E1611] sm:px-7 md:px-8 md:py-8", landingRadiusTokens.card)}
+            ref={(element) => {
+              cardRefs.current[card.key] = element
+            }}
+            data-feature-card={card.key}
+            className={cn(
+              "transform-gpu bg-[#FFF] px-6 py-10 text-[#1E1611] transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform sm:px-7 md:px-8 md:py-8",
+              landingRadiusTokens.card
+            )}
+            style={{
+              opacity: isVisible ? 1 : 0,
+              transform: isVisible ? "translateY(0)" : "translateY(32px)",
+              transitionDelay: "0ms",
+            }}
           >
             <div className="md:grid md:grid-cols-[minmax(0,320px)_minmax(0,1fr)] md:items-start md:gap-8">
               <div>
@@ -268,7 +328,10 @@ export function CounselingCoachingCards({
                       : `/quick_coaching_guide?type=${typeParam}`
 
                     return (
-                      <div key={item.key} className="rounded-2xl bg-[#FFF7EF] px-4 py-8">
+                      <div
+                        key={item.key}
+                        className="rounded-2xl bg-[#FFF7EF] px-4 py-8 transition-colors duration-200 hover:bg-[#FFEFDF]"
+                      >
                         <button
                           type="button"
                           onClick={() => toggleAgeItem(card.key, item.key)}

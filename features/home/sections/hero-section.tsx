@@ -70,7 +70,7 @@ export function HeroSection() {
             backgroundImage: `url(${HERO_BG_IMAGE_MOBILE_URL})`,
             backgroundPosition: "right 0px bottom -64px",
             backgroundRepeat: "no-repeat",
-            backgroundSize: "250%",
+            backgroundSize: "cover",
           }}
         />
 
@@ -133,11 +133,9 @@ export function HeroSection() {
 
           <div ref={descRef} className="mt-8 max-w-[min(86vw,440px)] md:mt-10 md:max-w-[520px] lg:max-w-[620px]">
             <p className="text-[clamp(18px,2.2vw,24px)] font-medium leading-[1.5] tracking-[-0.01em] text-[#2F251D] lg:text-[22px]">
-              초등 저학년부터 고등학생까지
-              <br />
-              <span className="lg:whitespace-nowrap">
-                발달 단계에 맞춘 <span className="font-bold">맞춤형 성장 코칭</span>
-              </span>
+              <span className="block">초등 저학년부터 고등학생까지,</span>
+              <span className="block md:inline">발달 단계에 맞춘</span>{" "}
+              <span className="block font-bold md:inline lg:whitespace-nowrap">맞춤형 성장 코칭</span>
             </p>
           </div>
         </div>

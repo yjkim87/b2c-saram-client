@@ -90,31 +90,38 @@ const REVIEW_SUMMARY: ReviewItem[] = [
 
 function ReviewCard({
   item,
+  cardId,
   index,
   animate,
   mobileMinHeight,
   cardRef,
+  enableEntranceAnimation = true,
 }: {
   item: ReviewItem
+  cardId: string
   index: number
   animate: boolean
   mobileMinHeight?: number | null
   cardRef?: (node: HTMLElement | null) => void
+  enableEntranceAnimation?: boolean
 }) {
+  const shouldAnimateEntrance = enableEntranceAnimation ? animate : true
+
   return (
     <article
       ref={cardRef}
+      data-review-card={cardId}
       className={cn(
         "h-full transform-gpu bg-[#FFF7EF] shadow-[0_1px_0_rgba(57,40,28,0.05)] transition-[transform,box-shadow,opacity] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform md:hover:-translate-y-1.5 md:hover:shadow-[0_16px_30px_rgba(95,67,43,0.16)]",
         landingRadiusTokens.cardLg,
         landingSpaceTokens.cardPaddingLarge
       )}
       style={{
-        opacity: animate ? 1 : 0,
-        transform: animate ? undefined : "translateY(20px)",
-        transitionDuration: animate ? "420ms" : "560ms",
+        opacity: shouldAnimateEntrance ? 1 : 0,
+        transform: shouldAnimateEntrance ? "translateY(0)" : "translateY(28px)",
+        transitionDuration: enableEntranceAnimation ? "620ms" : "0ms",
         transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
-        transitionDelay: animate ? "0ms" : `${index * 100}ms`,
+        transitionDelay: enableEntranceAnimation && animate ? `${index * 110}ms` : "0ms",
         height: mobileMinHeight ? `${mobileMinHeight}px` : undefined,
       }}
     >
@@ -131,7 +138,7 @@ function ReviewCard({
         <p
           className="text-[18px] leading-none tracking-[2px] text-[#ffb21f]"
           style={
-            animate
+            enableEntranceAnimation && animate
               ? {
                   animation: `review-star-twinkle 820ms ease ${240 + index * 110}ms 1 both`,
                 }
@@ -155,28 +162,82 @@ function ReviewCard({
 }
 
 export function ReviewsSection() {
-  const sectionRef = useRef<HTMLElement>(null)
+  const reviewCardRefs = useRef<Record<string, HTMLElement | null>>({})
+  const observerRef = useRef<IntersectionObserver | null>(null)
+  const reduceMotionRef = useRef(false)
   const mobileCardRefs = useRef<Record<string, HTMLElement | null>>({})
-  const [animateCards, setAnimateCards] = useState(false)
+  const [visibleCards, setVisibleCards] = useState<Record<string, boolean>>({})
   const [mobileCardMinHeight, setMobileCardMinHeight] = useState<number | null>(null)
 
   useEffect(() => {
-    const section = sectionRef.current
-    if (!section) return
+    const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
+    reduceMotionRef.current = reduceMotionQuery.matches
+
+    if (reduceMotionRef.current) {
+      setVisibleCards((prev) => {
+        const next = { ...prev }
+        Object.keys(reviewCardRefs.current).forEach((cardId) => {
+          next[cardId] = true
+        })
+        return next
+      })
+      return
+    }
 
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setAnimateCards(true)
-          observer.disconnect()
-        }
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return
+
+          const cardId = entry.target.getAttribute("data-review-card")
+          if (!cardId) return
+
+          setVisibleCards((prev) => {
+            if (prev[cardId]) return prev
+            return { ...prev, [cardId]: true }
+          })
+
+          observer.unobserve(entry.target)
+        })
       },
-      { threshold: 0.2 }
+      { threshold: 0.45 }
     )
 
-    observer.observe(section)
-    return () => observer.disconnect()
+    observerRef.current = observer
+    Object.values(reviewCardRefs.current).forEach((card) => {
+      if (card) {
+        observer.observe(card)
+      }
+    })
+
+    return () => {
+      observer.disconnect()
+      observerRef.current = null
+    }
   }, [])
+
+  const setReviewCardRef = (cardId: string, node: HTMLElement | null) => {
+    const previousNode = reviewCardRefs.current[cardId]
+    if (previousNode && observerRef.current) {
+      observerRef.current.unobserve(previousNode)
+    }
+
+    if (!node) {
+      delete reviewCardRefs.current[cardId]
+      return
+    }
+
+    reviewCardRefs.current[cardId] = node
+
+    if (reduceMotionRef.current) {
+      setVisibleCards((prev) => (prev[cardId] ? prev : { ...prev, [cardId]: true }))
+      return
+    }
+
+    if (observerRef.current) {
+      observerRef.current.observe(node)
+    }
+  }
 
   useEffect(() => {
     let rafId = 0
@@ -217,10 +278,10 @@ export function ReviewsSection() {
       }
       window.removeEventListener("resize", scheduleMeasure)
     }
-  }, [animateCards])
+  }, [])
 
   return (
-    <section ref={sectionRef} id="reviews" className={cn("bg-[#ffff]", landingSectionTokens.base)}>
+    <section id="reviews" className={cn("bg-[#ffff]", landingSectionTokens.base)}>
       <div className={landingLayoutTokens.containerWide}>
         <div className={cn("text-center", landingLayoutTokens.sectionHeaderGap)}>
           <span className={cn("mb-4 inline-flex", landingTypeTokens.eyebrow)}>부모님 · 학생 후기</span>
@@ -255,8 +316,10 @@ export function ReviewsSection() {
               >
                 <ReviewCard
                   item={item}
+                  cardId={`mobile-${item.key}`}
                   index={index}
-                  animate={animateCards}
+                  animate={true}
+                  enableEntranceAnimation={false}
                   mobileMinHeight={mobileCardMinHeight}
                   cardRef={(node) => {
                     mobileCardRefs.current[item.key] = node
@@ -269,7 +332,14 @@ export function ReviewsSection() {
 
         <div className="hidden gap-5 md:grid md:grid-cols-4">
           {REVIEW_SUMMARY.map((item, index) => (
-            <ReviewCard key={`${item.key}-desktop`} item={item} index={index} animate={animateCards} />
+            <ReviewCard
+              key={`${item.key}-desktop`}
+              item={item}
+              cardId={`desktop-${item.key}`}
+              index={index}
+              animate={Boolean(visibleCards[`desktop-${item.key}`])}
+              cardRef={(node) => setReviewCardRef(`desktop-${item.key}`, node)}
+            />
           ))}
         </div>
 
