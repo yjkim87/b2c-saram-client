@@ -89,7 +89,7 @@ export function QuickCoachingGuide_Page({ initialStep, presetGradeLevel, guideTy
         typingTimeoutRef.current = null
       }
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleSelectOption = async (stepIndex: number, stepId: string, option: StepOption) => {
     if (isTyping || stepId !== currentStepId) return
