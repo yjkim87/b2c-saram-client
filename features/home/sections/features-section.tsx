@@ -46,11 +46,6 @@ export function FeaturesSection() {
             </span>
           </p>
         </div>
-<<<<<<< HEAD
-=======
-
-        <CounselingCoachingCards useAgePresetQuickGuide />
->>>>>>> 09ad2b01d772dd2eabba1f6553884f8d31f08642
       </div>
     </section>
   )
