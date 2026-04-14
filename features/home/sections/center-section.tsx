@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import Link from "next/link"
 import { cn } from "@/shared/lib/utils"
@@ -11,6 +11,7 @@ import {
 } from "@/features/home/styles/landing-tokens"
 
 const CENTER_MAP_IMAGE_URL = "https://img.assesta.com/saram-me/center_map.png"
+const CENTER_GALLERY_IMAGES = ["/placeholder.jpg", "/placeholder.jpg", "/placeholder.jpg", "/placeholder.jpg"]
 
 const CENTER_ADDRESS_QUERY = "부산시 해운대구 센텀동로 99, 백산센텀클래스원(1차) 406호"
 const NAVER_MAP_URL = `https://map.naver.com/p/search/${encodeURIComponent(CENTER_ADDRESS_QUERY)}`
@@ -64,7 +65,7 @@ export function CenterSection() {
           <span className="text-[#F07C33]">면</span>
         </h2>
 
-        <p className={cn("mx-auto mt-6 max-w-2xl text-[#3A2F27]", landingTypeTokens.bodyRelaxed)}>
+        <p className={cn("mx-auto mt-6 max-w-2xl text-[#3A2F27]", landingTypeTokens.sectionSubtitleRelaxed)}>
           사람의 발견을 지향하는 '사발면' 센터입니다.
         </p>
 
@@ -91,7 +92,7 @@ export function CenterSection() {
               <div className="space-y-[var(--landing-space-chip-y)]">
                 <p className={cn(landingTypeTokens.stepDescription, "text-[#1E1611] font-bold")}>운영시간</p>
                 <p className={landingTypeTokens.stepDescription}>평일 09:00 ~ 20:00, 주말 09:00 ~ 17:00</p>
-                <p className={landingTypeTokens.stepDescription}>
+                <p className={cn("mt-[var(--landing-space-grid-sm)]", landingTypeTokens.stepDescription)}>
                   <span className="font-bold">전화상담</span> 051-928-0944
                 </p>
                 <p
@@ -164,7 +165,7 @@ export function CenterSection() {
                 <p className={cn("mt-[var(--landing-space-chip-y)]", landingTypeTokens.stepDescription)}>
                   평일 09:00 ~ 20:00, 주말 09:00 ~ 17:00
                 </p>
-                <p className={cn("mt-[var(--landing-space-chip-y)]", landingTypeTokens.stepDescription)}>
+                <p className={cn("mt-[var(--landing-space-grid-sm)]", landingTypeTokens.stepDescription)}>
                   <span className="font-bold">전화상담</span> 051-928-0944
                 </p>
                 <p
@@ -179,6 +180,24 @@ export function CenterSection() {
                 </p>
               </article>
             </div>
+          </div>
+        </div>
+
+        <div className="mt-6 md:mt-8">
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-3 md:grid-cols-4 md:gap-4">
+            {CENTER_GALLERY_IMAGES.map((imageSrc, index) => (
+              <div
+                key={`center-gallery-${index}`}
+                className={cn("relative h-[150px] overflow-hidden bg-[#EFEFEF] sm:h-[170px] md:h-[220px]", landingRadiusTokens.card)}
+              >
+                <img
+                  src={imageSrc}
+                  alt={`센터 이미지 더미 ${index + 1}`}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+            ))}
           </div>
         </div>
 

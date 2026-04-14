@@ -212,7 +212,7 @@ export function ProcessStepsSection({ tab }: ProcessStepsSectionProps) {
         <div className={cn("text-center", landingLayoutTokens.sectionHeaderGap)}>
           <span className={cn("mb-4 inline-flex", landingTypeTokens.eyebrow)}>{badgeLabel}</span>
           <h2 className={landingTypeTokens.sectionTitle}>{headline}</h2>
-          <p className={cn("mx-auto mt-5 max-w-2xl text-[#3A2F27]", landingTypeTokens.body)}>{description}</p>
+          <p className={cn("mx-auto mt-5 max-w-2xl text-[#3A2F27]", landingTypeTokens.sectionSubtitle)}>{description}</p>
         </div>
 
         <div className="md:hidden">

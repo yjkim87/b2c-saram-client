@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useEffect, useRef, useState } from "react"
 import { Autoplay } from "swiper/modules"
@@ -115,7 +115,7 @@ function ReviewCard({
         transitionDuration: animate ? "420ms" : "560ms",
         transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
         transitionDelay: animate ? "0ms" : `${index * 100}ms`,
-        minHeight: mobileMinHeight ? `${mobileMinHeight}px` : undefined,
+        height: mobileMinHeight ? `${mobileMinHeight}px` : undefined,
       }}
     >
       <div className="flex items-center justify-between gap-3">
@@ -128,9 +128,19 @@ function ReviewCard({
         >
           {item.ageLabel}
         </span>
-        <span className={cn("inline-flex w-fit bg-[#FFF] px-3 py-1 text-xs font-semibold text-[#8B7561]", landingRadiusTokens.pill)}>
-          {item.reviewType}
-        </span>
+        <p
+          className="text-[18px] leading-none tracking-[2px] text-[#ffb21f]"
+          style={
+            animate
+              ? {
+                  animation: `review-star-twinkle 820ms ease ${240 + index * 110}ms 1 both`,
+                }
+              : undefined
+          }
+          aria-label="별점 5점"
+        >
+          ★★★★★
+        </p>
       </div>
 
       <h3 className={cn("mt-4 text-[#1E1611]", landingTypeTokens.serviceCardTitle)}>{item.name}</h3>
@@ -140,24 +150,6 @@ function ReviewCard({
         {item.summary}
       </p>
 
-      <div className={cn("relative mt-4 rounded-[12px] bg-[#fff] p-4 pl-5")}>
-        <span className={cn("absolute bottom-3 left-0 top-3 w-[3px] rounded-full", item.tone.accentBar)} aria-hidden />
-        <p className={cn("text-[#4A3B30]", landingTypeTokens.bodySm)}>{item.quote}</p>
-      </div>
-
-      <p
-        className="mt-4 text-[18px] leading-none tracking-[2px] text-[#ffb21f]"
-        style={
-          animate
-            ? {
-                animation: `review-star-twinkle 820ms ease ${240 + index * 110}ms 1 both`,
-              }
-            : undefined
-        }
-        aria-label="별점 5점"
-      >
-        ★★★★★
-      </p>
     </article>
   )
 }
@@ -232,9 +224,13 @@ export function ReviewsSection() {
       <div className={landingLayoutTokens.containerWide}>
         <div className={cn("text-center", landingLayoutTokens.sectionHeaderGap)}>
           <span className={cn("mb-4 inline-flex", landingTypeTokens.eyebrow)}>부모님 · 학생 후기</span>
-          <h2 className={landingTypeTokens.reviewTitle}>직접 들어보세요</h2>
-          <p className={cn("mx-auto mt-5 max-w-2xl text-[#3A2F27]", landingTypeTokens.body)}>
-            초등학교부터 고등학교까지, 상담/코칭을 경험한 부모님과 학생들의 이야기입니다.
+          <h2 className={landingTypeTokens.reviewTitle}>
+            <span className="text-[#FF7A33]">직접</span> 들어보세요
+          </h2>
+          <p className={cn("mx-auto mt-5 max-w-2xl text-[#3A2F27]", landingTypeTokens.sectionSubtitle)}>
+            초등학교부터 고등학교까지,
+            <br />
+            상담/코칭을 경험한 부모님과 학생들의 이야기입니다.
           </p>
         </div>
 
@@ -253,7 +249,10 @@ export function ReviewsSection() {
             }}
           >
             {REVIEW_SUMMARY.map((item, index) => (
-              <SwiperSlide key={item.key}>
+              <SwiperSlide
+                key={item.key}
+                style={mobileCardMinHeight ? { height: `${mobileCardMinHeight}px` } : undefined}
+              >
                 <ReviewCard
                   item={item}
                   index={index}
@@ -268,7 +267,7 @@ export function ReviewsSection() {
           </Swiper>
         </div>
 
-        <div className="hidden gap-5 md:grid md:grid-cols-2">
+        <div className="hidden gap-5 md:grid md:grid-cols-4">
           {REVIEW_SUMMARY.map((item, index) => (
             <ReviewCard key={`${item.key}-desktop`} item={item} index={index} animate={animateCards} />
           ))}

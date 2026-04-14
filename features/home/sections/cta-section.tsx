@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import Link from "next/link"
 import { useEffect, useRef } from "react"
@@ -79,7 +79,7 @@ export function CTASection() {
           우리 아이 지금 어떤 시기일까요?
         </h2>
 
-        <p className={cn("mx-auto mt-5 max-w-2xl text-[#3A2F27]", landingTypeTokens.bodyRelaxed)}>
+        <p className={cn("mx-auto mt-5 max-w-2xl text-[#3A2F27]", landingTypeTokens.sectionSubtitleRelaxed)}>
           학년을 알려주시면 발달 단계와 지금 꼭 알아야 할 것들을 바로 확인해드립니다.
         </p>
 

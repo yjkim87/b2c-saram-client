@@ -23,7 +23,7 @@ export function AgeGuideSection({ tab }: AgeGuideSectionProps) {
             <span className="text-[#FF7A33]">심리상담</span>으로 단단하게, <br />
             <span className="text-[#FF7A33]">성장코칭</span>으로 당당하게
           </h2>
-          <p className={cn("mx-auto mt-5 max-w-2xl text-[#3A2F27]", landingTypeTokens.body)}>
+          <p className={cn("mx-auto mt-5 max-w-2xl text-[#3A2F27]", landingTypeTokens.sectionSubtitle)}>
             아이의 성장 단계와 필요에 따라 심리상담과 성장코칭의 차이를 확인해보세요.
           </p>
         </div>

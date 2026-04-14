@@ -214,161 +214,166 @@ export function CounselingCoachingCards({
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:items-start md:gap-5">
+    <div className="grid grid-cols-1 gap-4 md:gap-5">
       {FEATURE_CARDS.map((card) => {
         const isExpanded = isDesktop || expandedCardKey === "all" || expandedCardKey === card.key
 
         return (
           <article
             key={card.key}
-            className={cn("bg-[#FFF] px-6 py-10 text-[#1E1611] sm:px-7", landingRadiusTokens.card)}
+            className={cn("bg-[#FFF] px-6 py-10 text-[#1E1611] sm:px-7 md:px-8 md:py-8", landingRadiusTokens.card)}
           >
-            <button
-              type="button"
-              onClick={() => {
-                if (!isDesktop) {
-                  toggleCard(card.key)
-                }
-              }}
-              className="w-full text-left"
-              aria-expanded={isExpanded}
-            >
-              <p className="text-[14px] font-bold leading-tight text-[#FF7A33]">{card.eyebrow}</p>
-              <h3 className="mt-[6px] text-[26px] font-bold leading-tight tracking-[-0.02em] text-[#1B140F]">
-                {card.title}
-              </h3>
-              <p className="mt-6 text-[16px] leading-[1.65] text-[#1E1712]">
-                {card.description.regular}
-                <br />
-                <strong className="font-extrabold">{card.description.emphasized}</strong>
-              </p>
-            </button>
+            <div className="md:grid md:grid-cols-[minmax(0,320px)_minmax(0,1fr)] md:items-start md:gap-8">
+              <div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!isDesktop) {
+                      toggleCard(card.key)
+                    }
+                  }}
+                  className="w-full text-left"
+                  aria-expanded={isExpanded}
+                >
+                  <p className="text-[14px] font-bold leading-tight text-[#FF7A33]">{card.eyebrow}</p>
+                  <h3 className="mt-[6px] text-[26px] font-bold leading-tight tracking-[-0.02em] text-[#1B140F]">
+                    {card.title}
+                  </h3>
+                  <p className="mt-6 text-[16px] leading-[1.65] text-[#1E1712]">
+                    {card.description.regular}
+                    <br />
+                    <strong className="font-extrabold">{card.description.emphasized}</strong>
+                  </p>
+                </button>
 
-            {!isDesktop && !isExpanded ? (
-              <button
-                type="button"
-                onClick={() => toggleCard(card.key)}
-                className="mt-7 inline-flex h-10 items-center gap-1 rounded-full border border-[#CEB196] bg-transparent px-4 text-[14px] font-medium text-[#A87D5E] transition-colors hover:bg-[#EBEBEB]"
-              >
-                자세히 보기
-                <ChevronDown className="h-4 w-4" />
-              </button>
-            ) : null}
-
-            <AnimatedCollapse open={isExpanded} innerClassName="pt-8">
-              <div className="space-y-3">
-                {card.ageItems.map((item) => {
-                  const isAgeOpen = openAgeByCard[card.key] === item.key
-                  const typeParam     = card.key === "counseling" ? "Mind" : "Coaching"
-                  const quickGuideHref = useAgePresetQuickGuide
-                    ? `/quick_coaching_guide?gradeLevel=${encodeURIComponent(item.quickGuideGradeLevel)}&type=${typeParam}`
-                    : `/quick_coaching_guide?type=${typeParam}`
-
-                  return (
-                    <div key={item.key} className="rounded-2xl bg-[#FFF7EF] px-4 py-8">
-                      <button
-                        type="button"
-                        onClick={() => toggleAgeItem(card.key, item.key)}
-                        className="flex w-full items-center justify-between gap-4 text-left"
-                        aria-expanded={isAgeOpen}
-                      >
-                        <div>
-                          <p className="inline-flex rounded-lg bg-[#FFF] px-2.5 py-1 text-[12px] font-bold leading-tight text-[#F07C33]">
-                            {item.rangeLabel}
-                          </p>
-                          <p className="mt-[10px] whitespace-pre-line text-[18px] font-bold leading-[1.35] tracking-[-0.01em] text-[#1B140F] md:overflow-hidden md:text-ellipsis md:whitespace-nowrap">
-                            {item.question}
-                          </p>
-                        </div>
-                        {isAgeOpen ? (
-                          <ChevronUp className="h-5 w-5 shrink-0 text-[#C49B7C]" />
-                        ) : (
-                          <ChevronDown className="h-5 w-5 shrink-0 text-[#C49B7C]" />
-                        )}
-                      </button>
-
-                      <AnimatedCollapse open={isAgeOpen} innerClassName="pt-5">
-                        <div className="space-y-5">
-                          <div
-                            className={cn(
-                              "flex flex-col space-y-2.5",
-                              bubbleAlign === "left" ? "items-start" : "items-center"
-                            )}
-                          >
-                            {item.details.map((detail, detailIndex) => {
-                              const tailGradientId = `${idPrefix}-bubble-tail-${card.key}-${item.key}-${detailIndex}`
-
-                              return (
-                                <div key={detail} className="relative inline-block w-fit max-w-full pb-[14px]">
-                                  <p className="relative z-10 rounded-[36px] bg-[linear-gradient(90deg,#FFF7EF_0%,#FFE3C7_100%)] px-5 py-3 text-[14px] font-medium leading-[1.5] text-[#7E5F41]">
-                                    {detail}
-                                  </p>
-                                  <svg
-                                    aria-hidden="true"
-                                    viewBox="0 0 30 18"
-                                    className="pointer-events-none absolute -bottom-[1px] left-8 h-[18px] w-[30px]"
-                                  >
-                                    <defs>
-                                      <linearGradient id={tailGradientId} x1="0%" y1="50%" x2="100%" y2="50%">
-                                        <stop offset="0%" stopColor="#FFF7EF" />
-                                        <stop offset="100%" stopColor="#FFE3C7" />
-                                      </linearGradient>
-                                    </defs>
-                                    <path
-                                      d="M1 1H29C22 3 19 8 15 13C11 18 3 18 2 12C1 9 1 5 1 1Z"
-                                      fill={`url(#${tailGradientId})`}
-                                    />
-                                  </svg>
-                                </div>
-                              )
-                            })}
-                          </div>
-
-                          <div
-                            className={cn(
-                              "flex flex-col space-y-2.5",
-                              buttonWidth === "full" ? "items-stretch" : "items-center"
-                            )}
-                          >
-                            <Link
-                              href="/reservation"
-                              className={cn(
-                                "inline-flex h-12 w-full items-center justify-center rounded-full bg-[#090909] text-[14px] font-semibold text-white transition-opacity hover:opacity-90",
-                                buttonWidth === "full" ? "" : "mx-auto max-w-[280px]"
-                              )}
-                            >
-                              빠른상담 예약하기
-                            </Link>
-                            <Link
-                              href={quickGuideHref}
-                              className={cn(
-                                "inline-flex h-12 w-full items-center justify-center rounded-full bg-[#090909] text-[14px] font-semibold text-white transition-opacity hover:opacity-90",
-                                buttonWidth === "full" ? "" : "mx-auto max-w-[280px]"
-                              )}
-                            >
-                              맞춤상담 예약하기
-                            </Link>
-                          </div>
-                        </div>
-                      </AnimatedCollapse>
-                    </div>
-                  )
-                })}
-
-                {!isDesktop ? (
-                  <div className="flex justify-center pt-1">
-                    <button
+                {!isDesktop && !isExpanded ? (
+                  <button
                     type="button"
                     onClick={() => toggleCard(card.key)}
-                    className="inline-flex h-10 items-center gap-1 rounded-full border border-[#CEB196] bg-transparent px-4 text-[14px] font-medium text-[#A87D5E] transition-colors hover:bg-[#EBEBEB]"
+                    className="mt-7 inline-flex h-10 items-center gap-1 rounded-full border border-[#CEB196] bg-transparent px-4 text-[14px] font-medium text-[#A87D5E] transition-colors hover:bg-[#EBEBEB]"
                   >
-                    접기
-                    <ChevronUp className="h-4 w-4" />
-                    </button>
-                  </div>
+                    자세히 보기
+                    <ChevronDown className="h-4 w-4" />
+                  </button>
                 ) : null}
               </div>
-            </AnimatedCollapse>
+
+              <AnimatedCollapse open={isExpanded} innerClassName={isDesktop ? "pt-0" : "pt-8"}>
+                <div className="space-y-3">
+                  {card.ageItems.map((item) => {
+                    const isAgeOpen = openAgeByCard[card.key] === item.key
+                    const typeParam = card.key === "counseling" ? "Mind" : "Coaching"
+                    const quickGuideHref = useAgePresetQuickGuide
+                      ? `/quick_coaching_guide?gradeLevel=${encodeURIComponent(item.quickGuideGradeLevel)}&type=${typeParam}`
+                      : `/quick_coaching_guide?type=${typeParam}`
+
+                    return (
+                      <div key={item.key} className="rounded-2xl bg-[#FFF7EF] px-4 py-8">
+                        <button
+                          type="button"
+                          onClick={() => toggleAgeItem(card.key, item.key)}
+                          className="flex w-full items-center justify-between gap-4 text-left"
+                          aria-expanded={isAgeOpen}
+                        >
+                          <div>
+                            <p className="inline-flex rounded-lg bg-[#FFF] px-2.5 py-1 text-[12px] font-bold leading-tight text-[#F07C33]">
+                              {item.rangeLabel}
+                            </p>
+                            <p className="mt-[10px] whitespace-pre-line text-[18px] font-bold leading-[1.35] tracking-[-0.01em] text-[#1B140F] md:overflow-hidden md:text-ellipsis md:whitespace-nowrap">
+                              {item.question}
+                            </p>
+                          </div>
+                          {isAgeOpen ? (
+                            <ChevronUp className="h-5 w-5 shrink-0 text-[#C49B7C]" />
+                          ) : (
+                            <ChevronDown className="h-5 w-5 shrink-0 text-[#C49B7C]" />
+                          )}
+                        </button>
+
+                        <AnimatedCollapse open={isAgeOpen} innerClassName="pt-5">
+                          <div className="space-y-5">
+                            <div
+                              className={cn(
+                                "flex flex-col space-y-2.5",
+                                bubbleAlign === "left" ? "items-start" : "items-center"
+                              )}
+                            >
+                              {item.details.map((detail, detailIndex) => {
+                                const tailGradientId = `${idPrefix}-bubble-tail-${card.key}-${item.key}-${detailIndex}`
+
+                                return (
+                                  <div key={detail} className="relative inline-block w-fit max-w-full pb-[14px]">
+                                    <p className="relative z-10 rounded-[36px] bg-[linear-gradient(90deg,#FFF7EF_0%,#FFE3C7_100%)] px-5 py-3 text-[14px] font-medium leading-[1.5] text-[#7E5F41]">
+                                      {detail}
+                                    </p>
+                                    <svg
+                                      aria-hidden="true"
+                                      viewBox="0 0 30 18"
+                                      className="pointer-events-none absolute -bottom-[1px] left-8 h-[18px] w-[30px]"
+                                    >
+                                      <defs>
+                                        <linearGradient id={tailGradientId} x1="0%" y1="50%" x2="100%" y2="50%">
+                                          <stop offset="0%" stopColor="#FFF7EF" />
+                                          <stop offset="100%" stopColor="#FFE3C7" />
+                                        </linearGradient>
+                                      </defs>
+                                      <path
+                                        d="M1 1H29C22 3 19 8 15 13C11 18 3 18 2 12C1 9 1 5 1 1Z"
+                                        fill={`url(#${tailGradientId})`}
+                                      />
+                                    </svg>
+                                  </div>
+                                )
+                              })}
+                            </div>
+
+                            <div
+                              className={cn(
+                                buttonWidth === "full"
+                                  ? "grid grid-cols-1 gap-2.5 md:grid-cols-2"
+                                  : "flex flex-col space-y-2.5 items-center"
+                              )}
+                            >
+                              <Link
+                                href="/reservation"
+                                className={cn(
+                                  "inline-flex h-12 w-full items-center justify-center rounded-full bg-[#090909] px-3 text-[14px] font-semibold text-white transition-opacity hover:opacity-90",
+                                  buttonWidth === "full" ? "" : "mx-auto max-w-[280px]"
+                                )}
+                              >
+                                빠른상담 예약하기
+                              </Link>
+                              <Link
+                                href={quickGuideHref}
+                                className={cn(
+                                  "inline-flex h-12 w-full items-center justify-center rounded-full bg-[#090909] px-3 text-[14px] font-semibold text-white transition-opacity hover:opacity-90",
+                                  buttonWidth === "full" ? "" : "mx-auto max-w-[280px]"
+                                )}
+                              >
+                                맞춤상담 예약하기
+                              </Link>
+                            </div>
+                          </div>
+                        </AnimatedCollapse>
+                      </div>
+                    )
+                  })}
+
+                  {!isDesktop ? (
+                    <div className="flex justify-center pt-1">
+                      <button
+                        type="button"
+                        onClick={() => toggleCard(card.key)}
+                        className="inline-flex h-10 items-center gap-1 rounded-full border border-[#CEB196] bg-transparent px-4 text-[14px] font-medium text-[#A87D5E] transition-colors hover:bg-[#EBEBEB]"
+                      >
+                        접기
+                        <ChevronUp className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ) : null}
+                </div>
+              </AnimatedCollapse>
+            </div>
           </article>
         )
       })}

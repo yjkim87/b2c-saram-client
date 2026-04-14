@@ -109,7 +109,7 @@ export function ServiceProgramSection({ tab }: ServiceProgramSectionProps) {
           <h2 className={cn("mobile-auto-phrase", landingTypeTokens.sectionTitle)}>
             과학적 접근, 따뜻한 마음으로
           </h2>
-          <p className={cn("mx-auto mt-5 max-w-2xl text-[#3A2F27]", landingTypeTokens.body)}>
+          <p className={cn("mx-auto mt-5 max-w-2xl text-[#3A2F27]", landingTypeTokens.sectionSubtitle)}>
             발달심리학 이론을 바탕으로 아이 개개인의 특성을 존중하는 맞춤형 서비스를 제공합니다.
           </p>
         </div>

@@ -15,15 +15,15 @@ export const landingLayoutTokens = {
 
 export const landingTypeTokens = {
   eyebrow:
-    "font-sans text-[18px] font-bold leading-[1] tracking-[0] text-[#FF7A33]",
+    "font-sans text-[18px] md:text-[22px] font-bold leading-[1] tracking-[0] text-[#FF7A33]",
   heroTitle:
     "font-landing-title text-[length:var(--landing-font-title-hero)] font-bold leading-[1.2] tracking-[-0.02em]",
   displayTitle:
     "font-landing-title text-[length:var(--landing-font-title-display)] font-extrabold leading-[1.2] tracking-[-0.02em]",
   sectionTitle:
-    "font-landing-title text-[length:var(--landing-font-title-section)] font-bold leading-[1.25] tracking-[0] text-[#1A1410]",
+    "font-landing-title text-[length:var(--landing-font-title-section)] md:text-[40px] font-bold leading-[1.25] tracking-[0] text-[#1A1410]",
   reviewTitle:
-    "font-landing-title text-[length:var(--landing-font-title-review)] font-bold leading-[1.25] tracking-[0] text-[#1A1410]",
+    "font-landing-title text-[length:var(--landing-font-title-review)] md:text-[40px] font-bold leading-[1.25] tracking-[0] text-[#1A1410]",
   cardTitle:
     "font-landing-title text-[length:var(--landing-font-title-card)] font-extrabold leading-none tracking-[-0.02em]",
   stepTitle:
@@ -53,6 +53,10 @@ export const landingTypeTokens = {
     "text-[length:var(--landing-font-body-sm)] leading-[var(--landing-leading-body)]",
   bodyRelaxed:
     "text-[length:var(--landing-font-body)] leading-[var(--landing-leading-body-relaxed)]",
+  sectionSubtitle:
+    "text-[length:var(--landing-font-body)] md:text-[20px] leading-[var(--landing-leading-body)]",
+  sectionSubtitleRelaxed:
+    "text-[length:var(--landing-font-body)] md:text-[20px] leading-[var(--landing-leading-body-relaxed)]",
   chip: "text-[length:var(--landing-font-chip)] font-bold",
   button: "text-[length:var(--landing-font-button)] font-semibold",
   buttonLg: "text-[length:var(--landing-font-button-lg)] font-semibold",
