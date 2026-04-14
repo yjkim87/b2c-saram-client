@@ -64,7 +64,7 @@ export function QuickCoachingGuide_Page({ initialStep, presetGradeLevel, guideTy
 
       if (!presetGradeLevel) return
 
-      const gradeStepId    = `step-concern-root:${presetGradeLevel}`
+      const gradeStepId    = `step-grade-detail:${presetGradeLevel}`
       const matchingOption = initialStep.options?.find((o) => o.nextStep === gradeStepId)
       if (!matchingOption) return
 
