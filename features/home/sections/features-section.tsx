@@ -1,37 +1,51 @@
 ﻿"use client"
 
 import { cn } from "@/shared/lib/utils"
-import { CounselingCoachingCards } from "@/features/home/components/counseling-coaching-cards"
 import {
   landingLayoutTokens,
   landingSectionTokens,
-  landingTypeTokens,
 } from "@/features/home/styles/landing-tokens"
 
 export function FeaturesSection() {
   return (
-    <section id="features" className={cn("bg-[#FFFFFF]", landingSectionTokens.base, "pt-6 md:pt-10")}>
+    <section id="features" className={cn("bg-[#FFF]", landingSectionTokens.base, "pt-6 md:pt-10")}>
       <div className={landingLayoutTokens.containerWide}>
-        <div className={cn("text-center", landingLayoutTokens.sectionHeaderGap)}>
-          <span className={cn("mb-4 inline-flex uppercase", landingTypeTokens.eyebrow)}>INTEGRATED SOLUTION</span>
-          <h2 className={cn("mobile-auto-phrase", landingTypeTokens.sectionTitle)}>
-            심리상담으로 단단하게,
+        <div className="mx-auto max-w-4xl text-center text-[#1A1410]">
+          <p className="text-[20px] font-medium leading-[1.55]">
+            전문가를 찾기엔 애매하고
             <br />
-            성장코칭으로 당당하게
-          </h2>
-          <p className={cn("mx-auto mt-5 max-w-2xl text-[#3A2F27]", landingTypeTokens.body)}>
-            <span className="sm:hidden">
-              아이의 성장 단계와 필요에 따라
-              <br />
-              심리상담과 성장코칭의 차이를 확인해보세요.
+            혼자 해결하기엔 버거운 고민들이 있습니다.
+          </p>
+
+          <p className="mt-8 text-[20px] font-medium leading-[1.55]">
+            나 자신, 자녀, 관계에 대한 질문들.
+            <br />
+            이것은 문제가 아니라{" "}
+            <span className="inline-flex rounded-[10px] bg-[linear-gradient(90deg,#FF7A33_0%,#FF6221_100%)] px-2.5 py-1 text-[20px] font-bold leading-none text-white">
+              성장의 과정
             </span>
-            <span className="hidden sm:inline">
-              아이의 성장 단계와 필요에 따라 심리상담과 성장코칭의 차이를 확인해보세요.
+          </p>
+
+          <p className="mt-10 text-[20px] leading-[1.55]">
+            <span className="font-bold">사발면은 심리상담의 깊이와</span>
+            <br />
+            <span className="font-bold">코칭의 실용성으로</span>
+            <br />
+            그 과정을 전문적으로 함께합니다.
+          </p>
+
+          <p className="mt-10 text-[20px] leading-[1.55]">
+            초등학교 입학부터 고등학교 졸업까지.
+            <br />
+            아이의 발달 단계에 맞춘
+          </p>
+
+          <p className="mt-2">
+            <span className="inline-flex rounded-[12px] border-2 border-[#FF7A33] px-3 py-1 text-[20px] font-bold leading-[1.15] text-[#1A1410]">
+              맞춤형 심리상담·성장 코칭
             </span>
           </p>
         </div>
-
-        <CounselingCoachingCards />
       </div>
     </section>
   )

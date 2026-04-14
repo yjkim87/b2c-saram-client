@@ -265,7 +265,11 @@ export function CommunityInsightsPage() {
               </div>
             </div>
 
-            {viewMode === "list" ? (
+            {filteredBoardItems.length === 0 ? (
+              <div className="px-3 py-16 text-center text-sm font-medium text-[#6B7684]">
+                새로운 소식이 곧 업데이트될 예정입니다.
+              </div>
+            ) : viewMode === "list" ? (
               <ul className="divide-y divide-[#EEF2F6]">
                 {filteredBoardItems.map((item) => (
                   <InsightBoardRow key={item.id} item={item} />
