@@ -15,6 +15,7 @@ interface AgeAccordionItem {
   rangeLabel: string
   question: string
   details: string[]
+  quickGuideGradeLevel: "elementary-lower" | "elementary-upper" | "middle" | "high"
 }
 
 interface FeatureCard {
@@ -26,6 +27,12 @@ interface FeatureCard {
     emphasized: string
   }
   ageItems: AgeAccordionItem[]
+}
+
+interface CounselingCoachingCardsProps {
+  bubbleAlign?: "left" | "center"
+  buttonWidth?: "full" | "compact"
+  useAgePresetQuickGuide?: boolean
 }
 
 interface AnimatedCollapseProps {
@@ -88,6 +95,7 @@ const AGE_ITEMS: AgeAccordionItem[] = [
     key: "elementary-lower",
     rangeLabel: "7 - 10세 · 초등 저학년",
     question: "내가 잘 하고 있는 건지 모르겠어요",
+    quickGuideGradeLevel: "elementary-lower",
     details: [
       "도와주면 의존하고, 혼자 하라니 더 느려지고",
       "매일 같이 있는데 우리 아이가 뭘 좋아하는지 모르겠어요",
@@ -98,6 +106,7 @@ const AGE_ITEMS: AgeAccordionItem[] = [
     key: "elementary-upper",
     rangeLabel: "11 - 13세 · 초등 고학년",
     question: "아이는 알고 있는데\n내가 모르는 것 같아요",
+    quickGuideGradeLevel: "elementary-upper",
     details: [
       "좋아하는 건 알겠는데, 그게 직업이 될 수 있는 건지 모르겠어요",
       "아이가 뭔가 좋아하는 건 있는데, 공부랑 어떻게 연결해야 할지 모르겠어요",
@@ -108,6 +117,7 @@ const AGE_ITEMS: AgeAccordionItem[] = [
     key: "middle-school",
     rangeLabel: "14 - 16세 · 중학생",
     question: "아이와 점점 멀어지는 것 같아요",
+    quickGuideGradeLevel: "middle",
     details: [
       "제가 도와주려 하면 간섭이래요. 그렇다고 놔두면 아무것도 안 해요",
       "목표는 생겼는데 어떻게 준비해야 하는지 정보가 없어요",
@@ -118,6 +128,7 @@ const AGE_ITEMS: AgeAccordionItem[] = [
     key: "high-school",
     rangeLabel: "17 - 19세 · 고등학생",
     question: "이제 제가 해줄 수 있는 게\n없는 것 같아요",
+    quickGuideGradeLevel: "high",
     details: [
       "지금이라도 늦지 않은 건지, 이미 늦은 건지 모르겠어요",
       "제 방식으로 도와주려 하면 아이가 답답해해요",
@@ -149,7 +160,11 @@ const FEATURE_CARDS = [
   },
 ] as const satisfies readonly FeatureCard[]
 
-export function CounselingCoachingCards() {
+export function CounselingCoachingCards({
+  bubbleAlign = "center",
+  buttonWidth = "compact",
+  useAgePresetQuickGuide = false,
+}: CounselingCoachingCardsProps = {}) {
   const [expandedCardKey, setExpandedCardKey] = useState<ExpandedCardState>(null)
   const [isDesktop, setIsDesktop] = useState(false)
   const [openAgeByCard, setOpenAgeByCard] = useState<Record<FeatureCardKey, string | null>>({
@@ -182,7 +197,6 @@ export function CounselingCoachingCards() {
 
   const toggleCard = (cardKey: FeatureCardKey) => {
     if (isDesktop) {
-      setExpandedCardKey((prev) => (prev === "all" ? null : "all"))
       return
     }
 
@@ -202,7 +216,7 @@ export function CounselingCoachingCards() {
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:items-start md:gap-5">
       {FEATURE_CARDS.map((card) => {
-        const isExpanded = expandedCardKey === "all" || expandedCardKey === card.key
+        const isExpanded = isDesktop || expandedCardKey === "all" || expandedCardKey === card.key
 
         return (
           <article
@@ -211,7 +225,11 @@ export function CounselingCoachingCards() {
           >
             <button
               type="button"
-              onClick={() => toggleCard(card.key)}
+              onClick={() => {
+                if (!isDesktop) {
+                  toggleCard(card.key)
+                }
+              }}
               className="w-full text-left"
               aria-expanded={isExpanded}
             >
@@ -226,7 +244,7 @@ export function CounselingCoachingCards() {
               </p>
             </button>
 
-            {!isExpanded ? (
+            {!isDesktop && !isExpanded ? (
               <button
                 type="button"
                 onClick={() => toggleCard(card.key)}
@@ -241,6 +259,9 @@ export function CounselingCoachingCards() {
               <div className="space-y-3">
                 {card.ageItems.map((item) => {
                   const isAgeOpen = openAgeByCard[card.key] === item.key
+                  const quickGuideHref = useAgePresetQuickGuide
+                    ? `/quick-coaching-guide?gradeLevel=${encodeURIComponent(item.quickGuideGradeLevel)}`
+                    : "/quick-coaching-guide"
 
                   return (
                     <div key={item.key} className="rounded-2xl bg-white px-4 py-8">
@@ -267,7 +288,12 @@ export function CounselingCoachingCards() {
 
                       <AnimatedCollapse open={isAgeOpen} innerClassName="pt-5">
                         <div className="space-y-5">
-                          <div className="flex flex-col items-center space-y-2.5">
+                          <div
+                            className={cn(
+                              "flex flex-col space-y-2.5",
+                              bubbleAlign === "left" ? "items-start" : "items-center"
+                            )}
+                          >
                             {item.details.map((detail, detailIndex) => {
                               const tailGradientId = `${idPrefix}-bubble-tail-${card.key}-${item.key}-${detailIndex}`
 
@@ -297,16 +323,27 @@ export function CounselingCoachingCards() {
                             })}
                           </div>
 
-                          <div className="flex flex-col items-center space-y-2.5">
+                          <div
+                            className={cn(
+                              "flex flex-col space-y-2.5",
+                              buttonWidth === "full" ? "items-stretch" : "items-center"
+                            )}
+                          >
                             <Link
                               href="/reservation"
-                              className="mx-auto inline-flex h-12 w-full max-w-[280px] items-center justify-center rounded-full bg-[#090909] text-[14px] font-semibold text-white transition-opacity hover:opacity-90"
+                              className={cn(
+                                "inline-flex h-12 w-full items-center justify-center rounded-full bg-[#090909] text-[14px] font-semibold text-white transition-opacity hover:opacity-90",
+                                buttonWidth === "full" ? "" : "mx-auto max-w-[280px]"
+                              )}
                             >
                               빠른상담 예약하기
                             </Link>
                             <Link
-                              href="/quick-coaching-guide"
-                              className="mx-auto inline-flex h-12 w-full max-w-[280px] items-center justify-center rounded-full bg-[#090909] text-[14px] font-semibold text-white transition-opacity hover:opacity-90"
+                              href={quickGuideHref}
+                              className={cn(
+                                "inline-flex h-12 w-full items-center justify-center rounded-full bg-[#090909] text-[14px] font-semibold text-white transition-opacity hover:opacity-90",
+                                buttonWidth === "full" ? "" : "mx-auto max-w-[280px]"
+                              )}
                             >
                               맞춤상담 예약하기
                             </Link>
@@ -317,16 +354,18 @@ export function CounselingCoachingCards() {
                   )
                 })}
 
-                <div className="flex justify-center pt-1">
-                  <button
-                    type="button"
-                    onClick={() => toggleCard(card.key)}
-                    className="inline-flex h-10 items-center gap-1 rounded-full border border-[#CFAE90] bg-white px-4 text-[14px] font-medium text-[#9B7558] transition-colors hover:bg-[#F7EFE8]"
-                  >
-                    접기
-                    <ChevronUp className="h-4 w-4" />
-                  </button>
-                </div>
+                {!isDesktop ? (
+                  <div className="flex justify-center pt-1">
+                    <button
+                      type="button"
+                      onClick={() => toggleCard(card.key)}
+                      className="inline-flex h-10 items-center gap-1 rounded-full border border-[#CFAE90] bg-white px-4 text-[14px] font-medium text-[#9B7558] transition-colors hover:bg-[#F7EFE8]"
+                    >
+                      접기
+                      <ChevronUp className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : null}
               </div>
             </AnimatedCollapse>
           </article>

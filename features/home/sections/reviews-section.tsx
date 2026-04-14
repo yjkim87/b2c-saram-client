@@ -38,7 +38,7 @@ const REVIEW_SUMMARY: ReviewItem[] = [
     quote:
       "몰랐던 관심 분야를 알게 되었습니다. 아이와 부모의 성향을 함께 알아갈 수 있어서 좋았습니다.",
     tone: {
-      ageBadge: "bg-[#F07C33] text-white",
+      ageBadge: "border border-[#3378F6] bg-[#EAF3FF] text-[#3378F6]",
       accentBar: "bg-[#F07C33]",
     },
   },
@@ -52,7 +52,7 @@ const REVIEW_SUMMARY: ReviewItem[] = [
       "진로 상담 선생님이 잘 이끌어주셨습니다. 한 번쯤 이런 경험을 하는 것도 중요하다고 생각해요.",
     quote: "코칭을 한 후 앞으로의 방향이 조금 더 확고해졌습니다. 추천하고 싶어요.",
     tone: {
-      ageBadge: "bg-[#D6783F] text-white",
+      ageBadge: "border border-[#12905D] bg-[#EAFBF2] text-[#12905D]",
       accentBar: "bg-[#D6783F]",
     },
   },
@@ -67,7 +67,7 @@ const REVIEW_SUMMARY: ReviewItem[] = [
     quote:
       "정확한 데이터를 통해 아이를 보게 되어 더욱 좋았습니다. 사춘기 자녀에게 본인을 돌아볼 수 있는 시간이었습니다.",
     tone: {
-      ageBadge: "bg-[#A76843] text-white",
+      ageBadge: "border border-[#D9821B] bg-[#FFF5E7] text-[#D9821B]",
       accentBar: "bg-[#A76843]",
     },
   },
@@ -82,7 +82,7 @@ const REVIEW_SUMMARY: ReviewItem[] = [
     quote:
       "나를 좀 더 알게 되었고, 내가 진정으로 원하는 것이 무엇인지 앞으로의 진로 설정에 큰 도움이 되었습니다.",
     tone: {
-      ageBadge: "bg-[#7E543A] text-white",
+      ageBadge: "border border-[#D0527E] bg-[#FFF0F4] text-[#D0527E]",
       accentBar: "bg-[#7E543A]",
     },
   },
@@ -105,7 +105,7 @@ function ReviewCard({
     <article
       ref={cardRef}
       className={cn(
-        "h-full transform-gpu border border-[#DCCEBF] bg-[#F6EFE8] shadow-[0_1px_0_rgba(57,40,28,0.05)] transition-[transform,box-shadow,border-color,opacity] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform md:hover:-translate-y-1.5 md:hover:border-[#CDB79F] md:hover:shadow-[0_16px_30px_rgba(95,67,43,0.16)]",
+        "h-full transform-gpu bg-[#FFF7EF] shadow-[0_1px_0_rgba(57,40,28,0.05)] transition-[transform,box-shadow,opacity] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform md:hover:-translate-y-1.5 md:hover:shadow-[0_16px_30px_rgba(95,67,43,0.16)]",
         landingRadiusTokens.cardLg,
         landingSpaceTokens.cardPaddingLarge
       )}
@@ -128,7 +128,7 @@ function ReviewCard({
         >
           {item.ageLabel}
         </span>
-        <span className={cn("inline-flex w-fit bg-[#EEE2D6] px-3 py-1 text-xs font-semibold text-[#8B7561]", landingRadiusTokens.pill)}>
+        <span className={cn("inline-flex w-fit bg-[#FFF] px-3 py-1 text-xs font-semibold text-[#8B7561]", landingRadiusTokens.pill)}>
           {item.reviewType}
         </span>
       </div>
@@ -140,13 +140,13 @@ function ReviewCard({
         {item.summary}
       </p>
 
-      <div className={cn("relative mt-4 rounded-[12px] bg-[#EFE4DA] p-4 pl-5")}>
+      <div className={cn("relative mt-4 rounded-[12px] bg-[#fff] p-4 pl-5")}>
         <span className={cn("absolute bottom-3 left-0 top-3 w-[3px] rounded-full", item.tone.accentBar)} aria-hidden />
         <p className={cn("text-[#4A3B30]", landingTypeTokens.bodySm)}>{item.quote}</p>
       </div>
 
       <p
-        className="mt-4 text-[18px] leading-none tracking-[2px] text-[#E9A03C]"
+        className="mt-4 text-[18px] leading-none tracking-[2px] text-[#ffb21f]"
         style={
           animate
             ? {
@@ -228,7 +228,7 @@ export function ReviewsSection() {
   }, [animateCards])
 
   return (
-    <section ref={sectionRef} id="reviews" className={cn("bg-[#FFF7EF]", landingSectionTokens.base)}>
+    <section ref={sectionRef} id="reviews" className={cn("bg-[#ffff]", landingSectionTokens.base)}>
       <div className={landingLayoutTokens.containerWide}>
         <div className={cn("text-center", landingLayoutTokens.sectionHeaderGap)}>
           <span className={cn("mb-4 inline-flex", landingTypeTokens.eyebrow)}>부모님 · 학생 후기</span>

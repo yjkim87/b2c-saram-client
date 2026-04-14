@@ -89,7 +89,7 @@ const QUICK_INTRO_AGE_OPTIONS: QuickIntroAgeOption[] = [
 const QUICK_INTRO_RESERVATION_LABEL = "전문가 상담 바로 시작하기"
 const QUICK_INTRO_TYPING_DELAY_MS = 900
 const QUICK_TOPIC_TYPING_DELAY_MS = 900
-const RIGHT_BUBBLE_GRADIENT_CLASS = "bg-[linear-gradient(144.37deg,#5CCDFF_7.06%,#3E72FF_90.82%)]"
+const RIGHT_BUBBLE_GRADIENT_CLASS = "bg-[linear-gradient(144.37deg,#FFB836_7.06%,#F57220_90.82%)]"
 const RIGHT_INTERACTIVE_PANEL_CLASS = "w-full max-w-md rounded-[20px] rounded-tr-[5px] border border-[#DFDFDF] bg-white"
 const WIDE_INTERACTIVE_PANEL_CLASS = "w-full rounded-[20px] border border-[#DFDFDF] bg-white"
 
@@ -100,8 +100,8 @@ function AttendanceOptionButton({ isSelected, onClick, children }: AttendanceOpt
       className={cn(
         "w-full rounded-[18px] border px-4 py-5 text-left transition-all duration-200",
         isSelected
-          ? "border-[#8FB3E8] bg-[#F4FAFF]"
-          : "border-[#DFDFDF] bg-[#F4FAFF] hover:border-[#C9D7EE] hover:bg-[#F4FAFF]",
+          ? "border-[#8FB3E8] bg-[#FFF7EF]"
+          : "border-[#DFDFDF] bg-[#FFF7EF] hover:border-[#C9D7EE] hover:bg-[#FFEBD7]",
       )}
     >
       {children}
@@ -1120,7 +1120,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                                   className={cn(
                                     "w-9 h-9 rounded-full border flex items-center justify-center transition-all flex-shrink-0",
                                     isValidName(nameDraft)
-                                      ? "border-transparent bg-[#F4FAFF] text-[#2E5FD7] hover:bg-[#EAF4FF]"
+                                      ? "border-transparent bg-[#FFF7EF] text-[#2E5FD7] hover:bg-[#FFEBD7]"
                                       : "bg-muted border-transparent text-muted-foreground cursor-not-allowed",
                                   )}
                                   aria-label={"이름 전송"}
@@ -1159,8 +1159,8 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                                           className={cn(
                                             "w-full px-4 py-2.5 rounded-xl border text-left transition-all",
                                             userInfo.relationship === rel
-                                              ? "border-[#7FC6FF] bg-[#F4FAFF] text-[#235FD7] font-semibold"
-                                              : "border-transparent bg-[#F4FAFF] hover:bg-[#EAF4FF] text-[#1F2B3D]",
+                                              ? "border-[#7FC6FF] bg-[#FFF7EF] text-[#235FD7] font-semibold"
+                                              : "border-transparent bg-[#FFF7EF] hover:bg-[#FFEBD7] text-[#1F2B3D]",
                                           )}
                                         >
                                           {rel}
@@ -1218,7 +1218,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                                           className={cn(
                                             "w-9 h-9 rounded-full border flex items-center justify-center transition-all flex-shrink-0",
                                             birthdateInput.trim().length > 0
-                                              ? "border-transparent bg-[#F4FAFF] text-[#2E5FD7] hover:bg-[#EAF4FF]"
+                                              ? "border-transparent bg-[#FFF7EF] text-[#2E5FD7] hover:bg-[#FFEBD7]"
                                               : "bg-muted border-transparent text-muted-foreground cursor-not-allowed",
                                           )}
                                           aria-label={"생년월일 전송"}
@@ -1275,8 +1275,8 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                                           className={cn(
                                             "px-4 py-2.5 rounded-xl border text-center transition-all",
                                             userInfo.gender === gender
-                                              ? "border-[#7FC6FF] bg-[#F4FAFF] text-[#235FD7] font-semibold"
-                                              : "border-transparent bg-[#F4FAFF] hover:bg-[#EAF4FF] text-[#1F2B3D]",
+                                              ? "border-[#7FC6FF] bg-[#FFF7EF] text-[#235FD7] font-semibold"
+                                              : "border-transparent bg-[#FFF7EF] hover:bg-[#FFEBD7] text-[#1F2B3D]",
                                           )}
                                         >
                                           {gender}

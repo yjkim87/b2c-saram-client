@@ -119,7 +119,7 @@ export function Header() {
                       <ChevronDown className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180" />
                     </button>
 
-                    <div className="pointer-events-none absolute left-1/2 top-full z-[120] w-56 -translate-x-1/2 translate-y-2 scale-[0.98] rounded-xl border border-[#E3D5C7] bg-[#FBF6F1] p-2 opacity-0 shadow-[0_16px_36px_rgba(37,23,15,0.12)] transition-[opacity,transform] duration-200 ease-out group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:scale-100 group-focus-within:opacity-100">
+                    <div className="pointer-events-none absolute left-1/2 top-full z-[120] mt-3 w-56 -translate-x-1/2 translate-y-3 scale-[0.98] rounded-xl border border-[#E3D5C7] bg-[#fff] p-2 opacity-0 shadow-[0_16px_36px_rgba(37,23,15,0.12)] transition-[opacity,transform] duration-200 ease-out group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:scale-100 group-focus-within:opacity-100">
                       <ul className="space-y-1">
                         {group.children.map((item) => (
                           <li key={item.href}>

@@ -1,11 +1,14 @@
 "use client"
 
 import { Fragment, useEffect, useMemo, useRef, useState } from "react"
+import { useSearchParams } from "next/navigation"
 import { BotMessage, StepGroupMessage, UserMessage } from "@/features/quick-coaching-guide/components/quick-guide"
 import {
   QUICK_GUIDE_DATA,
   QUICK_GUIDE_INITIAL_STEP_ID,
   QUICK_GUIDE_PAGE_CONTENT,
+  getQuickGuideGradeDetailStepId,
+  type QuickGuideGradeLevelKey,
   type StepGroup,
   type StepOption,
 } from "@/features/quick-coaching-guide/data/quickGuideData"
@@ -13,12 +16,38 @@ import {
 const TYPING_DELAY_MS = 850
 
 export function QuickCoachingGuidePage() {
+  const searchParams = useSearchParams()
   const stepGroupById = useMemo(
     () => Object.fromEntries(QUICK_GUIDE_DATA.map((group) => [group.id, group])) as Record<string, StepGroup>,
     [],
   )
+  const presetGradeLevel = useMemo(() => {
+    const raw = searchParams.get("gradeLevel")
+    if (!raw) return null
 
-  const [currentStepId, setCurrentStepId] = useState(QUICK_GUIDE_INITIAL_STEP_ID)
+    if (raw === "elementary-lower" || raw === "elementary-upper" || raw === "middle" || raw === "high") {
+      return raw as QuickGuideGradeLevelKey
+    }
+
+    return null
+  }, [searchParams])
+  const initialStepId = useMemo(() => {
+    if (!presetGradeLevel) {
+      return QUICK_GUIDE_INITIAL_STEP_ID
+    }
+
+    return getQuickGuideGradeDetailStepId(presetGradeLevel)
+  }, [presetGradeLevel])
+  const presetRootSelection = useMemo(() => {
+    if (!presetGradeLevel || initialStepId === QUICK_GUIDE_INITIAL_STEP_ID) {
+      return null
+    }
+
+    const rootStep = stepGroupById[QUICK_GUIDE_INITIAL_STEP_ID]
+    return rootStep?.options?.find((option) => option.nextStep === initialStepId)?.label ?? null
+  }, [initialStepId, presetGradeLevel, stepGroupById])
+
+  const [currentStepId, setCurrentStepId] = useState(initialStepId)
   const [currentStepIndex, setCurrentStepIndex] = useState(-1)
   const [visibleStepIds, setVisibleStepIds] = useState<string[]>([])
   const [selectedAnswers, setSelectedAnswers] = useState<string[]>([])
@@ -46,15 +75,23 @@ export function QuickCoachingGuidePage() {
   }, [visibleStepIds, selectedAnswers, isTyping])
 
   useEffect(() => {
-    if (!stepGroupById[QUICK_GUIDE_INITIAL_STEP_ID]) {
+    if (!stepGroupById[initialStepId]) {
       setIsTyping(false)
       return
     }
 
     typingTimeoutRef.current = setTimeout(() => {
-      setVisibleStepIds([QUICK_GUIDE_INITIAL_STEP_ID])
-      setCurrentStepIndex(0)
-      setCurrentStepId(QUICK_GUIDE_INITIAL_STEP_ID)
+      if (presetRootSelection) {
+        setVisibleStepIds([QUICK_GUIDE_INITIAL_STEP_ID, initialStepId])
+        setSelectedAnswers([presetRootSelection])
+        setCurrentStepIndex(1)
+        setCurrentStepId(initialStepId)
+      } else {
+        setVisibleStepIds([initialStepId])
+        setSelectedAnswers([])
+        setCurrentStepIndex(0)
+        setCurrentStepId(initialStepId)
+      }
       setIsTyping(false)
       typingTimeoutRef.current = null
     }, TYPING_DELAY_MS)
@@ -65,7 +102,7 @@ export function QuickCoachingGuidePage() {
         typingTimeoutRef.current = null
       }
     }
-  }, [stepGroupById])
+  }, [initialStepId, presetRootSelection, stepGroupById])
 
   const handleSelectOption = (stepIndex: number, stepId: string, option: StepOption) => {
     if (isTyping || !currentStep || stepId !== currentStepId) {
@@ -76,11 +113,13 @@ export function QuickCoachingGuidePage() {
       return
     }
 
-    if (!stepGroupById[option.nextStep]) {
+    setSelectedAnswers((prev) => [...prev, option.label])
+    const nextStepId = option.nextStep
+
+    if (!nextStepId || !stepGroupById[nextStepId]) {
       return
     }
 
-    setSelectedAnswers((prev) => [...prev, option.label])
     setIsTyping(true)
 
     if (typingTimeoutRef.current) {
@@ -89,13 +128,13 @@ export function QuickCoachingGuidePage() {
 
     typingTimeoutRef.current = setTimeout(() => {
       setVisibleStepIds((prev) => {
-        if (prev.includes(option.nextStep)) {
+        if (prev.includes(nextStepId)) {
           return prev
         }
-        return [...prev, option.nextStep]
+        return [...prev, nextStepId]
       })
       setCurrentStepIndex((prev) => prev + 1)
-      setCurrentStepId(option.nextStep)
+      setCurrentStepId(nextStepId)
       setIsTyping(false)
       typingTimeoutRef.current = null
     }, TYPING_DELAY_MS)
