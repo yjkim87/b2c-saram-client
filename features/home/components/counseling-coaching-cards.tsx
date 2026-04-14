@@ -259,9 +259,10 @@ export function CounselingCoachingCards({
               <div className="space-y-3">
                 {card.ageItems.map((item) => {
                   const isAgeOpen = openAgeByCard[card.key] === item.key
+                  const typeParam     = card.key === "counseling" ? "Mind" : "Coaching"
                   const quickGuideHref = useAgePresetQuickGuide
-                    ? `/quick-coaching-guide?gradeLevel=${encodeURIComponent(item.quickGuideGradeLevel)}`
-                    : "/quick-coaching-guide"
+                    ? `/quick_coaching_guide?gradeLevel=${encodeURIComponent(item.quickGuideGradeLevel)}&type=${typeParam}`
+                    : `/quick_coaching_guide?type=${typeParam}`
 
                   return (
                     <div key={item.key} className="rounded-2xl bg-white px-4 py-8">

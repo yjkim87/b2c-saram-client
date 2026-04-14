@@ -17,9 +17,9 @@ const dao = new QuickCoachingGuideDao()
 // ─────────────────────────────────────────────────────────────────────────────
 // 2026-04-13 (김재국) - 퀵코칭가이드 정보 조회
 // ─────────────────────────────────────────────────────────────────────────────
-export async function getStepData(stepId: string): Promise<StepGroup> {
+export async function getStepData(stepId: string, type: string = "Mind"): Promise<StepGroup> {
   try {
-    const { contents, buttons } = await dao.LF_Quick_Coaching_Guide_Info(stepId)
+    const { contents, buttons } = await dao.LF_Quick_Coaching_Guide_Info(stepId, type)
     return transformToStepGroup(contents, buttons)
   } catch (e) {
     const err = e as Error

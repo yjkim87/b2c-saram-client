@@ -2,7 +2,7 @@
 // 화 일 명 : Quick_Coaching_Guide_Page.tsx
 // 용    도 : 퀵코칭가이드 채팅 페이지 (버튼 클릭 시 Server Action을 호출하여 다음 Step 데이터를 가져오고 상태(state)를 업데이트하여 화면을 순차적으로 렌더링)
 // 작성일시 : 2026-04-13 (김재국)
-// 수정일시 : 
+// 수정일시 : 2026-04-14 (김재국) - gradeLevel 파라미터로 진입 시 학년 버튼 자동 선택
 // 주의사항 :
 //-------------------------------------------------------------------------------
 
@@ -16,21 +16,27 @@ import type { StepGroup, StepOption } from "@/features/quick_coaching_guide/mode
 
 const TYPING_DELAY_MS = 850
 
+export type GradeLevelKey  = "elementary-lower" | "elementary-upper" | "middle" | "high"
+export type QuickGuideType = "Mind" | "Coaching"
+
 interface QuickCoachingGuidePageProps {
-  initialStep: StepGroup
+  initialStep:       StepGroup
+  presetGradeLevel?: GradeLevelKey | null
+  guideType:         QuickGuideType
 }
 
-export function QuickCoachingGuide_Page({ initialStep }: QuickCoachingGuidePageProps) {
-  const [stepCache, setStepCache]             = useState<Record<string, StepGroup>>({ [initialStep.id]: initialStep })
-  const [currentStepId, setCurrentStepId]     = useState(QUICK_COACHING_GUIDE_INITIAL_STEP_ID)
+export function QuickCoachingGuide_Page({ initialStep, presetGradeLevel, guideType }: QuickCoachingGuidePageProps) {
+  const [stepCache, setStepCache]               = useState<Record<string, StepGroup>>({ [initialStep.id]: initialStep })
+  const [currentStepId, setCurrentStepId]       = useState(QUICK_COACHING_GUIDE_INITIAL_STEP_ID)
   const [currentStepIndex, setCurrentStepIndex] = useState(-1)
-  const [visibleStepIds, setVisibleStepIds]    = useState<string[]>([])
-  const [selectedAnswers, setSelectedAnswers]  = useState<string[]>([])
-  const [isTyping, setIsTyping]                = useState(true)
-  const chatEndRef                             = useRef<HTMLDivElement | null>(null)
-  const selectedAnswerRefs                     = useRef<Array<HTMLDivElement | null>>([])
-  const typingTimeoutRef                       = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [visibleStepIds, setVisibleStepIds]     = useState<string[]>([])
+  const [selectedAnswers, setSelectedAnswers]   = useState<string[]>([])
+  const [isTyping, setIsTyping]                 = useState(true)
+  const chatEndRef                              = useRef<HTMLDivElement | null>(null)
+  const selectedAnswerRefs                      = useRef<Array<HTMLDivElement | null>>([])
+  const typingTimeoutRef                        = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  // 스크롤 처리
   useEffect(() => {
     const isMobileView = window.innerWidth < 1024
 
@@ -47,14 +53,34 @@ export function QuickCoachingGuide_Page({ initialStep }: QuickCoachingGuidePageP
     chatEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" })
   }, [visibleStepIds, selectedAnswers, isTyping])
 
-  // 첫 스텝 타이핑 애니메이션
+  // 첫 스텝 타이핑 애니메이션 + gradeLevel 파라미터로 진입 시 학년 버튼 자동 선택
   useEffect(() => {
-    typingTimeoutRef.current = setTimeout(() => {
+    typingTimeoutRef.current = setTimeout(async () => {
       setVisibleStepIds([QUICK_COACHING_GUIDE_INITIAL_STEP_ID])
       setCurrentStepIndex(0)
       setCurrentStepId(QUICK_COACHING_GUIDE_INITIAL_STEP_ID)
       setIsTyping(false)
       typingTimeoutRef.current = null
+
+      if (!presetGradeLevel) return
+
+      const gradeStepId    = `step-concern-root:${presetGradeLevel}`
+      const matchingOption = initialStep.options?.find((o) => o.nextStep === gradeStepId)
+      if (!matchingOption) return
+
+      // 학년 버튼 자동 선택: 선택된 학년 표시 후 해당 학년 고민 스텝 로드
+      setSelectedAnswers([matchingOption.label])
+      setIsTyping(true)
+
+      try {
+        const gradeStep = await getStepData(gradeStepId, guideType)
+        setStepCache((prev) => ({ ...prev, [gradeStepId]: gradeStep }))
+        setVisibleStepIds([QUICK_COACHING_GUIDE_INITIAL_STEP_ID, gradeStepId])
+        setCurrentStepIndex(1)
+        setCurrentStepId(gradeStepId)
+      } finally {
+        setIsTyping(false)
+      }
     }, TYPING_DELAY_MS)
 
     return () => {
@@ -63,28 +89,35 @@ export function QuickCoachingGuide_Page({ initialStep }: QuickCoachingGuidePageP
         typingTimeoutRef.current = null
       }
     }
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSelectOption = async (stepIndex: number, stepId: string, option: StepOption) => {
     if (isTyping || stepId !== currentStepId) return
     if (selectedAnswers[stepIndex]) return
 
     setSelectedAnswers((prev) => [...prev, option.label])
+    const nextStepId = option.nextStep
+    if (!nextStepId) return
+
     setIsTyping(true)
 
     try {
-      let nextStep = stepCache[option.nextStep]
+      const delay = new Promise<void>((resolve) => setTimeout(resolve, TYPING_DELAY_MS))
+      let nextStep = stepCache[nextStepId]
       if (!nextStep) {
-        nextStep = await getStepData(option.nextStep)
-        setStepCache((prev) => ({ ...prev, [option.nextStep]: nextStep! }))
+        const [fetched] = await Promise.all([getStepData(nextStepId, guideType), delay])
+        nextStep = fetched
+        setStepCache((prev) => ({ ...prev, [nextStepId]: nextStep! }))
+      } else {
+        await delay
       }
 
       setVisibleStepIds((prev) => {
-        if (prev.includes(option.nextStep)) return prev
-        return [...prev, option.nextStep]
+        if (prev.includes(nextStepId)) return prev
+        return [...prev, nextStepId]
       })
       setCurrentStepIndex((prev) => prev + 1)
-      setCurrentStepId(option.nextStep)
+      setCurrentStepId(nextStepId)
     } finally {
       setIsTyping(false)
     }

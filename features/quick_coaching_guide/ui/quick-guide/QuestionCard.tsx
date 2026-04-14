@@ -13,7 +13,7 @@ interface QuestionCardProps {
 
 export function QuestionCard({ title, content }: QuestionCardProps) {
   return (
-    <article className="rounded-xl border border-[#DFDFDF] bg-[#F8FBFF] px-3 py-2.5">
+    <article className="rounded-xl border border-[#DFDFDF] bg-white px-3 py-2.5">
       <p className="text-sm font-semibold text-[#2D486A] md:text-base">{title}</p>
       <p className="mt-1 text-sm leading-relaxed whitespace-pre-line text-[#4D6E95] md:text-base">{content}</p>
     </article>

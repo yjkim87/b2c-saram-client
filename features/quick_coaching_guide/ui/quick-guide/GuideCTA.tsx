@@ -27,7 +27,7 @@ export function GuideCTA({
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#DFDFDF] pt-3">
       <p className="text-sm leading-relaxed text-[#4E5D90]">{description}</p>
-      <Button asChild className="h-10 cursor-pointer rounded-full bg-[#3391FF] px-5 text-sm font-semibold text-white hover:bg-[#2b7de0]">
+      <Button asChild className="h-10 cursor-pointer rounded-full bg-[#0C0C0C] px-5 text-sm font-semibold text-white hover:bg-[#000000]">
         <Link href={href}>
           {label}
           <ArrowRight className="h-4 w-4" />

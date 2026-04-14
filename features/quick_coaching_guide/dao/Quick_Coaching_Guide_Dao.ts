@@ -18,10 +18,11 @@ export class QuickCoachingGuideDao {
   // ─────────────────────────────────────────────────────────────────────────────
   // 2026-04-13 (김재국) - 퀵코칭가이드 정보 조회
   // ─────────────────────────────────────────────────────────────────────────────
-  async LF_Quick_Coaching_Guide_Info(stepId: string): Promise<QuickCoachingGuideDS> {
+  async LF_Quick_Coaching_Guide_Info(stepId: string, type: string): Promise<QuickCoachingGuideDS> {
     const query = "USP_Quick_Coaching_Guide_Info_S00"
     const parameters: SqlParameter[] = [
       { ParameterName: "@Step_Id",  Value: stepId, SqlDbType: sql.NVarChar(200) },
+      { ParameterName: "@Type",     Value: type,   SqlDbType: sql.NVarChar(20)  },
       { ParameterName: "@ErrNum",   SqlDbType: sql.Int(),         Direction: ParameterDirection.Output },
       { ParameterName: "@ErrSev",   SqlDbType: sql.Int(),         Direction: ParameterDirection.Output },
       { ParameterName: "@ErrState", SqlDbType: sql.Int(),         Direction: ParameterDirection.Output },

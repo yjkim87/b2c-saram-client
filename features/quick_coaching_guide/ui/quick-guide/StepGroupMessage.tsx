@@ -66,9 +66,9 @@ export function StepGroupMessage({
                   "w-full rounded-2xl border px-4 py-3 text-left transition-colors",
                   option.description ? "space-y-1.5" : "",
                   isSelected
-                    ? "border-[#2F79FF] bg-[#2F79FF] text-white"
+                    ? "border-[#FF7A33] bg-[#FF7A33] text-white"
                     : "border-[#D9DDE5] bg-white text-[#202940]",
-                  isDisabled && !isSelected ? "opacity-70" : "hover:border-[#AFC9F8]",
+                  isDisabled && !isSelected ? "opacity-70" : "hover:border-[#FDC2A3]",
                   isDisabled ? "cursor-default" : "cursor-pointer",
                 )}
               >
@@ -84,7 +84,9 @@ export function StepGroupMessage({
         </div>
       ) : null}
 
-      {step.reservationHref ? <GuideCTA href={step.reservationHref} /> : null}
+      {step.reservationHref && (step.options?.length ? isAnswered : true) ? (
+        <GuideCTA href={step.reservationHref} />
+      ) : null}
     </div>
   )
 }

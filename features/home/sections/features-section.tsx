@@ -31,7 +31,7 @@ export function FeaturesSection() {
           </p>
         </div>
 
-        <CounselingCoachingCards />
+        <CounselingCoachingCards useAgePresetQuickGuide />
       </div>
     </section>
   )
