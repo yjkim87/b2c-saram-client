@@ -214,7 +214,7 @@ function ExpertsSectionFull() {
   }, [query])
 
   return (
-    <section className="min-h-screen bg-[#fafafa] py-12 md:py-16">
+    <section className="min-h-screen bg-[#fffcfc] py-12 md:py-16">
       <div className="mx-auto w-full max-w-[1200px] px-4">
         <div className="max-w-md">
           <label htmlFor="expert-search" className="text-sm font-medium text-slate-700">
@@ -284,7 +284,7 @@ function ExpertsSectionFull() {
 
               <Link
                 href={`/experts/${expert.id}?from=experts`}
-                className="mt-5 inline-flex w-full items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm font-semibold text-slate-800 transition-colors hover:border-slate-400 hover:bg-slate-50"
+                className="mt-5 inline-flex w-full items-center justify-center rounded-lg border border-[#292828] bg-[#292828] px-3 py-2.5 text-sm font-semibold text-[#fff] transition-colors hover:bg-[#1f1f1f]"
               >
                 프로필 보기
               </Link>

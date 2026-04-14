@@ -1,7 +1,7 @@
 ﻿"use client"
 
 import { useMemo, useState, type ReactNode } from "react"
-import { CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Clock, Sprout } from "lucide-react"
+import { CheckCircle2, ChevronLeft, ChevronRight, Clock, Sprout } from "lucide-react"
 import { Button } from "@/shared/ui/button"
 import { Calendar } from "@/shared/ui/calendar"
 import { cn } from "@/shared/lib/utils"
@@ -31,7 +31,7 @@ interface CalendarPickerProps {
 
 function BotAvatar() {
   return (
-    <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(144.37deg,#5CCDFF_7.06%,#3E72FF_90.82%)]">
+    <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(144.37deg,#FF5C88_7.06%,#A63EFF_90.82%)]">
       <Sprout className="h-4 w-4 text-white" />
     </div>
   )
@@ -39,7 +39,7 @@ function BotAvatar() {
 
 export function TypingIndicator() {
   return (
-    <div className="flex items-center gap-1 px-4 py-3 bg-[#F4FAFF] rounded-[20px] rounded-tl-[5px] w-fit">
+    <div className="flex items-center gap-1 px-4 py-3 bg-[#FFF7EF] rounded-[20px] rounded-tl-[5px] w-fit">
       <div className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
       <div className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
       <div className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
@@ -63,7 +63,7 @@ export function BotMessage({ content, isTyping }: BotMessageProps) {
     <div className="animate-in fade-in-0 slide-in-from-left-4 duration-300">
       <div className="flex items-start gap-2.5">
         <BotAvatar />
-        <div className="w-fit max-w-[calc(100%-3.25rem)] rounded-[20px] rounded-tl-[5px] bg-[#F4FAFF] px-4 py-3 sm:max-w-[85%]">
+        <div className="w-fit max-w-[calc(100%-3.25rem)] rounded-[20px] rounded-tl-[5px] bg-[#FFF7EF] px-4 py-3 sm:max-w-[85%]">
           {typeof content === "string" ? (
             <p className="text-foreground text-sm leading-relaxed whitespace-pre-wrap break-words md:text-base">{content}</p>
           ) : (
@@ -78,7 +78,7 @@ export function BotMessage({ content, isTyping }: BotMessageProps) {
 export function UserMessage({ content }: UserMessageProps) {
   return (
     <div className="flex justify-end animate-in fade-in-0 slide-in-from-right-4 duration-300">
-      <div className="bg-[linear-gradient(144.37deg,#5CCDFF_7.06%,#3E72FF_90.82%)] text-white rounded-[20px] rounded-tr-[5px] px-4 py-3 max-w-[85%]">
+      <div className="bg-[linear-gradient(144.37deg,#FFB836_7.06%,#F57220_90.82%)] text-white rounded-[20px] rounded-tr-[5px] px-4 py-3 max-w-[85%]">
         <p className="text-sm leading-relaxed whitespace-pre-wrap break-words md:text-base">{content}</p>
       </div>
     </div>
@@ -91,8 +91,6 @@ export function ConcernCard({
   selectionOrder,
   onSelect,
 }: ConcernCardProps) {
-  const [isExpanded, setIsExpanded] = useState(false)
-
   return (
     <div
       className={cn(
@@ -101,55 +99,21 @@ export function ConcernCard({
       )}
       onClick={onSelect}
     >
-      <div className="space-y-3 p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div
-              className={cn(
-                "flex h-7 w-7 items-center justify-center rounded-full border-2 text-xs font-bold transition-colors",
-                isSelected
-                  ? "border-[#4A83D8] bg-[#4A83D8] text-white"
-                  : "border-[#B8B8B8] bg-white text-transparent",
-              )}
-            >
-              {isSelected && selectionOrder ? selectionOrder : ""}
-            </div>
-            <span className="font-semibold text-[#2F2A23]">{card.title}</span>
-          </div>
-        </div>
-
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation()
-              setIsExpanded((prev) => !prev)
-            }}
-            className="inline-flex items-center gap-1 text-xs text-[#676059] transition-colors hover:text-[#2F2A23]"
+      <div className="p-4">
+        <div className="flex items-center gap-3">
+          <div
+            className={cn(
+              "flex h-7 w-7 items-center justify-center rounded-full border-2 text-xs font-bold transition-colors",
+              isSelected
+                ? "border-[#4A83D8] bg-[#4A83D8] text-white"
+                : "border-[#B8B8B8] bg-white text-transparent",
+            )}
           >
-            {isExpanded ? "접기" : "자세히 보기"}
-            <ChevronDown className={cn("w-4 h-4 transition-transform", isExpanded && "rotate-180")} />
-          </button>
+            {isSelected && selectionOrder ? selectionOrder : ""}
+          </div>
+          <span className="font-semibold text-[#2F2A23]">{card.title}</span>
         </div>
       </div>
-
-      {isExpanded && (
-        <div className="animate-in slide-in-from-top-2 fade-in-0 px-4 pb-4 duration-300">
-          <div className="space-y-4 rounded-2xl border border-[#DFDFDF] bg-[#F4FAFF] p-5">
-            <p className="text-[15px] leading-relaxed text-[#4D6E95]">{card.needs}</p>
-
-            <div className="rounded-xl border border-[#CFE0F6] bg-white p-4">
-              <p className="mb-2 text-xs font-bold text-[#6D4BFF]">
-                <span className="mr-1" aria-hidden="true">
-                  💡
-                </span>
-                사발면 솔루션
-              </p>
-              <p className="text-base font-semibold leading-relaxed text-[#2D486A]">{card.solution}</p>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

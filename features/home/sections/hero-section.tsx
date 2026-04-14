@@ -4,8 +4,7 @@ import { useEffect, useRef } from "react"
 import { cn } from "@/shared/lib/utils"
 import { landingLayoutTokens } from "@/features/home/styles/landing-tokens"
 
-const HERO_BG_IMAGE_URL_MOBILE = "https://img.assesta.com/saram-me/main_mw_bg.png"
-const HERO_BG_IMAGE_URL_DESKTOP = "https://img.assesta.com/saram-me/main_bg.png"
+const HERO_BG_IMAGE_URL = "https://img.assesta.com/saram-me/main_mw_bg.png"
 
 function useFadeInUp(delay = 0) {
   const ref = useRef<HTMLDivElement>(null)
@@ -63,25 +62,28 @@ export function HeroSection() {
   return (
     <section className="relative h-[500px] overflow-hidden bg-[#F2D8C0] pt-[64px] md:h-[890px] md:pt-[78px]">
       <div className="absolute inset-0">
-        <div className="h-full w-full pt-[62px] md:hidden">
-          <img
-            src={HERO_BG_IMAGE_URL_MOBILE}
-            alt=""
-            aria-hidden="true"
-            fetchPriority="high"
-            className="h-full w-full object-cover"
-            style={{ objectPosition: "50% 0%" }}
-          />
-        </div>
+        <div
+          className="h-full w-full pt-[62px] md:hidden"
+          aria-hidden="true"
+          style={{
+            backgroundImage: `url(${HERO_BG_IMAGE_URL})`,
+            backgroundPosition: "right 47% bottom -80px",
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "250%",
+          }}
+        />
 
-        <div className="hidden h-full w-full pt-[60px] md:block">
-          <img
-            src={HERO_BG_IMAGE_URL_DESKTOP}
-            alt=""
-            aria-hidden="true"
-            className="h-full w-full object-cover object-top"
-          />
-        </div>
+        <div
+          className="hidden h-full w-full md:block"
+          aria-hidden="true"
+          style={{
+            backgroundImage: `url(${HERO_BG_IMAGE_URL})`,
+            backgroundPosition: "right -310px bottom 100%",
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "100%",
+            backgroundColor: "#F2D8C0",
+          }}
+        />
 
         <div
           className="pointer-events-none absolute inset-0 md:hidden"

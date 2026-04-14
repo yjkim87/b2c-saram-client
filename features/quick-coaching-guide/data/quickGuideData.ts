@@ -6,7 +6,7 @@ export type StepQuestion = {
 export type StepOption = {
   label: string
   description?: string
-  nextStep: string
+  nextStep?: string
 }
 
 export type StepGroup = {
@@ -28,6 +28,10 @@ type GradeInfoItem = {
 type ConcernTipItem = {
   title: string
   content: string
+  hasFollowUpQuestion?: boolean
+  followUpQuestion?: string
+  followUpOptions?: string[]
+  followUpResponses?: Record<string, string>
 }
 
 type HelpType = {
@@ -35,8 +39,10 @@ type HelpType = {
   description: string
 }
 
+export type QuickGuideGradeLevelKey = "elementary-lower" | "elementary-upper" | "middle" | "high"
+
 type GradeLevel = {
-  key: "elementary-lower" | "elementary-upper" | "middle" | "high"
+  key: QuickGuideGradeLevelKey
   label: string
   grades: string[]
 }
@@ -690,22 +696,31 @@ const QUICK_GUIDE_ROOT_CONCERNS = (() => {
 const QUICK_GUIDE_INTRO_HEAD_MESSAGE =
   "안녕하세요! 사발면에 오신 걸 환영해요.\n사발면은 '사람의 발견을 원하면'의 줄임말이에요.\n아이를 매일 보면서도 몰랐던 면을 발견하는 순간, 나 자신을 오래 살아왔지만 미처 몰랐던 나를 만나는 순간, 그 발견의 순간을 함께하고 싶다는 마음을 담았어요."
 
-export const QUICK_GUIDE_INITIAL_STEP_ID = "step-concern-root"
+export const QUICK_GUIDE_INITIAL_STEP_ID = "step-grade-level-root"
 
 function encodeStepValue(value: string): string {
   return encodeURIComponent(value)
 }
 
-function makeGradeLevelStepId(concernSlotIndex: number): string {
-  return `step-grade-level:${concernSlotIndex}`
+function makeGradeDetailStepId(levelKey: GradeLevel["key"]): string {
+  return `step-grade-detail:${levelKey}`
 }
 
-function makeGradeDetailStepId(levelKey: GradeLevel["key"], concernSlotIndex: number): string {
-  return `step-grade-detail:${levelKey}:${concernSlotIndex}`
+export function getQuickGuideGradeDetailStepId(levelKey: QuickGuideGradeLevelKey): string {
+  return makeGradeDetailStepId(levelKey)
 }
 
-function makeHelpStepId(grade: string, concernSlotIndex: number): string {
-  return `step-help:${encodeStepValue(grade)}:${concernSlotIndex}`
+function makeConcernStepId(grade: string): string {
+  return `step-concern:${encodeStepValue(grade)}`
+}
+
+function makeConcernTipStepId(grade: string, concernSlotIndex: number): string {
+  return `step-concern-tip:${encodeStepValue(grade)}:${concernSlotIndex}`
+}
+
+function makeHelpStepId(grade: string, concernSlotIndex: number, followUpOptionIndex?: number): string {
+  const suffix = followUpOptionIndex === undefined ? "base" : `${followUpOptionIndex}`
+  return `step-help:${encodeStepValue(grade)}:${concernSlotIndex}:${suffix}`
 }
 
 function makeFinalStepId(helpTypeIndex: number): string {
@@ -750,59 +765,110 @@ function resolveConcernBySlot(grade: string, concernSlotIndex: number): string {
   return QUICK_GUIDE_ROOT_CONCERNS[0] ?? ""
 }
 
+function resolveConcernsForGrade(grade: string): string[] {
+  const concerns = QUICK_GUIDE_GRADE_INFO[grade]?.concerns ?? []
+  if (concerns.length > 0) {
+    return concerns
+  }
+
+  return QUICK_GUIDE_ROOT_CONCERNS
+}
+
+function resolveGradeTip(grade: string): string {
+  return QUICK_GUIDE_GRADE_INFO[grade]?.tip ?? ""
+}
+
 function buildQuickGuideStepGroups(): StepGroup[] {
   const stepGroups: StepGroup[] = [
     {
       id: QUICK_GUIDE_INITIAL_STEP_ID,
-      botMessage: `${QUICK_GUIDE_INTRO_HEAD_MESSAGE}\n\n지금 가장 마음에 걸리는 게 뭔가요?`,
-      options: QUICK_GUIDE_ROOT_CONCERNS.map((concern, concernSlotIndex) => ({
-        label: concern,
-        nextStep: makeGradeLevelStepId(concernSlotIndex),
+      botMessage: `${QUICK_GUIDE_INTRO_HEAD_MESSAGE}\n\n학년구분을 선택해주세요.`,
+      options: QUICK_GUIDE_GRADE_LEVELS.map((level) => ({
+        label: level.label,
+        nextStep: makeGradeDetailStepId(level.key),
       })),
     },
   ]
 
-  QUICK_GUIDE_ROOT_CONCERNS.forEach((_, concernSlotIndex) => {
+  QUICK_GUIDE_GRADE_LEVELS.forEach((level) => {
     stepGroups.push({
-      id: makeGradeLevelStepId(concernSlotIndex),
-      botMessage: "지금 자녀분은 어떤 성장 시기를 지나고 있나요?",
-      options: QUICK_GUIDE_GRADE_LEVELS.map((level) => ({
-        label: level.label,
-        nextStep: makeGradeDetailStepId(level.key, concernSlotIndex),
+      id: makeGradeDetailStepId(level.key),
+      botMessage: "학년을 선택해주세요.",
+      options: level.grades.map((grade) => ({
+        label: grade,
+        nextStep: makeConcernStepId(grade),
       })),
-    })
-
-    QUICK_GUIDE_GRADE_LEVELS.forEach((level) => {
-      stepGroups.push({
-        id: makeGradeDetailStepId(level.key, concernSlotIndex),
-        botMessage: "학년을 선택해주세요.",
-        options: level.grades.map((grade) => ({
-          label: grade,
-          nextStep: makeHelpStepId(grade, concernSlotIndex),
-        })),
-      })
     })
   })
 
-  Object.keys(QUICK_GUIDE_GRADE_INFO).forEach((grade) => {
-    QUICK_GUIDE_ROOT_CONCERNS.forEach((_, concernSlotIndex) => {
+  const allGrades = QUICK_GUIDE_GRADE_LEVELS.flatMap((level) => level.grades)
+
+  allGrades.forEach((grade) => {
+    const concerns = resolveConcernsForGrade(grade)
+    const gradeTip = resolveGradeTip(grade)
+
+    stepGroups.push({
+      id: makeConcernStepId(grade),
+      botMessage: "지금 가장 마음에 걸리는 게 뭔가요?",
+      questions: gradeTip
+        ? [
+            {
+              label: "💡 알고 계셨나요?",
+              description: gradeTip,
+            },
+          ]
+        : undefined,
+      options: concerns.map((concern, concernSlotIndex) => ({
+        label: concern,
+        nextStep: makeConcernTipStepId(grade, concernSlotIndex),
+      })),
+    })
+
+    concerns.forEach((_, concernSlotIndex) => {
       const concern = resolveConcernBySlot(grade, concernSlotIndex)
       const concernTip = resolveConcernTip(grade, concern)
+      const followUpOptions =
+        concernTip.hasFollowUpQuestion && concernTip.followUpOptions?.length ? concernTip.followUpOptions : []
+      const hasFollowUpFlow = followUpOptions.length > 0
 
       stepGroups.push({
-        id: makeHelpStepId(grade, concernSlotIndex),
-        botMessage: "어떤 방식으로 도움받고 싶으세요?",
+        id: makeConcernTipStepId(grade, concernSlotIndex),
+        botMessage: hasFollowUpFlow ? concernTip.followUpQuestion ?? "지금 상황에 가장 가까운 항목을 선택해주세요." : "어떤 방식으로 도움받고 싶으세요?",
         questions: [
           {
             label: `💡 ${concernTip.title}`,
             description: concernTip.content,
           },
         ],
-        options: QUICK_GUIDE_HELP_TYPES.map((helpType, helpTypeIndex) => ({
-          label: helpType.label,
-          description: helpType.description || undefined,
-          nextStep: makeFinalStepId(helpTypeIndex),
-        })),
+        options: hasFollowUpFlow
+          ? followUpOptions.map((followUpOption, followUpOptionIndex) => ({
+              label: followUpOption,
+              nextStep: makeHelpStepId(grade, concernSlotIndex, followUpOptionIndex),
+            }))
+          : undefined,
+        cta: !hasFollowUpFlow,
+      })
+
+      if (!hasFollowUpFlow) {
+        return
+      }
+
+      followUpOptions.forEach((followUpOption, followUpOptionIndex) => {
+        const followUpResponse = concernTip.followUpResponses?.[followUpOption] ?? ""
+
+        stepGroups.push({
+          id: makeHelpStepId(grade, concernSlotIndex, followUpOptionIndex),
+          botMessage: "어떤 방식으로 도움받고 싶으세요?",
+          questions: followUpResponse
+            ? [
+                {
+                  label: "💡 이렇게 살펴볼 수 있어요",
+                  description: followUpResponse,
+                },
+              ]
+            : undefined,
+          cta: true,
+        })
       })
     })
   })
