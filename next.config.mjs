@@ -6,6 +6,11 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  experimental: {
+    serverActions: {
+      allowedOrigins: ["www.saram.me", "saram.me", "www.saram.at", "saram.at"],
+    },
+  },
 }
 
 export default nextConfig
