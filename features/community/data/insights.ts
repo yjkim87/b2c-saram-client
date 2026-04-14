@@ -12,9 +12,8 @@ export const INSIGHT_GRADE_BADGE_TONE: Record<InsightGrade, string> = {
 
 export const DEFAULT_INSIGHT_COVER_IMAGE = "/default-thumbnail.jpg"
 
-export function resolveInsightCoverImage(coverImage: string | null | undefined) {
-  const normalizedCoverImage = coverImage?.trim()
-  return normalizedCoverImage ? normalizedCoverImage : DEFAULT_INSIGHT_COVER_IMAGE
+export function resolveInsightCoverImage(_coverImage: string | null | undefined) {
+  return DEFAULT_INSIGHT_COVER_IMAGE
 }
 
 export type InsightHighlightItem = {
@@ -76,7 +75,7 @@ export const INSIGHT_HIGHLIGHT_ITEMS: InsightHighlightItem[] = [
   },
   {
     id: "highlight-2",
-    grade: "초등 고학년",
+    grade: "중학생",
     category: "인터뷰",
     title: "학습 동기가 떨어진 아이, 무엇부터 점검해야 할까요?",
     summary:
@@ -106,7 +105,7 @@ export const INSIGHT_BOARD_ITEMS: InsightBoardItem[] = [
   },
   {
     id: "board-2",
-    grade: "초등 고학년",
+    grade: "중학생",
     category: "인터뷰",
     title: "또래관계에서 자주 위축되는 아이, 부모 피드백은 어떻게 달라져야 하나요",
     summary: "사회성 코칭 현장에서 가장 자주 나오는 질문을 중심으로, 부모의 피드백 언어를 구체적으로 바꾸는 포인트를 정리했습니다.",

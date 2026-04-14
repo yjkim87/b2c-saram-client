@@ -221,7 +221,7 @@ export function CounselingCoachingCards({
         return (
           <article
             key={card.key}
-            className={cn("bg-[#FFF7EF] px-4 py-10 text-[#1E1611]", landingRadiusTokens.card)}
+            className={cn("bg-[#FFF] px-6 py-10 text-[#1E1611] sm:px-7", landingRadiusTokens.card)}
           >
             <button
               type="button"
@@ -233,11 +233,11 @@ export function CounselingCoachingCards({
               className="w-full text-left"
               aria-expanded={isExpanded}
             >
-              <p className="text-[14px] font-bold leading-tight text-[#F07C33]">{card.eyebrow}</p>
+              <p className="text-[14px] font-bold leading-tight text-[#FF7A33]">{card.eyebrow}</p>
               <h3 className="mt-[6px] text-[26px] font-bold leading-tight tracking-[-0.02em] text-[#1B140F]">
                 {card.title}
               </h3>
-              <p className="mt-6 text-[16px] leading-[1.65] text-[#2F261F]">
+              <p className="mt-6 text-[16px] leading-[1.65] text-[#1E1712]">
                 {card.description.regular}
                 <br />
                 <strong className="font-extrabold">{card.description.emphasized}</strong>
@@ -248,7 +248,7 @@ export function CounselingCoachingCards({
               <button
                 type="button"
                 onClick={() => toggleCard(card.key)}
-                className="mt-7 inline-flex h-10 items-center gap-1 rounded-full border border-[#CFAE90] bg-white px-4 text-[14px] font-medium text-[#9B7558] transition-colors hover:bg-[#F7EFE8]"
+                className="mt-7 inline-flex h-10 items-center gap-1 rounded-full border border-[#CEB196] bg-transparent px-4 text-[14px] font-medium text-[#A87D5E] transition-colors hover:bg-[#EBEBEB]"
               >
                 자세히 보기
                 <ChevronDown className="h-4 w-4" />
@@ -265,7 +265,7 @@ export function CounselingCoachingCards({
                     : `/quick_coaching_guide?type=${typeParam}`
 
                   return (
-                    <div key={item.key} className="rounded-2xl bg-white px-4 py-8">
+                    <div key={item.key} className="rounded-2xl bg-[#FFF7EF] px-4 py-8">
                       <button
                         type="button"
                         onClick={() => toggleAgeItem(card.key, item.key)}
@@ -273,7 +273,7 @@ export function CounselingCoachingCards({
                         aria-expanded={isAgeOpen}
                       >
                         <div>
-                          <p className="inline-flex rounded-lg bg-[#FFF7EF] px-2.5 py-1 text-[12px] font-bold leading-tight text-[#F07C33]">
+                          <p className="inline-flex rounded-lg bg-[#FFF] px-2.5 py-1 text-[12px] font-bold leading-tight text-[#F07C33]">
                             {item.rangeLabel}
                           </p>
                           <p className="mt-[10px] whitespace-pre-line text-[18px] font-bold leading-[1.35] tracking-[-0.01em] text-[#1B140F] md:overflow-hidden md:text-ellipsis md:whitespace-nowrap">
@@ -358,12 +358,12 @@ export function CounselingCoachingCards({
                 {!isDesktop ? (
                   <div className="flex justify-center pt-1">
                     <button
-                      type="button"
-                      onClick={() => toggleCard(card.key)}
-                      className="inline-flex h-10 items-center gap-1 rounded-full border border-[#CFAE90] bg-white px-4 text-[14px] font-medium text-[#9B7558] transition-colors hover:bg-[#F7EFE8]"
-                    >
-                      접기
-                      <ChevronUp className="h-4 w-4" />
+                    type="button"
+                    onClick={() => toggleCard(card.key)}
+                    className="inline-flex h-10 items-center gap-1 rounded-full border border-[#CEB196] bg-transparent px-4 text-[14px] font-medium text-[#A87D5E] transition-colors hover:bg-[#EBEBEB]"
+                  >
+                    접기
+                    <ChevronUp className="h-4 w-4" />
                     </button>
                   </div>
                 ) : null}

@@ -15,25 +15,25 @@ export const landingLayoutTokens = {
 
 export const landingTypeTokens = {
   eyebrow:
-    "font-sans text-[18px] font-bold leading-[1] tracking-[0] text-[#F07C33]",
+    "font-sans text-[18px] font-bold leading-[1] tracking-[0] text-[#FF7A33]",
   heroTitle:
-    "text-[length:var(--landing-font-title-hero)] font-bold leading-[1.2] tracking-[-0.02em]",
+    "font-landing-title text-[length:var(--landing-font-title-hero)] font-bold leading-[1.2] tracking-[-0.02em]",
   displayTitle:
-    "text-[length:var(--landing-font-title-display)] font-extrabold leading-[1.2] tracking-[-0.02em]",
+    "font-landing-title text-[length:var(--landing-font-title-display)] font-extrabold leading-[1.2] tracking-[-0.02em]",
   sectionTitle:
-    "font-sans text-[length:var(--landing-font-title-section)] font-bold leading-[1.25] tracking-[0] text-[#1A1410]",
+    "font-landing-title text-[length:var(--landing-font-title-section)] font-bold leading-[1.25] tracking-[0] text-[#1A1410]",
   reviewTitle:
-    "font-sans text-[length:var(--landing-font-title-review)] font-bold leading-[1.25] tracking-[0] text-[#1A1410]",
+    "font-landing-title text-[length:var(--landing-font-title-review)] font-bold leading-[1.25] tracking-[0] text-[#1A1410]",
   cardTitle:
-    "text-[length:var(--landing-font-title-card)] font-extrabold leading-none tracking-[-0.02em]",
+    "font-landing-title text-[length:var(--landing-font-title-card)] font-extrabold leading-none tracking-[-0.02em]",
   stepTitle:
-    "text-[length:var(--landing-font-title-step)] font-extrabold leading-none tracking-[-0.02em]",
+    "font-landing-title text-[length:var(--landing-font-title-step)] font-extrabold leading-none tracking-[-0.02em]",
   stepTitleLg:
-    "text-[length:var(--landing-font-title-step-lg)] font-extrabold leading-none tracking-[-0.02em]",
+    "font-landing-title text-[length:var(--landing-font-title-step-lg)] font-extrabold leading-none tracking-[-0.02em]",
   ageCardTitle:
-    "font-sans text-[length:var(--landing-font-title-age-card)] font-bold leading-[1] tracking-[0]",
+    "font-landing-title text-[length:var(--landing-font-title-age-card)] font-bold leading-[1] tracking-[0]",
   serviceCardTitle:
-    "font-sans text-[length:var(--landing-font-service-card-title)] font-bold leading-[1] tracking-[0]",
+    "font-landing-title text-[length:var(--landing-font-service-card-title)] font-bold leading-[1] tracking-[0]",
   serviceCardNote:
     "font-sans text-[length:var(--landing-font-service-note)] font-normal leading-[1] tracking-[0] text-[#7A6656]",
   noteText:
@@ -57,7 +57,7 @@ export const landingTypeTokens = {
   button: "text-[length:var(--landing-font-button)] font-semibold",
   buttonLg: "text-[length:var(--landing-font-button-lg)] font-semibold",
   tabLabel:
-    "text-[length:var(--landing-font-tab)] font-extrabold leading-none tracking-[-0.02em]",
+    "font-landing-title text-[length:var(--landing-font-tab)] font-extrabold leading-none tracking-[-0.02em]",
 } as const
 
 export const landingRadiusTokens = {

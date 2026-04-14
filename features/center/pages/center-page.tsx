@@ -10,13 +10,16 @@ const TEXT = {
   centerAddress: "\uBD80\uC0B0\uC2DC \uD574\uC6B4\uB300\uAD6C \uC13C\uD140\uB3D9\uB85C 99, \uBC31\uC0B0\uC13C\uD140\uD074\uB798\uC2A4\uC6D0(1\uCC28) 406\uD638",
   naverMap: "\uB124\uC774\uBC84 \uC9C0\uB3C4",
   kakaoMap: "\uCE74\uCE74\uC624\uB9F5",
-  tempImage: "\uC784\uC2DC \uC13C\uD130 \uC774\uBBF8\uC9C0 01",
   directions: "\uC624\uC2DC\uB294 \uAE38",
   subway: "\uB3D9\uD574\uC120 \uC13C\uD140\uC5ED 2\uBC88 \uCD9C\uAD6C \uB3C4\uBCF4 10\uBD84",
   businessHours: "\uC6B4\uC601\uC2DC\uAC04",
   businessHoursValue: "\uD3C9\uC77C 09:00 ~ 20:00, \uC8FC\uB9D0 09:00 ~ 17:00",
   closedNote: "* \uC77C\uC694\uC77C\uC740 \uD734\uBB34\uC774\uBA70, \uC0AC\uC804 \uC608\uC57D\uC81C \uC6B4\uC601\uB429\uB2C8\uB2E4.",
+  phoneConsult: "\uC804\uD654\uC0C1\uB2F4",
+  phoneNumber: "051-928-0944",
 } as const
+
+const CENTER_MAP_IMAGE_URL = "https://img.assesta.com/saram-me/center_map.png"
 
 const NAVER_MAP_URL = `https://map.naver.com/p/search/${encodeURIComponent(TEXT.centerAddress)}`
 const KAKAO_MAP_URL = `https://map.kakao.com/?q=${encodeURIComponent(TEXT.centerAddress)}`
@@ -63,32 +66,33 @@ export function CenterPage() {
     <>
       <PageHeader label={TEXT.headerLabel} title={TEXT.headerTitle} description={TEXT.headerDescription} />
 
-      <section className="bg-[#fafafa] px-4 py-10 sm:px-6 md:py-12 lg:px-8">
+      <section className="bg-[#fff] px-4 py-14 sm:px-6 md:py-16 lg:px-8">
         <div className="mx-auto grid w-full max-w-[1200px] gap-[var(--landing-space-grid-md)] md:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] md:items-stretch">
           <div className="w-full min-w-0">
-            <div
+            <a
+              href={NAVER_MAP_URL}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="네이버 지도 위치 열기"
               className={cn(
-                "relative flex h-[221px] w-full items-center justify-center overflow-hidden md:h-full md:min-h-[336px]",
+                "group relative block h-[221px] w-full overflow-hidden bg-white md:h-full md:min-h-[336px]",
                 landingRadiusTokens.card
               )}
-              style={{ background: "linear-gradient(140deg, #dcecff 0%, #c2d8ff 100%)" }}
             >
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  background: "radial-gradient(65% 65% at 20% 20%, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0) 100%)",
-                }}
+              <img
+                src={CENTER_MAP_IMAGE_URL}
+                alt="사발면 센터 지도 이미지"
+                className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-[1.01]"
+                loading="lazy"
               />
-              <span className={cn("relative z-10 text-[#1f2f4f]", landingTypeTokens.stepDescription)}>{TEXT.tempImage}</span>
-            </div>
+            </a>
           </div>
 
           <div className="w-full min-w-0 text-left text-[#111827]">
             <div className="space-y-[var(--landing-space-grid-sm)]">
               <article
                 className={cn(
-                  "border border-[#E4E8EE] bg-white shadow-[0_6px_20px_rgba(15,23,42,0.06)]",
+                  "bg-[#f7f7f7]",
                   landingRadiusTokens.card,
                   landingSpaceTokens.cardPaddingResponsive
                 )}
@@ -113,7 +117,7 @@ export function CenterPage() {
 
               <article
                 className={cn(
-                  "border border-[#E4E8EE] bg-white shadow-[0_6px_20px_rgba(15,23,42,0.06)]",
+                  "bg-[#f7f7f7]",
                   landingRadiusTokens.card,
                   landingSpaceTokens.cardPaddingResponsive
                 )}
@@ -124,14 +128,26 @@ export function CenterPage() {
                 </p>
                 <p
                   className={cn(
-                    "mt-[var(--landing-space-chip-y)] inline-block w-fit bg-[#ECECEC] text-[#111827]",
+                    "mt-[var(--landing-space-chip-y)] inline-block w-fit bg-[#c5c5c5] text-[#111827]",
                     landingTypeTokens.noteText,
                     landingRadiusTokens.note,
-                    landingSpaceTokens.notePadding
+                    landingSpaceTokens.notePadding,
+                    "font-medium"
                   )}
                 >
                   {TEXT.closedNote}
                 </p>
+              </article>
+
+              <article
+                className={cn(
+                  "bg-[#f7f7f7]",
+                  landingRadiusTokens.card,
+                  landingSpaceTokens.cardPaddingResponsive
+                )}
+              >
+                <p className={cn(landingTypeTokens.stepDescription, "font-bold text-[#0C0C0C]")}>{TEXT.phoneConsult}</p>
+                <p className={cn("mt-[var(--landing-space-chip-y)]", landingTypeTokens.stepDescription)}>{TEXT.phoneNumber}</p>
               </article>
             </div>
           </div>
@@ -140,3 +156,5 @@ export function CenterPage() {
     </>
   )
 }
+
+
