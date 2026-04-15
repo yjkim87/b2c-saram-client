@@ -27,9 +27,4 @@ export const NAVIGATION: NavigationEntry[] = [
       { title: "오시는 길", href: "/about/location" },
     ],
   },
-  {
-    type: "link",
-    title: "양육 코칭 인사이트",
-    href: "/community/insights",
-  },
 ]

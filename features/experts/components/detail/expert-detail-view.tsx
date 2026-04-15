@@ -23,7 +23,7 @@ export function ExpertDetailView({ backHref, profileData }: ExpertDetailViewProp
           <span className="inline-flex rounded-full border border-slate-200 bg-white p-1.5 shadow-sm transition-all group-hover:bg-slate-50">
             <ArrowLeft className="h-5 w-5" />
           </span>
-          목록으로
+          {`\uBAA9\uB85D\uC73C\uB85C`}
         </Link>
 
         <HeaderSection data={profileData.header} />

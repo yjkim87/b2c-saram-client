@@ -41,7 +41,6 @@ function InfoRow({ label, value, icon: Icon }: InfoRowProps) {
 export function ReservationComplete({ flow }: ReservationCompleteProps) {
   const {
     ageGroup,
-    selectedConcern,
     userInfo,
     attendance,
     selectedSchedules,
@@ -143,7 +142,6 @@ export function ReservationComplete({ flow }: ReservationCompleteProps) {
                   value={`${ageGroup ? getAgeGroupLabel(ageGroup) : "-"} / ${userInfo.gender || "-"}`}
                 />
                 <InfoRow label="관계" value={userInfo.relationship || "-"} />
-                <InfoRow label="주요 고민" value={selectedConcern || "-"} />
                 <InfoRow label="참석 인원" value={attendanceLabel} />
               </div>
 

@@ -1,7 +1,7 @@
 ﻿"use client"
 
 import { useEffect, useRef, useState } from "react"
-import type { AgeGroup, Attendance, SelectedConcernItem, SelectedSchedule, UserInfo } from "../model/reservation.types"
+import type { AgeGroup, Attendance, SelectedSchedule, UserInfo } from "../model/reservation.types"
 import {
   calculateAgeGroupFromBirthdate,
   extractDigits,
@@ -45,8 +45,6 @@ export function useReservationFlow() {
   const [birthdateInput, setBirthdateInput] = useState("")
   const [birthdateError, setBirthdateError] = useState<string | null>(null)
   const [ageGroup, setAgeGroup] = useState<AgeGroup | null>(null)
-  const [selectedConcerns, setSelectedConcerns] = useState<SelectedConcernItem[]>([])
-  const [concernLimitMessage, setConcernLimitMessage] = useState<string | null>(null)
   const [attendance, setAttendance] = useState<Attendance | null>(null)
   const [showNudge, setShowNudge] = useState(false)
   const [selectedSchedules, setSelectedSchedules] = useState<SelectedSchedule[]>([])
@@ -58,7 +56,7 @@ export function useReservationFlow() {
   useEffect(() => {
     const isMobile = window.innerWidth < 1024
 
-    if (isMobile || step === 1 || step === 2 || step === 4 || !showContent) {
+    if (isMobile || step === 1 || step === 2 || step === 3 || !showContent) {
       return
     }
 
@@ -141,8 +139,6 @@ export function useReservationFlow() {
     setBirthdateInput("")
     setBirthdateError(null)
     setAgeGroup(null)
-    setSelectedConcerns([])
-    setConcernLimitMessage(null)
     setAttendance(null)
     setShowNudge(false)
     setSelectedSchedules([])
@@ -150,22 +146,6 @@ export function useReservationFlow() {
     setPrivacyConsent(false)
     setShowPrivacyModal(false)
     setIsComplete(false)
-  }
-
-  const toggleConcernSelection = (id: string) => {
-    setSelectedConcerns((prev) => {
-      const exists = prev.some((item) => item.id === id)
-
-      if (exists) {
-        setConcernLimitMessage(null)
-        return prev
-          .filter((item) => item.id !== id)
-          .map((item, index) => ({ ...item, order: index + 1 }))
-      }
-
-      setConcernLimitMessage(null)
-      return [...prev, { id, order: prev.length + 1 }]
-    })
   }
 
   const handleAttendanceSelect = (value: Attendance) => {
@@ -215,8 +195,6 @@ export function useReservationFlow() {
     userInfo.birthdate === birthdateInput &&
     userInfo.gender
 
-  const selectedConcern = selectedConcerns.length > 0 ? selectedConcerns.map((item) => item.id).join(" / ") : null
-
   return {
     step,
     stepHistory,
@@ -227,9 +205,6 @@ export function useReservationFlow() {
     birthdateInput,
     birthdateError,
     ageGroup,
-    selectedConcerns,
-    concernLimitMessage,
-    selectedConcern,
     attendance,
     showNudge,
     selectedSchedules,
@@ -246,7 +221,6 @@ export function useReservationFlow() {
     resetAll,
     handleBirthdateChange,
     handleBirthdateBlur,
-    toggleConcernSelection,
     handleAttendanceSelect,
     handleNudgeResponse,
     handleScheduleSelect,

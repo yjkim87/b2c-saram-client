@@ -22,7 +22,7 @@ import { FieldLabel } from "@/shared/ui/field-label"
 import { cn } from "@/shared/lib/utils"
 import { Footer } from "@/shared/layout/footer"
 import type { UseReservationFlowReturn } from "../../hooks/use-reservation-flow"
-import { concernData, genders, relationships } from "../../data/reservation.constants"
+import { genders, relationships } from "../../data/reservation.constants"
 import {
   QUICK_TOPICS,
   QUICK_TOPIC_ORDER,
@@ -32,7 +32,7 @@ import {
   type QuickTopicItem,
 } from "../../data/quick-topics"
 import type { Gender, Relationship } from "../../model/reservation.types"
-import { BotMessage, CalendarPicker, ConcernCard, UserMessage } from "../shared/reservation-primitives"
+import { BotMessage, CalendarPicker, UserMessage } from "../shared/reservation-primitives"
 import { Step1Service } from "./step1-service"
 import { Step2Expert } from "./step2-expert"
 import { Step3Schedule } from "./step3-schedule"
@@ -146,9 +146,6 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
     birthdateInput,
     birthdateError,
     ageGroup,
-    selectedConcerns,
-    concernLimitMessage,
-    selectedConcern,
     attendance,
     showNudge,
     selectedSchedules,
@@ -163,7 +160,6 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
     resetAll,
     handleBirthdateChange,
     handleBirthdateBlur,
-    toggleConcernSelection,
     handleAttendanceSelect,
     handleNudgeResponse,
     handleScheduleSelect,
@@ -184,13 +180,11 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
   const step2StartRef = useRef<HTMLDivElement>(null)
   const step3StartRef = useRef<HTMLDivElement>(null)
   const step4StartRef = useRef<HTMLDivElement>(null)
-  const step5StartRef = useRef<HTMLDivElement>(null)
   const step1LatestUserBubbleRef = useRef<HTMLDivElement>(null)
   const step1LatestBotBubbleRef = useRef<HTMLDivElement>(null)
   const step1AnswerRef = useRef<HTMLDivElement>(null)
   const step2AnswerRef = useRef<HTMLDivElement>(null)
   const step3AnswerRef = useRef<HTMLDivElement>(null)
-  const step4AnswerRef = useRef<HTMLDivElement>(null)
   const [showExitModal, setShowExitModal] = useState(false)
   const [quickTopicHistory, setQuickTopicHistory] = useState<QuickTopicChatEntry[]>([])
   const [activeQuickTopicId, setActiveQuickTopicId] = useState<QuickTopicId | null>(null)
@@ -263,14 +257,12 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
   }
 
   const isBothSelected = attendance === "both"
-  const concernAgeGroup = ageGroup === "adult" ? "high" : ageGroup
-  const totalConcernCount = concernAgeGroup ? concernData[concernAgeGroup].cards.length : 5
   const hasNameAnswer = isValidName(userInfo.name)
   const hasRelationshipAnswer = Boolean(userInfo.relationship)
   const hasBirthdateAnswer =
     userInfo.birthdate.length === 10 && birthdateError === null && userInfo.birthdate === birthdateInput
   const hasGenderAnswer = Boolean(userInfo.gender)
-  const stepLabels = ["정보입력", "고민선택", "참석자", "일정", "연락처"]
+  const stepLabels = ["정보입력", "참석자", "일정", "연락처"]
   const totalSteps = stepLabels.length
   const currentStep = Math.min(step, totalSteps)
   const currentStepLabel = stepLabels[currentStep - 1] ?? stepLabels[0]
@@ -477,9 +469,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
           ? step3StartRef
           : step === 4
             ? step4StartRef
-            : step === 5
-              ? step5StartRef
-              : null
+            : null
 
     const isMobileView = window.innerWidth < 1024
     const mobileAnswerTargetRef =
@@ -489,9 +479,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
           ? step2AnswerRef
           : step === 4
             ? step3AnswerRef
-            : step === 5
-              ? step4AnswerRef
-              : null
+            : null
     const target = isMobileView ? (mobileAnswerTargetRef?.current ?? stepStartTargetRef?.current) : stepStartTargetRef?.current
 
     if (!target) {
@@ -1256,7 +1244,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                                       <Button
                                         onClick={goToNextStep}
                                         disabled={!isStep1Valid}
-                                        className="mt-5 h-[50px] w-full bg-[#4A83D8] text-[18px] font-semibold text-white hover:bg-[#3F73C2] disabled:bg-[#4A83D8] disabled:text-white"
+                                        className="mt-5 h-[50px] w-full bg-[#333333] text-[18px] font-semibold text-white hover:bg-[#333333] disabled:bg-[#333333] disabled:text-white"
                                       >
                                         {"다음으로"}
                                       </Button>
@@ -1305,76 +1293,18 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
             )}
           </Step1Service>
 
-          {/* Step 2: Expert */}
+          {/* Step 2: Attendance */}
           <Step2Expert flow={flow}>
-            {step >= 2 && concernAgeGroup && (
+            {step >= 2 && (
             <>
               <div ref={step2StartRef} />
               {isTyping && step === 2 ? (
                 <BotMessage content="" isTyping />
               ) : (
                 <>
-                  <BotMessage content={"현재 가장 고민되는 부분은 무엇인가요?"} />
-
-                  {showContent && step === 2 && (
-                    <div className="space-y-4 animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
-                      <div className={cn(WIDE_INTERACTIVE_PANEL_CLASS, "space-y-4 p-4")}>
-                        {/* Slogan Card */}
-                        <div className="rounded-xl border border-[#DFDFDF] bg-[#FAF8F4] p-4">
-                          <p className="text-center text-sm font-medium leading-relaxed text-[#2F2A23]">
-                            {concernData[concernAgeGroup].slogan}
-                          </p>
-                          <p className="mt-2 text-center text-xs text-[#6B6256]">{concernData[concernAgeGroup].intro}</p>
-                        </div>
-
-                        {/* Concern Cards */}
-                        <div className="space-y-3">
-                          {concernData[concernAgeGroup].cards.map((card) => (
-                            <ConcernCard
-                              key={card.title}
-                              card={card}
-                              isSelected={selectedConcerns.some((item) => item.id === card.title)}
-                              selectionOrder={selectedConcerns.find((item) => item.id === card.title)?.order}
-                              onSelect={() => toggleConcernSelection(card.title)}
-                            />
-                          ))}
-                        </div>
-
-                        {concernLimitMessage && <p className="text-sm text-destructive">{concernLimitMessage}</p>}
-                        <p className="text-sm text-[#5D5549]">{"선택된 고민:"} {selectedConcerns.length}/{totalConcernCount}</p>
-                      </div>
-
-                      <Button
-                        onClick={goToNextStep}
-                        disabled={selectedConcerns.length === 0}
-                        className="mt-5 h-[50px] w-full bg-[#4A83D8] text-[18px] font-semibold text-white hover:bg-[#3F73C2] disabled:bg-[#4A83D8] disabled:text-white"
-                      >
-                        {"다음으로"}
-                      </Button>
-                    </div>
-                  )}
-                </>
-              )}
-
-              {step > 2 && selectedConcern && (
-                <div ref={step2AnswerRef}>
-                  <UserMessage content={selectedConcern} />
-                </div>
-              )}
-            </>
-            )}
-
-            {/* Step 3: Attendance */}
-            {step >= 3 && (
-            <>
-              <div ref={step3StartRef} />
-              {isTyping && step === 3 ? (
-                <BotMessage content="" isTyping />
-              ) : (
-                <>
                   <BotMessage content={"이번 코칭/상담에는 누가 참석하시나요?"} />
 
-                  {showContent && step === 3 && !showNudge && attendance !== "both" && (
+                  {showContent && step === 2 && !showNudge && attendance !== "both" && (
                     <div className="space-y-3 animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
                       <div className={cn(WIDE_INTERACTIVE_PANEL_CLASS, "space-y-3 p-3")}>
                         <AttendanceOptionButton isSelected={isBothSelected} onClick={() => handleAttendanceSelect("both")}>
@@ -1413,11 +1343,11 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                               </div>
                             }
                           />
-                          <div className="flex gap-3 animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
-                            <Button onClick={() => handleNudgeResponse(true)} className="flex-1">
+                          <div className="mt-5 flex gap-3 animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
+                            <Button onClick={() => handleNudgeResponse(true)} className="h-[50px] flex-1 text-[18px] font-semibold">
                               {"네, 함께 참석할게요"}
                             </Button>
-                            <Button variant="outline" onClick={() => handleNudgeResponse(false)} className="flex-1">
+                            <Button variant="outline" onClick={() => handleNudgeResponse(false)} className="h-[50px] flex-1 text-[18px] font-semibold">
                               {"이번에는 홀로 참석할게요"}
                             </Button>
                           </div>
@@ -1430,8 +1360,8 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                 </>
               )}
 
-              {step > 3 && attendance && (
-                <div ref={step3AnswerRef}>
+              {step > 2 && attendance && (
+                <div ref={step2AnswerRef}>
                   <UserMessage
                     content={
                       attendance === "both" ? "부모와 자녀 모두 참석" : attendance === "child" ? "자녀만 참석" : "부모만 참석"
@@ -1445,10 +1375,10 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
 
           {/* Step 3: Schedule */}
           <Step3Schedule flow={flow}>
-            {step >= 4 && (
+            {step >= 3 && (
             <>
-              <div ref={step4StartRef} />
-              {isTyping && step === 4 ? (
+              <div ref={step3StartRef} />
+              {isTyping && step === 3 ? (
                 <BotMessage content="" isTyping />
               ) : (
                 <>
@@ -1465,7 +1395,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                     }
                   />
 
-                  {showContent && step === 4 && (
+                  {showContent && step === 3 && (
                     <div className="space-y-4 animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
                       <CalendarPicker selectedDates={selectedSchedules} onDateSelect={handleScheduleSelect} />
 
@@ -1495,7 +1425,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                       <Button
                         onClick={goToNextStep}
                         disabled={selectedSchedules.length < 2}
-                        className="mt-5 h-[50px] w-full bg-[#4A83D8] text-[18px] font-semibold text-white hover:bg-[#3F73C2] disabled:bg-[#4A83D8] disabled:text-white"
+                        className="mt-5 h-[50px] w-full bg-[#333333] text-[18px] font-semibold text-white hover:bg-[#333333] disabled:bg-[#333333] disabled:text-white"
                       >
                         {"다음으로"} {selectedSchedules.length < 2 && `(${2 - selectedSchedules.length}개 더 선택)`}
                       </Button>
@@ -1504,25 +1434,25 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                 </>
               )}
 
-              {step > 4 && selectedSchedules.length > 0 && (
-                <div ref={step4AnswerRef}>
+              {step > 3 && selectedSchedules.length > 0 && (
+                <div ref={step3AnswerRef}>
                   <UserMessage content={`희망 일정: ${selectedSchedules.map((s) => formatScheduleDisplay(s)).join(", ")}`} />
                 </div>
               )}
             </>
             )}
 
-            {/* Step 5: Phone Number */}
-            {step >= 5 && (
+            {/* Step 4: Phone Number */}
+            {step >= 4 && (
             <>
-              <div ref={step5StartRef} />
-              {isTyping && step === 5 ? (
+              <div ref={step4StartRef} />
+              {isTyping && step === 4 ? (
                 <BotMessage content="" isTyping />
               ) : (
                 <>
                   <BotMessage content={"거의 완료되었습니다. 예약자분의 연락처를 남겨주시면 센터에서 일정 확인 후 카카오 알림톡으로 최종 확정 안내를 보내드립니다."} />
 
-                  {showContent && step === 5 && (
+                  {showContent && step === 4 && (
                     <div className="bg-card rounded-2xl p-5 shadow-sm border border-border animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
                       <div className="space-y-4">
                         <div>
@@ -1661,7 +1591,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                 className="h-11 cursor-pointer rounded-xl border-[#D4CBB9] bg-white text-[#3D372F] hover:bg-white hover:text-[#3D372F]"
               >
                 {"계속 진행"}              </Button>
-              <Button type="button" onClick={handleExit} className="h-11 cursor-pointer rounded-xl bg-[#0B6980] text-white hover:bg-[#0B6980] hover:text-white">
+              <Button type="button" onClick={handleExit} className="h-11 cursor-pointer rounded-xl bg-[#333333] text-white hover:bg-[#333333] hover:text-white">
                 {"나가기"}              </Button>
             </div>
           </div>

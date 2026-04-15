@@ -180,7 +180,7 @@ export function CalendarPicker({
   }
 
   return (
-    <div className="overflow-hidden rounded-[24px] border border-[#D6D9F3] bg-[#FBF7F1]">
+    <div className="overflow-hidden rounded-[24px] border border-[#FBF7F1] bg-[#FBF7F1]">
       <div className="grid lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]">
         <div className="relative p-4 md:p-6 lg:border-r lg:border-[#E7DCCB]">
           <div className="mb-3">
@@ -280,10 +280,10 @@ export function CalendarPicker({
                   disabled={isDisabled}
                   onClick={() => setSelectedTime(time)}
                   className={cn(
-                    "flex items-center justify-center gap-2 rounded-xl border px-3 py-3 text-[17px] font-semibold transition-all",
-                    isDisabled && "cursor-not-allowed border-[#E4DACA] bg-[#F4EEE6] text-[#B7AB97]",
-                    selectedDateKey && selectedTime === time && !isAlreadySelected && "border-[#F08B49] bg-[#F08B49] text-white shadow-md shadow-[#F08B49]/20",
-                    selectedDateKey && selectedTime !== time && !isAlreadySelected && "border-[#DCCEBB] bg-white text-[#3F372D] hover:border-[#F0A870] hover:text-[#A85F21]",
+                    "flex items-center justify-center gap-2 rounded-xl px-3 py-3 text-[17px] font-semibold transition-all",
+                    isDisabled && "cursor-not-allowed bg-[#F4EEE6] text-[#B7AB97]",
+                    selectedDateKey && selectedTime === time && !isAlreadySelected && "bg-[#F08B49] text-white shadow-md shadow-[#F08B49]/20",
+                    selectedDateKey && selectedTime !== time && !isAlreadySelected && "bg-white text-[#3F372D] hover:bg-[#FFE2BD] hover:text-[#A54C00]",
                   )}
                 >
                   <Clock className="h-4 w-4" />

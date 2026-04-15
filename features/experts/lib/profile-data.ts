@@ -13,16 +13,16 @@ export function createExpertProfileData(expert: ExpertProfile): ExpertProfileDat
       specialty: detail.specialtyLine,
       name: expert.name,
       tags: expert.tags.map((tag) => `#${tag}`),
-      totalSessionsLabel: "누적 코칭 세션",
+      totalSessionsLabel: "현장 경험",
       totalSessionsValue: detail.totalSessions,
     },
     philosophy: {
-      title: "코칭 철학",
+      title: "성장 코칭 철학",
       highlights: detail.philosophyHighlights,
       description: detail.philosophyDescription,
     },
     bio: {
-      title: "코치 소개",
+      title: "전문가 소개",
       description: detail.bioDescription,
     },
     infoCards: [

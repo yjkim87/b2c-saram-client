@@ -226,7 +226,7 @@ function ExpertsSectionFull() {
               id="expert-search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="예) 김지윤 코치, 진로 코칭"
+              placeholder="예) 김명준 박사, 아동 발달"
               className="h-11 border-slate-300 bg-white pl-9 text-slate-700 placeholder:text-slate-400"
             />
           </div>
@@ -253,7 +253,6 @@ function ExpertsSectionFull() {
 
                   <div className="min-w-0">
                     <h2 className="truncate text-[15px] font-bold text-slate-900 md:text-base">{expert.name}</h2>
-                    <p className="text-xs text-slate-500">{expert.specialty}</p>
                   </div>
                 </div>
 

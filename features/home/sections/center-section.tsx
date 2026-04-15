@@ -203,7 +203,8 @@ export function CenterSection() {
 
         <div className="mt-12">
           <Link
-            href="/quick-coaching-guide"
+            href="/reservation"
+            data-home-center-reservation-cta
             className={cn(
               "inline-flex min-w-[280px] items-center justify-center bg-[#25170F] text-white shadow-[0_14px_30px_rgba(37,23,15,0.24)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#1B110B]",
               landingRadiusTokens.pill,
@@ -211,7 +212,7 @@ export function CenterSection() {
               landingTypeTokens.buttonLg
             )}
           >
-            학년 맞춤으로 알아보기
+            무료 상담 예약 →
           </Link>
         </div>
       </div>

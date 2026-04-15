@@ -326,6 +326,7 @@ export function CounselingCoachingCards({
                     const quickGuideHref = useAgePresetQuickGuide
                       ? `/quick_coaching_guide?gradeLevel=${encodeURIComponent(item.quickGuideGradeLevel)}&type=${typeParam}`
                       : `/quick_coaching_guide?type=${typeParam}`
+                    const shouldShowCustomConsultButton = card.key !== "counseling"
 
                     return (
                       <div
@@ -392,7 +393,7 @@ export function CounselingCoachingCards({
 
                             <div
                               className={cn(
-                                buttonWidth === "full"
+                                buttonWidth === "full" && shouldShowCustomConsultButton
                                   ? "grid grid-cols-1 gap-2.5 md:grid-cols-2"
                                   : "flex flex-col space-y-2.5 items-center"
                               )}
@@ -406,15 +407,17 @@ export function CounselingCoachingCards({
                               >
                                 빠른상담 예약하기
                               </Link>
-                              <Link
-                                href={quickGuideHref}
-                                className={cn(
-                                  "inline-flex h-12 w-full items-center justify-center rounded-full bg-[#090909] px-3 text-[14px] font-semibold text-white transition-opacity hover:opacity-90",
-                                  buttonWidth === "full" ? "" : "mx-auto max-w-[280px]"
-                                )}
-                              >
-                                맞춤상담 예약하기
-                              </Link>
+                              {shouldShowCustomConsultButton ? (
+                                <Link
+                                  href={quickGuideHref}
+                                  className={cn(
+                                    "inline-flex h-12 w-full items-center justify-center rounded-full bg-[#090909] px-3 text-[14px] font-semibold text-white transition-opacity hover:opacity-90",
+                                    buttonWidth === "full" ? "" : "mx-auto max-w-[280px]"
+                                  )}
+                                >
+                                  맞춤상담 예약하기
+                                </Link>
+                              ) : null}
                             </div>
                           </div>
                         </AnimatedCollapse>

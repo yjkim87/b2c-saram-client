@@ -9,6 +9,7 @@ import { cn } from "@/shared/lib/utils"
 
 type CTAEmphasis = "high" | "normal"
 const DIRECTION_SHEET_OPEN_ATTR = "data-direction-sheet-open"
+const HOME_CENTER_RESERVATION_CTA_SELECTOR = "[data-home-center-reservation-cta]"
 
 interface MobileCTAConfig {
   label: string
@@ -91,6 +92,7 @@ export function MobileFloatingReservationCTA() {
   const [scrollProgress, setScrollProgress] = useState(0)
   const [isBlockedByDirectionSheet, setIsBlockedByDirectionSheet] = useState(false)
   const [isCTASectionInView, setIsCTASectionInView] = useState(false)
+  const [isCenterSectionCTAInView, setIsCenterSectionCTAInView] = useState(false)
 
   useEffect(() => {
     setScrollProgress(0)
@@ -121,6 +123,62 @@ export function MobileFloatingReservationCTA() {
           setIsCTASectionInView(entry.isIntersecting)
         },
         { threshold: 0.12 }
+      )
+
+      intersectionObserver.observe(target)
+      return true
+    }
+
+    if (!connectObserver()) {
+      mutationObserver = new MutationObserver(() => {
+        if (connectObserver() && mutationObserver) {
+          mutationObserver.disconnect()
+          mutationObserver = null
+        }
+      })
+
+      mutationObserver.observe(document.body, {
+        childList: true,
+        subtree: true,
+      })
+    }
+
+    return () => {
+      if (intersectionObserver) {
+        intersectionObserver.disconnect()
+      }
+
+      if (mutationObserver) {
+        mutationObserver.disconnect()
+      }
+    }
+  }, [pathname])
+
+  useEffect(() => {
+    setIsCenterSectionCTAInView(false)
+
+    if (pathname !== "/") {
+      return
+    }
+
+    let intersectionObserver: IntersectionObserver | null = null
+    let mutationObserver: MutationObserver | null = null
+
+    const connectObserver = () => {
+      if (intersectionObserver) {
+        return true
+      }
+
+      const target = document.querySelector(HOME_CENTER_RESERVATION_CTA_SELECTOR)
+      if (!target) {
+        return false
+      }
+
+      intersectionObserver = new IntersectionObserver(
+        ([entry]) => {
+          setIsCenterSectionCTAInView(entry.isIntersecting)
+        },
+        { threshold: 0.65 }
       )
 
       intersectionObserver.observe(target)
@@ -208,13 +266,13 @@ export function MobileFloatingReservationCTA() {
     return null
   }
 
-  const isVisible = scrollProgress >= config.threshold && !isCTASectionInView
+  const isVisible = scrollProgress >= config.threshold && !isCTASectionInView && !isCenterSectionCTAInView
 
   return (
     <div
       className={cn(
         "pointer-events-none fixed inset-x-0 bottom-3 z-[110] flex justify-center px-4 md:hidden",
-        "transition-transform duration-300 ease-out motion-reduce:transition-none",
+        "transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
         isVisible ? "translate-y-0" : "translate-y-[140%]"
       )}
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}

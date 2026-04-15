@@ -1,4 +1,4 @@
-﻿export interface ExpertProfile {
+export interface ExpertProfile {
   id: string
   name: string
   specialty: string
@@ -45,275 +45,332 @@ export interface LandingExpertItem {
   themeBg: string
 }
 
+// TODO: 어드민 연동 전까지 사용하는 임시 정적 데이터입니다.
 export const experts: ExpertProfile[] = [
   {
     id: "1",
-    name: "김지윤 코치",
-    specialty: "진로 코칭",
-    shortIntro: "학생의 진로 방향 탐색과 실행 가능한 성장 계획 수립을 돕습니다.",
-    experienceSummary: "청소년 진로 코칭 14년, 누적 3,000회 이상 세션 진행.",
-    philosophy:
-      "아이의 숨겨진 가능성을 함께 발견하는 여정, 그것이 진정한 진로 교육입니다.",
-    tags: ["진로탐색", "적성발견", "미래설계", "잠재력개발"],
+    name: "김명준 박사",
+    specialty: "진로·성장 코칭",
+    shortIntro: "정밀한 심리 진단과 글로벌 수준의 코칭으로 무한한 가능성을 엽니다.",
+    experienceSummary:
+      "한국코칭심리학회 코칭심리사 1급, TMBC 공식 파트너, MMTIC 검사리포트 개발 사업총괄",
+    philosophy: "아이의 고유한 결을 읽는 정밀함과 부모를 위한 근거 있는 가이드가 핵심입니다.",
+    tags: ["진로탐색", "적성발견", "부모가이드", "심리진단"],
   },
   {
     id: "2",
-    name: "이수민 코치",
-    specialty: "학습 코칭",
-    shortIntro: "학생의 진로 방향 탐색과 실행 가능한 성장 계획 수립을 돕습니다.",
-    experienceSummary: "학습 코칭 12년, 누적 2,890회 이상 세션 진행.",
-    philosophy:
-      "공부는 강요가 아닌 내면의 동기에서 시작됩니다. 그 불씨를 찾아드립니다.",
-    tags: ["자기주도학습", "학습동기", "메타인지", "공부습관"],
+    name: "김영재 박사",
+    specialty: "AI 기반 심리성장 코칭",
+    shortIntro:
+      "글로벌 MBTI 파트너십과 AI 시스템이 그리는, 우리 아이를 위한 과학적이고 균일한 성장 지도.",
+    experienceSummary: "MBTI 글로벌 파트너십 구축 및 심리학 기반 AI 시스템 도입·설계",
+    philosophy: "가장 과학적이면서도 인간적인 품질 관리로 신뢰 가능한 성장 솔루션을 만듭니다.",
+    tags: ["AI진단", "MBTI", "성장설계", "데이터코칭"],
   },
   {
     id: "3",
-    name: "박준호 코치",
-    specialty: "부모 양육 코칭",
-    shortIntro: "학생의 진로 방향 탐색과 실행 가능한 성장 계획 수립을 돕습니다.",
-    experienceSummary: "부모 양육 코칭 10년, 누적 4,120회 이상 세션 진행.",
+    name: "최윤희 박사",
+    specialty: "아동·청소년 발달 코칭",
+    shortIntro:
+      "어린이용 성격 유형 검사 한국 표준화 전문가로서, 아이 고유의 성향에 맞춘 발달 중심의 따뜻한 성장 지도를 그립니다.",
+    experienceSummary:
+      "MMTIC2 한국 표준화 연구 주도, CATi 및 초·중·고 어세스타 스쿨 검사 개발",
     philosophy:
-      "완벽한 부모는 없습니다. 하지만 성장하는 부모는 있습니다.",
-    tags: ["부모코칭", "양육스트레스", "기질이해", "가족소통"],
+      "과학적으로 검증된 데이터를 바탕으로 양육·정서·진로·학습을 연결하는 통합 로드맵을 제시합니다.",
+    tags: ["아동발달", "성격유형", "양육가이드", "학습코칭"],
   },
   {
     id: "4",
-    name: "정다은 코치",
-    specialty: "입시 전략",
-    shortIntro: "학생 목표와 성향에 맞춘 현실적인 입시 전략을 설계합니다.",
-    experienceSummary: "입시 컨설팅 9년, 학생부 면접 지원 전략 코칭 집중.",
-    philosophy: "입시는 정보의 양보다 맞는 전략을 선택하는 과정입니다.",
-    tags: ["입시로드맵", "학생부", "면접코칭"],
+    name: "송미리",
+    specialty: "영유아·아동 발달 코칭",
+    shortIntro: "마음이 자라는 여정을 탐구하며, 부모와 아이가 함께 행복할 수 있는 길에 동행합니다.",
+    experienceSummary: "MMTIC2 한국 표준화 연구 참여, MBTI 유형 연구 공저, 발달 연구·교육·콘텐츠 개발",
+    philosophy:
+      "아이의 발달 단계와 타고난 성향, 행동 이면의 심리를 학술적 근거로 해석해 성장 변화를 돕습니다.",
+    tags: ["영유아발달", "정서발달", "사회성", "부모상담"],
   },
   {
     id: "5",
-    name: "최서연 코치",
-    specialty: "정서 동기 코칭",
-    shortIntro: "불안 번아웃 학습 동기 저하와 같은 정서 이슈를 함께 다룹니다.",
-    experienceSummary: "청소년 정서 코칭 8년, 학교 센터 연계 프로그램 운영.",
+    name: "채주경",
+    specialty: "발달·학교 상담 코칭",
+    shortIntro: "우리 아이 인지·사회성·정서 발달의 따뜻하고 단단한 뿌리를 지원합니다.",
+    experienceSummary: "학교 검사 연구/강의(SPQ·KLAT·GST), 임상심리사 1급, 청소년상담사 2급",
     philosophy:
-      "정서 안정이 확보되어야 꾸준한 실행과 장기 성장이 가능합니다.",
-    tags: ["정서안정", "회복탄력성", "마인드셋"],
+      "학교·상담 현장에서 검증된 검사 데이터를 바탕으로 부모와 아이의 지속 가능한 소통과 성장을 지원합니다.",
+    tags: ["인지발달", "사회성", "정서지원", "학교상담"],
   },
   {
     id: "6",
-    name: "오민재 코치",
-    specialty: "커리어 설계",
-    shortIntro: "청소년 대학생의 전공 선택 강점 직무 방향을 연결해 설계합니다.",
-    experienceSummary: "전공 탐색 및 커리어 전환 코칭 7년.",
+    name: "김지영",
+    specialty: "진로·역량 컨설팅",
+    shortIntro:
+      "객관적인 데이터와 따뜻한 통찰로, 숨겨진 역량이 조직의 성과와 삶의 행복으로 연결되는 길을 안내합니다.",
+    experienceSummary: "어세스타 부산센터 센터장, NCS 컨설팅·채용 컨설턴트, 10년+ 교육·상담 경력",
     philosophy:
-      "흥미와 강점을 실제 선택지로 매핑할 때 커리어 경로가 선명해집니다.",
-    tags: ["전공선택", "직무탐색", "커리어코칭"],
+      "객관적인 공정성, 잠재력의 발현, 통합적 성숙을 기반으로 개인과 조직의 동반 성장을 이끕니다.",
+    tags: ["역량진단", "진로설계", "조직적합성", "MBTI"],
   },
   {
     id: "7",
-    name: "한유진 코치",
-    specialty: "학부모 상담",
-    shortIntro: "가정 내 교육 의사결정을 체계적으로 할 수 있도록 지원합니다.",
-    experienceSummary: "학부모 중심 교육 컨설팅 및 코칭 12년.",
+    name: "김하영 원장",
+    specialty: "임상·가족관계 코칭",
+    shortIntro:
+      "20년 임상경험의 통찰력과 과학적인 심리 평가를 통해 아이와 부모님의 관계를 이해하고 소통방식을 제시합니다.",
+    experienceSummary: "정신건강임상심리사 1급, 20년 임상경험, 아동청소년·가족관계 상담",
     philosophy:
-      "부모의 방향성이 명확할수록 아이의 불안은 줄고 집중은 높아집니다.",
-    tags: ["양육코칭", "의사결정", "가정교육"],
-  },
-  {
-    id: "8",
-    name: "윤태호 코치",
-    specialty: "멘탈 퍼포먼스",
-    shortIntro: "중요 시기 집중력과 실행력을 높이기 위한 코칭을 제공합니다.",
-    experienceSummary: "퍼포먼스 코칭 6년, 목표 실행 트래킹 프로그램 운영.",
-    philosophy:
-      "성과는 순간적인 동기보다 반복 가능한 습관에서 만들어집니다.",
-    tags: ["집중력", "실행관리", "성과관리"],
+      "가족 고유의 관계성을 존중하고 연령·특성에 맞춘 소통 방식을 제시해 부모와 자녀의 건강한 성장을 돕습니다.",
+    tags: ["가족소통", "임상심리", "아동청소년", "정서지원"],
   },
 ]
 
 export const landingExperts = experts.slice(0, 3)
 
-export const EXPERT_FALLBACK_IMAGE =
-  "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=600"
+export const EXPERT_FALLBACK_IMAGE = "/placeholder-user.jpg"
 
 function createDefaultDetailContent(expert: ExpertProfile): ExpertDetailContent {
   return {
-    categoryBadge: "🌱 코칭 전문",
+    categoryBadge: "🌱 성장 코칭",
     specialtyLine: `${expert.specialty} 전문`,
-    totalSessions: "2,800+",
-    philosophyHighlights: [expert.philosophy, "작은 실행이 큰 변화를 만듭니다."],
+    totalSessions: "다년+",
+    philosophyHighlights: [expert.philosophy, "근거 기반의 따뜻한 코칭을 제공합니다."],
     philosophyDescription: expert.philosophy,
     bioDescription: expert.shortIntro,
-    education: ["교육학 관련 석사", "상담심리 심화과정 수료", "코칭 전문과정 이수"],
-    career: [expert.experienceSummary, "학교/기관 연계 프로그램 운영", "1:1 맞춤 코칭 진행"],
-    certifications: ["Assesta 공인 코칭 인증", "상담 관련 전문 자격", "코칭 전문 과정 수료"],
+    education: ["전문 교육 과정 이수"],
+    career: [expert.experienceSummary],
+    certifications: ["전문가 자격 검증 완료"],
   }
 }
 
 const expertMetaById: Record<string, ExpertMeta> = {
   "1": {
-    imageUrl:
-      "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=1200",
+    imageUrl: "/expert-profile-photos/Kim-mj.jpg",
     listBadge: "추천",
-    landingCredentials: "청소년 진로상담 1급",
+    landingCredentials: "코칭심리사 1급",
     landingThemeColor: "text-blue-600",
     landingThemeBg: "bg-blue-50",
+    landingDescription: "정밀 심리 진단과 근거 기반 코칭으로 자녀의 가능성을 열어드립니다.",
     detail: {
-      categoryBadge: "🧭 진로 코칭",
-      specialtyLine: "진로 탐색 설계 전문",
-      totalSessions: "3,240+",
-      philosophyHighlights: [
-        "아이의 숨겨진 가능성을 함께 발견하는 여정,",
-        "그것이 진정한 진로 교육입니다.",
-      ],
+      categoryBadge: "🧭 진로·성장 코칭",
+      specialtyLine: "정밀 심리 진단 기반 진로·성장 코칭",
+      totalSessions: "다년+",
+      philosophyHighlights: ["아이의 고유한 결을 읽는 정밀함", "부모를 위한 근거 있는 가이드"],
       philosophyDescription:
-        "진로 교육의 핵심은 '발견'입니다. 아이들은 이미 자신 안에 답을 가지고 있습니다. 저는 그 답을 찾아가는 과정에서 안전한 탐색 환경을 제공하고, 다양한 가능성의 문을 열어주는 길잡이가 되고자 합니다. 성적이나 외부의 기대가 아닌, 아이 내면의 불꽃을 발견하는 것. 그것이 평생을 관통하는 진정한 진로 교육입니다.",
+        "자녀의 기질과 강점은 정밀 진단 도구를 통해 정확하게 이해되어야 합니다. 과학적 데이터에 근거해 영아부터 고등학생까지 발달 과업을 해석하고, 부모에게 아이의 눈높이에 맞는 지속 가능한 소통·성장 가이드를 제시합니다.",
       bioDescription:
-        "15년간 1,200명 이상의 청소년 진로 코칭을 수행하며, 각 아이의 고유한 강점과 관심사를 기반으로 맞춤형 진로 로드맵을 설계해왔습니다. '정답'을 알려주는 것이 아니라, 아이 스스로 자신의 길을 찾아갈 수 있도록 돕는 것이 저의 역할입니다.",
-      education: ["서울대학교 교육학 박사", "연세대학교 심리학 석사", "이화여자대학교 상담심리학 학사"],
-      career: ["現 사발면 수석 진로 코치", "前 서울시 교육청 진로진학 자문위원", "前 한국진로교육학회 이사", "EBS 진로 멘토링 프로그램 자문"],
-      certifications: ["Assesta 공인 모델 인증 코치", "국가공인 청소년상담사 1급", "한국코치협회 KPC 인증", "MBTI 국제공인강사"],
+        "국내에 심리 측정과 진단 개념이 자리 잡기 시작한 초기부터 객관적인 이해 도구를 연구해 왔습니다. 해외 연구 기관 경험과 국내 주요 검사 표준화 프로젝트를 바탕으로 부모와 아이가 함께 행복한 미래를 설계할 수 있도록 돕고 있습니다.",
+      education: ["University of Illinois at Urbana-Champaign PostDoc (산업 및 조직심리 전공)"],
+      career: [
+        "TMBC(The Myers-Briggs Company) 공식 파트너",
+        "STRONG, Firo-B, CPI 검사 및 교육 개발",
+        "MMTIC 기반 자녀의 발견 검사리포트 개발 사업총괄",
+      ],
+      certifications: [
+        "한국코칭심리학회 코칭심리사 1급",
+        "CPP 미국 MBTI 전문교육과정 수료",
+        "『한국인 대표 표본의 MBTI 유형 분포 연구(2012-2020)』 공저(2021)",
+      ],
     },
   },
   "2": {
-    imageUrl:
-      "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=1200",
+    imageUrl: "/expert-profile-photos/Kim-yj.jpg",
     listBadge: "추천",
-    landingCredentials: "학습코칭 전문가 1급",
-    landingThemeColor: "text-amber-600",
+    landingCredentials: "심리학 박사",
+    landingThemeColor: "text-amber-700",
     landingThemeBg: "bg-amber-50",
+    landingDescription: "글로벌 MBTI 파트너십과 AI 시스템으로 신뢰 가능한 성장 지도를 설계합니다.",
     detail: {
-      categoryBadge: "💡 학습 코칭",
-      specialtyLine: "자기주도 학습 시스템 설계 전문",
-      totalSessions: "2,890+",
+      categoryBadge: "🤖 AI 심리 코칭",
+      specialtyLine: "심리학 기반 AI 시스템 설계 및 성장 코칭",
+      totalSessions: "다년+",
       philosophyHighlights: [
-        "공부는 강요가 아닌 내면의 동기에서 시작됩니다.",
-        "그 불씨를 찾아드립니다.",
+        "글로벌 MBTI 파트너십과 AI 시스템이 그리는",
+        "우리 아이를 위한 과학적이고 균일한 성장 지도",
       ],
       philosophyDescription:
-        "학습의 출발점은 '나는 할 수 있다'는 믿음입니다. 많은 아이들이 실패 경험으로 인해 학습 무기력에 빠져있습니다. 저는 작은 성공 경험을 쌓아가며 아이 스스로 자신의 학습 방식을 설계할 수 있도록 돕습니다. 메타인지를 깨우고, 자기 주도적으로 목표를 세우고 실행하는 힘. 이것이 평생 학습자로 성장하는 기반입니다.",
+        "어떤 전문가를 만나더라도 차별 없이 최선의 성장을 경험하도록 신뢰 기반의 시스템을 구축합니다. 고도화된 AI 기술로 정밀도를 높이면서도, 데이터가 담지 못하는 아이의 마음은 전문가 통찰로 보완해 과학성과 인간성을 함께 지켜냅니다.",
       bioDescription:
-        "12년간 다양한 학습 유형의 아이들을 만나며, '왜 공부해야 하는지' 모르는 아이들이 스스로 책상 앞에 앉게 되는 변화를 이끌어왔습니다. 단순한 학습 기술이 아닌, 배움 자체에 대한 호기심과 자신감을 심어주는 것이 저의 목표입니다.",
-      education: ["고려대학교 교육심리학 박사수료", "서강대학교 인지과학 석사", "중앙대학교 심리학 학사"],
-      career: ["現 사발면 학습코칭 팀장", "前 강남 메가스터디 학습 컨설턴트", "前 한국학습코칭학회 연구위원", "SBS 교육 다큐멘터리 자문"],
-      certifications: ["Assesta 공인 모델 인증 코치", "학습컨설턴트 전문가 1급", "NLP 마스터 프랙티셔너", "한국코치협회 PCC 인증"],
+        "글로벌 심리 진단 기술 기업의 공식 파트너로 다양한 진단 도구와 교육 프로그램을 이끌어 왔습니다. 한국인 대표 표본 데이터 기반 연구를 통해 검사의 정밀도 향상에도 기여했으며, 축적된 분석 역량으로 부모의 성장 설계를 지원합니다.",
+      education: [
+        "University of Georgia 심리학 박사",
+        "KAIST 경영과학 석사",
+        "University of Illinois at Urbana-Champaign 심리학 학사",
+      ],
+      career: [
+        "심리학 기반 AI 시스템 설계",
+        "CSO(Chief Strategy Officer)",
+        "MBTI 글로벌 파트너십 구축 및 AI 시스템 도입",
+      ],
+      certifications: [
+        "글로벌 심리 진단 기술 기업 공식 파트너",
+        "한국인 대표 표본 데이터 기반 연구 공저",
+        "심리 지표 기반 성장 솔루션 설계",
+      ],
     },
   },
   "3": {
-    imageUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=1200",
+    imageUrl: "/expert-profile-photos/Choi-yh.jpg",
     listBadge: "추천",
-    landingCredentials: "가족상담전문가 1급",
-    landingThemeColor: "text-emerald-600",
+    landingCredentials: "아동·청소년 표준화 전문가",
+    landingThemeColor: "text-emerald-700",
     landingThemeBg: "bg-emerald-50",
+    landingDescription: "아동·청소년 성향을 과학적으로 읽어 발달 중심의 성장 지도를 제시합니다.",
     detail: {
-      categoryBadge: "🌱 부모 양육 코칭",
-      specialtyLine: "부모 양육 코칭 전문",
-      totalSessions: "4,120+",
-      philosophyHighlights: ["완벽한 부모는 없습니다.", "하지만 성장하는 부모는 있습니다."],
+      categoryBadge: "🧒 아동·청소년 발달",
+      specialtyLine: "성격유형 표준화 및 발달 통합 코칭",
+      totalSessions: "다년+",
+      philosophyHighlights: [
+        "아이 고유 성향에 맞춘 발달 중심의",
+        "따뜻하고 과학적인 성장 지도",
+      ],
       philosophyDescription:
-        "양육에는 정답이 없지만, 방향은 있습니다. 그 방향은 '아이의 기질을 이해하는 것'에서 시작됩니다. 부모와 아이의 기질적 차이를 인식하고, 그 차이를 갈등이 아닌 이해로 바꿀 때 진정한 소통이 시작됩니다. 저는 부모님들이 자녀의 고유한 특성을 발견하고, 그에 맞는 양육 방식을 찾아갈 수 있도록 돕는 동반자입니다.",
+        "직관이 아닌 검증된 스쿨 검사 데이터를 토대로 아이의 특성과 발달 맥락을 분석합니다. 양육·정서·진로·학습을 연결하는 통합 청사진을 통해 부모와 아이가 함께 성장의 방향을 명확히 볼 수 있도록 돕습니다.",
       bioDescription:
-        "10년간 2,000가정 이상의 부모-자녀 관계 개선을 도우며, 양육의 어려움 속에서 지쳐있는 부모님들이 다시 자신감을 되찾는 과정을 함께해왔습니다. 부모도 완벽할 필요가 없습니다. 아이와 함께 성장하는 것, 그것이 가장 아름다운 양육입니다.",
-      education: ["성균관대학교 아동가족학 박사", "숙명여자대학교 가족상담학 석사", "한양대학교 심리학 학사"],
-      career: ["現 사발면 부모코칭 총괄", "前 삼성생명 가족상담센터 책임연구원", "前 서울시 건강가정지원센터 자문위원", "MBC 육아 프로그램 전문가 패널"],
-      certifications: ["Assesta 공인 모델 인증 코치", "가족상담전문가 1급", "부모교육 전문강사", "한국상담학회 전문상담사"],
+        "미국 대학원 과정에서 실험심리학 기반을 다졌고, 이후 글로벌 MBTI 전문가 과정을 거치며 진단 전문성을 확장했습니다. MMTIC2 한국 표준화와 학교 검사 개발을 통해 아이 눈높이에 맞는 과학적 도구를 만들고 현장 적용 솔루션을 제시해 왔습니다.",
+      education: [
+        "University of Texas at Arlington 심리학 박사",
+        "Indiana State University 심리학 석사",
+        "덕성여자대학교 심리학 학사",
+      ],
+      career: [
+        "MBTI 적용교육 다수 과정 개발 및 교육",
+        "MMTIC2(Murphy-Meisgeier Type Indicator for Children) 한국 표준화 연구",
+        "CATi 어린이·청소년 성격유형 검사 II 개발",
+        "초·중·고 어세스타 스쿨 검사(ARQ, GST) 개발",
+      ],
+      certifications: [
+        "어린이용 성격 유형 검사 한국 표준화 전문가",
+        "발달·양육·정서·진로·학습 통합 분석 전문성",
+        "검사 기반 맞춤형 성장 로드맵 제공",
+      ],
     },
   },
   "4": {
-    imageUrl:
-      "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&q=80&w=1200",
-    landingCredentials: "진학지도사 1급",
-    landingThemeColor: "text-violet-600",
+    imageUrl: "/expert-profile-photos/Song-mr.jpg",
+    landingCredentials: "연세대 심리학 석사",
+    landingThemeColor: "text-violet-700",
     landingThemeBg: "bg-violet-50",
+    landingDescription: "아이의 발달 흐름을 학술적으로 해석해 부모와 함께 변화의 길을 만듭니다.",
     detail: {
-      categoryBadge: "🎯 입시 전략",
-      specialtyLine: "학생부/면접 기반 입시 전략 전문",
-      totalSessions: "3,540+",
-      philosophyHighlights: ["입시는 정보전이 아니라", "전략 설계의 과정입니다."],
+      categoryBadge: "🌱 영유아 발달 코칭",
+      specialtyLine: "영유아·아동 초기 발달 기반 심리 코칭",
+      totalSessions: "다년+",
+      philosophyHighlights: [
+        "마음이 자라는 여정을 탐구하며",
+        "부모와 아이가 함께 행복할 수 있는 길에 동행합니다",
+      ],
       philosophyDescription:
-        "학생의 목표와 성향, 현재 성취 수준을 함께 분석해 가장 현실적인 입시 경로를 만듭니다. 계획은 단순할수록 실행력이 높아집니다.",
+        "아이들은 공통 발달 과정을 따르면서도 각자 고유한 리듬으로 성장합니다. 발달 단계와 타고난 성향, 행동 이면의 심리를 학술적 근거로 해석해 부모가 자녀를 더 깊이 이해하고 긍정적 변화를 만들 수 있도록 돕습니다.",
       bioDescription:
-        "입시 컨설팅 9년 동안 학생별 강점에 맞춘 로드맵을 제시해 왔습니다. 학생부, 면접, 일정 관리를 한 흐름으로 통합해 불확실성을 줄이고 합격 가능성을 높입니다.",
-      education: ["교육행정학 석사", "진학지도 전문가 과정", "면접 코칭 실무 과정"],
-      career: ["입시 로드맵 컨설팅 2,100회+", "학생부/면접 집중 프로그램 운영", "고3 집중 코칭 캠프 총괄"],
-      certifications: ["Assesta 공인 모델 인증 코치", "진학지도사 1급", "면접지도 전문강사"],
+        "심리학 전공 이후 영아기와 아동 초기의 인지·정서·사회성 발달을 중심으로 연구해 왔습니다. 현재는 심리 평가 전문 기관에서 글로벌 진단 도구 관련 연구, 교육, 콘텐츠 개발, 강의를 수행하며 MMTIC2 한국 표준화 연구에도 참여했습니다.",
+      education: ["연세대학교 심리학 석사", "연세대학교 심리학 학사"],
+      career: [
+        "MMTIC2 한국 표준화 연구 참여",
+        "글로벌 진단 도구 관련 연구·교육·콘텐츠 개발",
+        "영아기·아동 초기 인지·정서·사회성 발달 연구",
+      ],
+      certifications: [
+        "『한국인 대표 표본의 MBTI 유형 분포 연구(2012-2020)』 공저(2021)",
+        "『MBTI 검사 결과 유형과 최적유형 비교 연구: 온라인 플랫폼을 중심으로』 공저(2023)",
+        "MMTIC2 표준화 기반 아동 성향 해석 전문성",
+      ],
     },
   },
   "5": {
-    imageUrl:
-      "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&q=80&w=1200",
-    landingCredentials: "청소년 상담사",
-    landingThemeColor: "text-rose-600",
-    landingThemeBg: "bg-rose-50",
+    imageUrl: "/expert-profile-photos/Chae-jk.jpg",
+    landingCredentials: "임상심리사 1급",
+    landingThemeColor: "text-cyan-700",
+    landingThemeBg: "bg-cyan-50",
+    landingDescription: "인지·사회성·정서 발달의 핵심 뿌리를 데이터 기반으로 단단하게 지원합니다.",
     detail: {
-      categoryBadge: "🫶 정서 코칭",
-      specialtyLine: "불안/번아웃 회복 코칭 전문",
-      totalSessions: "2,980+",
-      philosophyHighlights: ["정서가 안정되어야", "실행이 지속됩니다."],
+      categoryBadge: "🏫 발달·학교 상담",
+      specialtyLine: "학교 검사 데이터 기반 발달·상담 코칭",
+      totalSessions: "다년+",
+      philosophyHighlights: [
+        "아이 고유 발달 맥락에 대한 정교한 이해",
+        "학교 현장 검증 데이터를 부모 가이드로 연결",
+      ],
       philosophyDescription:
-        "학습과 진로 문제의 근저에는 정서적 소진이 있는 경우가 많습니다. 감정 조절과 회복 루틴을 통해 다시 행동할 힘을 만들도록 돕습니다.",
+        "학교 검사 개발 경험과 교사 워크숍 설계 전문성을 바탕으로 아이의 성향과 발달 상태를 과학적으로 진단합니다. 데이터를 현장에서 바로 활용할 수 있는 실질적 가이드로 전환해 부모와 아이의 지속 가능한 소통과 성장을 지원합니다.",
       bioDescription:
-        "청소년 정서 코칭 8년 동안 불안, 무기력, 번아웃 이슈를 다뤘습니다. 내담자의 리듬에 맞춘 회복 계획과 작은 성공 경험 설계를 통해 자기효능감을 회복하도록 지원합니다.",
-      education: ["상담심리학 석사", "정서조절 코칭 과정", "청소년 정신건강 지원 과정"],
-      career: ["정서 회복 코칭 1,900회+", "학교 연계 회복탄력성 프로그램 운영", "학부모 정서지원 워크숍 진행"],
-      certifications: ["Assesta 공인 모델 인증 코치", "청소년 상담사 자격", "회복탄력성 코칭 전문가"],
+        "발달심리학 연구를 바탕으로 영아의 초기 도덕성 발달과 공감 반응 형성 과정을 심도 있게 탐구했습니다. 이후 검사 데이터를 교육 현장과 학급 지도에 적용하는 워크숍을 설계해 왔고, 현재는 교육·임상 경험을 결합해 부모와 함께 성장 가이드를 제공합니다.",
+      education: ["연세대학교 심리학 석사", "이화여자대학교 심리학 학사"],
+      career: [
+        "학교 검사 연구 및 강의(SPQ, KLAT, GST)",
+        "초등학교 상담실 심리상담사",
+        "진로수퍼비전 설계",
+      ],
+      certifications: [
+        "임상심리사 1급(한국산업인력공단)",
+        "청소년상담사 2급(여성가족부)",
+        "학교 현장 기반 검사 활용 가이드 설계",
+      ],
     },
   },
   "6": {
-    imageUrl:
-      "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=1200",
-    landingCredentials: "커리어코치 1급",
-    landingThemeColor: "text-sky-600",
-    landingThemeBg: "bg-sky-50",
+    imageUrl: "/expert-profile-photos/Kim-jy.jpg",
+    landingCredentials: "어세스타 부산센터 센터장",
+    landingThemeColor: "text-rose-700",
+    landingThemeBg: "bg-rose-50",
+    landingDescription: "객관적인 데이터와 따뜻한 통찰로 개인과 조직의 성장을 연결합니다.",
     detail: {
-      categoryBadge: "🚀 커리어 설계",
-      specialtyLine: "전공-직무 연결형 커리어 코칭 전문",
-      totalSessions: "2,640+",
-      philosophyHighlights: ["흥미와 강점이 연결될 때", "커리어는 선명해집니다."],
+      categoryBadge: "🏢 역량·진로 컨설팅",
+      specialtyLine: "조직·개인 역량 진단 기반 진로 컨설팅",
+      totalSessions: "10년+",
+      philosophyHighlights: ["객관적인 공정성", "잠재력의 발현과 통합적 성숙"],
       philosophyDescription:
-        "전공 선택과 직무 탐색은 분리된 문제가 아닙니다. 개인의 강점과 시장 정보를 함께 분석해 실행 가능한 커리어 경로를 제시합니다.",
+        "근거 있는 데이터를 기반으로 개인의 성격과 역량을 편견 없이 바라보고, 누구나 내면의 성장 동력을 가지고 있다는 믿음으로 잠재력 발현을 돕습니다. 단순한 문제 해결을 넘어 심리적 건강과 조직 내 기능적 성장이 조화를 이루는 통합적 성숙을 지향합니다.",
       bioDescription:
-        "전공 탐색 및 커리어 전환 코칭 7년 동안 청소년과 대학생을 대상으로 현실적인 경로 설계를 지원했습니다. 탐색, 검증, 실행의 3단계 구조로 의사결정을 돕습니다.",
-      education: ["경영학 석사", "커리어코칭 전문 과정", "직무분석 실무 과정"],
-      career: ["전공/직무 코칭 1,600회+", "대학생 커리어 설계 캠프 운영", "직무 탐색 워크숍 기획"],
-      certifications: ["Assesta 공인 모델 인증 코치", "커리어코치 1급", "직무역량 진단 전문가"],
+        "10년 넘게 개인의 마음과 역량을 연구해 왔으며, 어세스타 부산센터를 이끌며 MBTI·NCS 기반의 진로 설계, 채용, 역량 평가까지 폭넓은 실무를 수행했습니다. 진단 결과를 실제 변화로 연결하는 성장 조력자로서 개인과 조직의 변화를 지원합니다.",
+      education: ["부경대학교 교육컨설팅 석사(교육 및 역량 설계 전문성)"],
+      career: [
+        "어세스타 부산센터 센터장(기업·학교 심리검사 및 역량 강화 솔루션 총괄)",
+        "NCS 기업 컨설팅 및 채용 컨설턴트",
+        "공공기관 및 기업 간부급 역량평가(AC) 평가위원(FT) 역임",
+        "부산외대·경상대 진로 및 자기이해 프로그램 책임 강사",
+      ],
+      certifications: [
+        "MBTI / STRONG / MMTIC 전문 자격 및 해석 강연 다수",
+        "인재 확보 및 조직 적합성 진단 전문성",
+        "10년 이상 교육·상담 경력",
+      ],
     },
   },
   "7": {
-    imageUrl:
-      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=1200",
-    landingCredentials: "부모교육 전문강사",
-    landingThemeColor: "text-cyan-700",
-    landingThemeBg: "bg-cyan-50",
-    detail: {
-      categoryBadge: "👨‍👩‍👧 학부모 상담",
-      specialtyLine: "가정 내 교육 의사결정 코칭 전문",
-      totalSessions: "4,430+",
-      philosophyHighlights: ["부모의 기준이 선명해지면", "아이의 불안은 줄어듭니다."],
-      philosophyDescription:
-        "가정의 교육 결정은 정보보다 기준이 먼저입니다. 각 가정의 우선순위를 정리해 일관된 방향으로 의사결정하도록 지원합니다.",
-      bioDescription:
-        "학부모 중심 코칭 12년 동안 가정별 환경과 아이의 성향을 함께 분석해 맞춤형 교육 결정을 돕고 있습니다. 불안 기반 의사결정을 줄이고 실행 가능한 합의점을 만드는 데 강점이 있습니다.",
-      education: ["가족상담학 석사", "부모교육 전문 과정", "가정코칭 리더십 과정"],
-      career: ["학부모 상담 2,900회+", "가정교육 컨설팅 프로그램 운영", "부모 소통 워크숍 다수 진행"],
-      certifications: ["Assesta 공인 모델 인증 코치", "가족상담사 1급", "부모교육 전문강사"],
-    },
-  },
-  "8": {
-    imageUrl:
-      "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&q=80&w=1200",
-    landingCredentials: "멘탈코칭 지도사",
-    landingThemeColor: "text-indigo-600",
+    imageUrl: "/expert-profile-photos/Kim-hy.jpg",
+    landingCredentials: "정신건강임상심리사 1급",
+    landingThemeColor: "text-indigo-700",
     landingThemeBg: "bg-indigo-50",
+    landingDescription: "20년 임상 통찰로 부모-자녀 관계를 읽고 건강한 소통 방식을 제시합니다.",
     detail: {
-      categoryBadge: "🔥 멘탈 퍼포먼스",
-      specialtyLine: "집중력/실행력 퍼포먼스 코칭 전문",
-      totalSessions: "2,350+",
-      philosophyHighlights: ["성과는 순간의 동기가 아닌", "반복 가능한 루틴에서 나옵니다."],
+      categoryBadge: "🧠 임상·가족 상담",
+      specialtyLine: "아동청소년 임상심리 및 가족관계 코칭",
+      totalSessions: "20년+",
+      philosophyHighlights: [
+        "관계성에 대한 심리학적 이해를 바탕으로",
+        "연령·특성에 맞춘 소통 방식을 제시합니다",
+      ],
       philosophyDescription:
-        "중요한 시기일수록 감정 관리와 실행 관리가 함께 필요합니다. 목표를 작게 쪼개고 일상 루틴에 연결해 꾸준한 퍼포먼스를 만듭니다.",
+        "우리는 태어나며 관계를 시작하고, 가족마다 고유한 문화와 상호작용을 갖습니다. 이 관계성을 심리학적으로 해석해 아이의 발달 과업을 건강하게 완수하도록 돕고, 궁극적으로 부모와 자녀 모두가 행복한 가정 생활을 영위할 수 있도록 지원합니다.",
       bioDescription:
-        "퍼포먼스 코칭 6년 동안 시험기/프로젝트기 집중력 관리 프로그램을 운영했습니다. 실행 추적과 피드백 사이클로 목표 달성 확률을 높이는 데 집중합니다.",
-      education: ["스포츠심리학 석사", "성과코칭 전문가 과정", "집중력 트레이닝 과정"],
-      career: ["퍼포먼스 코칭 1,400회+", "목표 실행 트래킹 프로그램 운영", "집중력 향상 워크숍 진행"],
-      certifications: ["Assesta 공인 모델 인증 코치", "멘탈코칭 지도사", "퍼포먼스 코칭 전문가"],
+        "어린 시절부터 삶의 본질에 대한 질문을 심리학으로 탐구해 왔고, 상담심리 전공과 대학병원 임상 수련을 거치며 사람 간 영향의 메커니즘을 과학적으로 연구했습니다. 앞으로도 부모와 자녀가 상호호혜적으로 성장할 수 있는 실질적 솔루션 제공에 집중합니다.",
+      education: [
+        "동국대학교 대학원 박사과정(아동청소년심리상담 전공)",
+        "영남대학교 심리학과 석사(상담심리학 전공)",
+        "영남대학교 심리학과 학사",
+        "대전대학교 대학원 석사(미술치료 전공)",
+      ],
+      career: [
+        "근로복지공단 산재병원 재활사업부 근무",
+        "법무복지공단 보호복지부 근무",
+        "카톨릭대학병원 정신의학과 수련",
+        "직업상담사 및 임상심리사 강의",
+      ],
+      certifications: [
+        "정신건강임상심리사 1급(보건복지부)",
+        "예술심리치료사 1급",
+        "인지학습치료사 1급",
+        "직업상담사 2급",
+      ],
     },
   },
 }
