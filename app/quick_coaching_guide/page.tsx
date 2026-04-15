@@ -21,8 +21,8 @@ export default async function QuickCoachingGuideRoutePage({
   searchParams: Promise<{ gradeLevel?: string; type?: string }>
 }) {
   const { gradeLevel: rawGrade, type: rawType } = await searchParams
-  const gradeLevel  = VALID_GRADE_LEVELS.includes(rawGrade as GradeLevelKey) ? (rawGrade as GradeLevelKey) : null
-  const guideType   = VALID_TYPES.includes(rawType as QuickGuideType) ? (rawType as QuickGuideType) : "Mind"
+  const gradeLevel = VALID_GRADE_LEVELS.includes(rawGrade as GradeLevelKey) ? (rawGrade as GradeLevelKey) : null
+  const guideType  = VALID_TYPES.includes(rawType as QuickGuideType) ? (rawType as QuickGuideType) : "Mind"
 
   const initialStep = await getStepData(QUICK_COACHING_GUIDE_INITIAL_STEP_ID, guideType)
 

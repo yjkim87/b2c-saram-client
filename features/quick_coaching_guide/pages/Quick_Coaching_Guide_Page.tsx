@@ -147,6 +147,7 @@ export function QuickCoachingGuide_Page({ initialStep, presetGradeLevel, guideTy
                       selectedOption={selectedAnswer}
                       isActive={step.id === currentStepId && !isTyping}
                       onSelectOption={(option) => handleSelectOption(stepIndex, step.id, option)}
+                      prevSelectedLabel={selectedAnswers[stepIndex - 1]}
                     />
                   }
                 />

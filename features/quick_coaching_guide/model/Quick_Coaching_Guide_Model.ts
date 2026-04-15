@@ -8,19 +8,13 @@
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ContentType 설명:
-//   'message'        : 퀵코칭가이드 메시지 본문
-//   'button'         : 사용자 선택 버튼 (Next_Step_Id 필수)
-//   'question_label' : 팁 제목
-//   'question_desc'  : 팁 본문
-//   'checkpoint'     : 체크리스트 항목
-//   'reservation'    : 상담 예약 (Guide_Content = ''/reservation'')
+//   'message'     : 퀵코칭가이드 메시지 본문
+//   'button'      : 사용자 선택 버튼 (Next_Step_Id 필수)
+//   'reservation' : 상담 예약 (Guide_Content = ''/reservation'')
 // ─────────────────────────────────────────────────────────────────────────────
 export type ContentType =
   | "message"
   | "button"
-  | "question_label"
-  | "question_desc"
-  | "checkpoint"
   | "reservation"
 
 export interface QuickCoachingGuideRow {
@@ -39,11 +33,6 @@ export interface QuickCoachingGuideDS {
 }
 
 // ── UI 모델 타입 (StepGroup) ──────────────────────────────────────────────────
-export interface StepQuestion {
-  label:       string
-  description: string
-}
-
 export interface StepOption {
   label:        string
   description?: string
@@ -53,10 +42,6 @@ export interface StepOption {
 export interface StepGroup {
   id:               string
   botMessage:       string
-  checkpoint?:      string[]
-  questions?:       StepQuestion[]
   options?:         StepOption[]
   reservationHref?: string
 }
-
-export type GuideData = StepGroup[]
