@@ -1,10 +1,34 @@
-﻿export interface HeaderSectionData {
+﻿export interface ExpertHeaderData {
   imageUrl: string
-  categoryBadge: string
   certificationLabel: string
   specialty: string
   name: string
   tags: string[]
+}
+
+export interface ExpertQuoteData {
+  lead: string
+  highlight: string
+  trailing: string
+}
+
+export interface ExpertTextSectionData {
+  title: string
+  description: string
+}
+
+export interface ExpertProfileData {
+  header: ExpertHeaderData
+  quote: ExpertQuoteData
+  historyTitle: string
+  historyItems: string[]
+  bio: ExpertTextSectionData
+  philosophy: ExpertTextSectionData
+}
+
+// Legacy types kept for unused section components to stay type-safe.
+export interface HeaderSectionData extends ExpertHeaderData {
+  categoryBadge: string
   totalSessionsLabel: string
   totalSessionsValue: string
 }
@@ -29,11 +53,4 @@ export interface InfoCardSectionData {
   items: string[]
   tone?: InfoCardTone
   useCheckIcon?: boolean
-}
-
-export interface ExpertProfileData {
-  header: HeaderSectionData
-  philosophy: PhilosophySectionData
-  bio: BioSectionData
-  infoCards: InfoCardSectionData[]
 }

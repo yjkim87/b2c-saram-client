@@ -1,5 +1,6 @@
 export interface ExpertProfile {
   id: string
+  slug: string
   name: string
   specialty: string
   shortIntro: string
@@ -22,6 +23,22 @@ export interface ExpertDetailContent {
   certifications: string[]
 }
 
+export interface ExpertQuoteContent {
+  lead: string
+  highlight: string
+  trailing: string
+}
+
+export interface ExpertLongformContent {
+  quote: ExpertQuoteContent
+  historyTitle: string
+  historyItems: string[]
+  bioTitle: string
+  bioDescription: string
+  philosophyTitle: string
+  philosophyDescription: string
+}
+
 export interface ExpertMeta {
   imageUrl: string
   listBadge?: ExpertBadge
@@ -30,10 +47,12 @@ export interface ExpertMeta {
   landingThemeBg: string
   landingDescription?: string
   detail: ExpertDetailContent
+  detailPage?: ExpertLongformContent
 }
 
 export interface LandingExpertItem {
   id: string
+  slug: string
   category: string
   emoji: string
   name: string
@@ -49,6 +68,7 @@ export interface LandingExpertItem {
 export const experts: ExpertProfile[] = [
   {
     id: "1",
+    slug: "kim-myungjun",
     name: "김명준 박사",
     specialty: "진로·성장 코칭",
     shortIntro: "정밀한 심리 진단과 글로벌 수준의 코칭으로 무한한 가능성을 엽니다.",
@@ -59,6 +79,7 @@ export const experts: ExpertProfile[] = [
   },
   {
     id: "2",
+    slug: "kim-youngjae",
     name: "김영재 박사",
     specialty: "AI 기반 심리성장 코칭",
     shortIntro:
@@ -69,6 +90,7 @@ export const experts: ExpertProfile[] = [
   },
   {
     id: "3",
+    slug: "choi-yoonhee",
     name: "최윤희 박사",
     specialty: "아동·청소년 발달 코칭",
     shortIntro:
@@ -81,6 +103,7 @@ export const experts: ExpertProfile[] = [
   },
   {
     id: "4",
+    slug: "song-miri",
     name: "송미리",
     specialty: "영유아·아동 발달 코칭",
     shortIntro: "마음이 자라는 여정을 탐구하며, 부모와 아이가 함께 행복할 수 있는 길에 동행합니다.",
@@ -91,6 +114,7 @@ export const experts: ExpertProfile[] = [
   },
   {
     id: "5",
+    slug: "chae-jookyung",
     name: "채주경",
     specialty: "발달·학교 상담 코칭",
     shortIntro: "우리 아이 인지·사회성·정서 발달의 따뜻하고 단단한 뿌리를 지원합니다.",
@@ -101,6 +125,7 @@ export const experts: ExpertProfile[] = [
   },
   {
     id: "6",
+    slug: "kim-jiyoung",
     name: "김지영",
     specialty: "진로·역량 컨설팅",
     shortIntro:
@@ -112,6 +137,7 @@ export const experts: ExpertProfile[] = [
   },
   {
     id: "7",
+    slug: "kim-hayoung",
     name: "김하영 원장",
     specialty: "임상·가족관계 코칭",
     shortIntro:
@@ -138,6 +164,27 @@ function createDefaultDetailContent(expert: ExpertProfile): ExpertDetailContent 
     education: ["전문 교육 과정 이수"],
     career: [expert.experienceSummary],
     certifications: ["전문가 자격 검증 완료"],
+  }
+}
+
+function createDefaultDetailPageContent(
+  expert: ExpertProfile,
+  detail: ExpertDetailContent
+): ExpertLongformContent {
+  const [lead = "", highlight = ""] = detail.philosophyHighlights
+
+  return {
+    quote: {
+      lead,
+      highlight,
+      trailing: "",
+    },
+    historyTitle: "경력 및 이력",
+    historyItems: [...detail.education, ...detail.career, ...detail.certifications],
+    bioTitle: "전문가 Bio: 걸어온 길",
+    bioDescription: detail.bioDescription,
+    philosophyTitle: "심리상담·성장코칭 철학",
+    philosophyDescription: detail.philosophyDescription,
   }
 }
 
@@ -169,6 +216,29 @@ const expertMetaById: Record<string, ExpertMeta> = {
         "CPP 미국 MBTI 전문교육과정 수료",
         "『한국인 대표 표본의 MBTI 유형 분포 연구(2012-2020)』 공저(2021)",
       ],
+    },
+    detailPage: {
+      quote: {
+        lead: "정밀한 심리 진단과 글로벌 수준의 코칭으로",
+        highlight: "무한한 가능성",
+        trailing: "을 엽니다",
+      },
+      historyTitle: "경력 및 이력",
+      historyItems: [
+        "University of Illinois at Urbana-Champaign PostDoc(산업 및 조직심리 전공)",
+        "한국코칭심리학회 코칭심리사 1급",
+        "TMBC(The Myers-Briggs Company)의 공식 파트너",
+        "STRONG, Firo-B, CPI 검사 및 교육 개발",
+        "MMTIC 검사를 활용한 자녀의 발견 검사리포트 개발 사업총괄",
+        "CPP, 미국 MBTI 전문교육과정 수료",
+        "'한국인 대표 표본의 MBTI 유형 분포 연구: 2012-2020년 자료를 바탕으로' 공저 (2021)",
+      ],
+      bioTitle: "전문가 Bio: 걸어온 길",
+      bioDescription:
+        "국내에 심리 측정과 진단 개념이 자리 잡기 시작하던 초기부터, 저는 '사람의 마음을 어떻게 객관적으로 이해할 수 있을까'라는 질문을 붙들고 연구해 왔습니다. 해외 연구 기관에서의 경험과 국내 주요 심리 검사들의 표준화 작업을 수행하며 제가 집중했던 것은, 개인이 자신의 고유한 특성을 발견하도록 돕는 실질적인 지표를 만드는 일이었습니다. 이제 그 축적된 경험과 글로벌 기준의 전문성을 통해, 전 생애 주기에 걸친 자녀의 건강한 성장과 진로 설계를 고민하는 부모님들에게 가장 확실하고 객관적인 나침반이 되어 드리고자 합니다. 아이와 부모가 함께 행복한 미래를 설계하는 길, 그 정밀한 동행을 시작합니다.",
+      philosophyTitle: "심리상담·성장코칭 철학",
+      philosophyDescription:
+        "저의 철학은 '아이의 고유한 결을 읽는 정밀함'과 '부모를 위한 근거 있는 가이드'에 기반합니다. 자녀의 기질과 강점은 글로벌 기준의 정밀 진단 도구를 통해 정확하게 진단되어야 하며, 이는 아이의 전 생애 주기에 걸친 성장의 기초가 됩니다. 저는 단순한 조언을 넘어, 과학적 데이터에 근거하여 영아부터 고등학생까지 자녀의 발달 과업을 정교하게 이해하고, 부모님들에게 아이의 눈높이에서 지속 가능한 소통과 성장을 돕는 맞춤형 가이드를 제공합니다. 복잡한 아이의 내면 지도를 세심하게 그리되, 그 길은 부모님과 함께 따뜻하고 안정적으로 동행하는 것, 그것이 제가 지향하는 심리 서비스입니다.",
     },
   },
   "2": {
@@ -205,6 +275,28 @@ const expertMetaById: Record<string, ExpertMeta> = {
         "한국인 대표 표본 데이터 기반 연구 공저",
         "심리 지표 기반 성장 솔루션 설계",
       ],
+    },
+    detailPage: {
+      quote: {
+        lead: "글로벌 MBTI 파트너십과 AI 시스템이 그리는,",
+        highlight: "우리 아이를 위한 과학적이고 균일한 성장 지도",
+        trailing: "",
+      },
+      historyTitle: "경력 및 이력",
+      historyItems: [
+        "University of Georgia 심리학 박사",
+        "KAIST 경영과학 석사",
+        "University of Illinois at Urbana-Champaign 심리학 학사",
+        "심리학 기반 AI 시스템 설계",
+        "CSO(Chief Strategy Officer)",
+        "MBTI 글로벌 파트너십 구축 및 AI 시스템 도입",
+      ],
+      bioTitle: "전문가 Bio: 걸어온 길",
+      bioDescription:
+        "저는 글로벌 심리 진단 기술 기업의 공식 파트너로서 다수의 진단 도구와 교육 프로그램을 이끌었으며, 특히 한국인 대표 표본을 대상으로 한 대규모 데이터 기반 연구를 공저하여 검사의 정밀도를 높이는 데 기여했습니다. 이제 그 축적된 데이터 분석 역량과 따뜻한 통찰을 통해, 부모님들이 우리 아이를 위한 최적의 성장을 디자인할 수 있도록 돕는 이정표가 되어 드리겠습니다.",
+      philosophyTitle: "심리상담·성장코칭 철학",
+      philosophyDescription:
+        "어세스타 사발면 심리상담·성장코칭의 핵심은 어떤 전문가를 만나더라도 차별 없이 최선의 성장을 경험할 수 있는 신뢰의 기반을 다지는 데 있습니다. 고도화된 AI 기술을 서비스 전반에 유기적으로 결합하여 정밀도를 높이되, 수치와 데이터가 미처 담아내지 못하는 아이의 고유한 마음의 결은 전문가의 깊은 통찰로 세밀하게 살피는 조화로운 시스템을 지향합니다. 부모님들께서 분석 결과를 온전히 신뢰하실 수 있도록, 복잡한 심리 지표들을 아이의 삶에 적용 가능한 명확한 성장 솔루션으로 세심하게 정제하여 전달하고자 합니다. 가장 과학적이면서도 인간적인 품질 관리를 통해, 부모님과 아이가 함께 마주하는 모든 순간이 흔들림 없는 성장의 확신으로 이어지도록 든든하게 뒷받침하겠습니다.",
     },
   },
   "3": {
@@ -243,6 +335,29 @@ const expertMetaById: Record<string, ExpertMeta> = {
         "검사 기반 맞춤형 성장 로드맵 제공",
       ],
     },
+    detailPage: {
+      quote: {
+        lead: "어린이용 성격 유형 검사 한국 표준화 전문가로서,",
+        highlight: "아이 고유의 성향에 맞춘 발달 중심의 따뜻한 성장 지도",
+        trailing: "를 그립니다",
+      },
+      historyTitle: "경력 및 이력",
+      historyItems: [
+        "University of Texas at Arlington 심리학 박사",
+        "Indiana State University 심리학 석사",
+        "덕성여자대학교 심리학 학사",
+        "MBTI 적용교육 다수 과정 개발 및 교육",
+        "MMTIC2(Murphy-Meisgeier Type Indicator for Children) 한국 표준화 연구",
+        "CATi 어린이·청소년 성격유형 검사 II 개발",
+        "초·중·고 학생 대상 어세스타 스쿨 검사(ARQ, GST) 개발",
+      ],
+      bioTitle: "전문가 Bio: 걸어온 길",
+      bioDescription:
+        "미국 유수 대학에서 실험심리학 박사 과정을 거치며 행동 분석의 기초를 다졌고, 이후 글로벌 MBTI 전문가 과정을 통해 심리 진단 분야의 정점에 섰습니다. 저의 가장 큰 열정은 '어린이'와 '청소년'에 있습니다. 이 열정을 바탕으로 어린이용 성격 유형 검사인 MMTIC2의 한국 표준화 연구를 주도했으며, 초·중·고 모든 학년을 아우르는 어세스타 스쿨 검사를 개발했습니다. 단순히 검사를 하는 전문가를 넘어, 우리 아이들의 눈높이에 맞춘 과학적인 진단 도구를 만들어낸 전문성을 보유하고 있습니다. 그리고 나아가 단순한 진단에 머물지 않고, 검사 결과 이면에 숨겨진 아이의 고유한 특성을 통찰하여 실제 상담과 코칭 현장에서 성장을 이끌어내는 솔루션을 제공하는 데 집중하고 있습니다.",
+      philosophyTitle: "심리상담·성장코칭 철학",
+      philosophyDescription:
+        "제가 직접 개발한 초·중·고 모든 단계의 스쿨 검사 데이터를 활용해, 아이의 타고난 특성이 어떤 발달적 맥락에서 빛을 발할지 정밀하게 분석합니다. 특히 양육·정서·진로·학습을 연계하는 통합적 청사진을 제시하여, 부모님과 함께 아이의 무한한 가능성을 만나는 즐거움을 누리고자 합니다. 직관에 의존하는 조언이 아닌, 과학적으로 검증된 데이터를 기반으로 영아부터 고등학생까지 자녀의 발달 과업을 정교하게 이해하고, 부모님들에게 근거 있는 맞춤형 로드맵을 제공하겠습니다.",
+    },
   },
   "4": {
     imageUrl: "/expert-profile-photos/Song-mr.jpg",
@@ -273,6 +388,27 @@ const expertMetaById: Record<string, ExpertMeta> = {
         "『MBTI 검사 결과 유형과 최적유형 비교 연구: 온라인 플랫폼을 중심으로』 공저(2023)",
         "MMTIC2 표준화 기반 아동 성향 해석 전문성",
       ],
+    },
+    detailPage: {
+      quote: {
+        lead: "마음이 자라는 여정을 탐구하며,",
+        highlight: "부모와 아이가 함께 행복할 수 있는 길",
+        trailing: "에 동행합니다.",
+      },
+      historyTitle: "경력 및 이력",
+      historyItems: [
+        "연세대학교 심리학 석사",
+        "연세대학교 심리학 학사",
+        "MMTIC2(Murphy-Meisgeier Type Indicator for Children) 한국 표준화 연구",
+        "'한국인 대표 표본의 MBTI 유형 분포 연구: 2012-2020년 자료를 바탕으로' 공저(2021)",
+        "'MBTI 검사 결과 유형과 최적유형 비교 연구: 온라인 플랫폼을 중심으로' 공저(2023)",
+      ],
+      bioTitle: "전문가 Bio: 걸어온 길",
+      bioDescription:
+        "심리학을 전공하며 시작된 저의 여정은 '인간은 어떻게 성장하는가'라는 근원적인 호기심에서 출발하였습니다. 전 생애 발달 중에서도 영유아기를 탐구하는 데 관심을 두고, 영아기와 아동 초기의 인지, 정서 및 사회성 발달 관련 연구를 진행하였습니다. 이후 심리 평가 전문 기관에 소속되어 글로벌 진단 도구와 관련된 연구, 교육 및 콘텐츠 개발, 강의를 담당하고 있습니다. 어린이용 성격 유형 검사인 MMTIC2의 한국 표준화 연구에 참여하여 아이들의 고유한 성향을 과학적으로 파악할 수 있는 토대를 마련하기도 하였습니다.",
+      philosophyTitle: "심리상담·성장코칭 철학",
+      philosophyDescription:
+        "아이들은 또래와 유사한 인지, 정서 및 사회성 발달 과정을 따르면서도 자신만의 고유한 흐름으로 성장합니다. 저는 단순히 눈앞의 문제를 해결하는 것을 넘어, 아이의 발달 단계와 타고난 성향, 행동 이면의 심리를 학술적 근거를 바탕으로 정확하게 해석합니다. 자녀를 더 깊이 이해하고 양육하고자 하는 부모님의 곁에서 아이의 긍정적 변화를 함께 고민하는 조력자가 되어 드리겠습니다.",
     },
   },
   "5": {
@@ -305,6 +441,28 @@ const expertMetaById: Record<string, ExpertMeta> = {
         "학교 현장 기반 검사 활용 가이드 설계",
       ],
     },
+    detailPage: {
+      quote: {
+        lead: "우리 아이 인지·사회성·정서 발달의",
+        highlight: "따뜻하고 단단한 뿌리",
+        trailing: "를 지원합니다",
+      },
+      historyTitle: "경력 및 이력",
+      historyItems: [
+        "연세대학교 심리학 석사",
+        "이화여자대학교 심리학 학사",
+        "학교 검사 연구 및 강의(SPQ, KLAT, GST)",
+        "임상심리사 1급(한국산업인력공단), 청소년상담사 2급(여성가족부)",
+        "초등학교 상담실 심리상담사",
+        "진로수퍼비전 설계",
+      ],
+      bioTitle: "전문가 Bio: 걸어온 길",
+      bioDescription:
+        "국내 유수 대학에서 발달심리학을 전공하며 아이의 성장에 대한 깊은 이해를 쌓았습니다. 특히 영아를 대상으로 초기 도덕성 발달에 관한 심도 있는 연구를 수행하여, 이 시기에 타인에 대한 공감적 반응과 초기 사회적 규칙의 기초가 어떻게 형성되는지 심도 있게 탐색했습니다. 이러한 연구 기반 위에 검사 데이터를 교육 현장과 학급 지도에 어떻게 실질적으로 활용할 수 있는지에 대한 교사 워크숍을 설계하며, 데이터의 실제적인 가치를 높이는 데 집중해 왔습니다. 이제는 교육 현장과 임상 경험을 넘어, 부모님들과 함께 아이의 발달적 맥락을 읽어내면서 아이의 건강한 성장을 돕는 가이드가 되어 드리겠습니다.",
+      philosophyTitle: "심리상담·성장코칭 철학",
+      philosophyDescription:
+        "저의 철학은 아이 고유의 발달적 맥락에 대한 정교한 데이터적 이해에 기반합니다. 제가 직접 수행한 학교 검사 개발 경험과 교사 워크숍 설계 전문성을 바탕으로, 아이의 성향과 발달 상태를 과학적으로 진단하고, 교육 현장에서 검증된 실질적인 활용 가이드를 부모님들에게 제공합니다. 아이와 지속 가능한 소통과 성장을 이루도록 단단하게 지원해드리도록 하겠습니다.",
+    },
   },
   "6": {
     imageUrl: "/expert-profile-photos/Kim-jy.jpg",
@@ -333,6 +491,29 @@ const expertMetaById: Record<string, ExpertMeta> = {
         "인재 확보 및 조직 적합성 진단 전문성",
         "10년 이상 교육·상담 경력",
       ],
+    },
+    detailPage: {
+      quote: {
+        lead: "객관적인 데이터와 따뜻한 통찰로,",
+        highlight: "숨겨진 역량이 조직의 성과와 삶의 행복",
+        trailing: "으로 연결되는 길을 안내합니다.",
+      },
+      historyTitle: "경력 및 이력",
+      historyItems: [
+        "현) 어세스타 부산센터 센터장(기업·학교 심리검사 및 역량 강화 솔루션 총괄)",
+        "부경대학교 교육컨설팅 석사(교육 및 역량 설계 전문성 보유)",
+        "NCS 기업 컨설팅 및 채용 컨설턴트(인재 확보 및 조직 적합성 진단 전문가)",
+        "MBTI / STRONG / MMTIC 등 전문 자격 및 해석 강연 다수",
+        "공공기관 및 기업 간부급 공무원 역량평가(AC) 평가위원(FT) 역임",
+        "부산외대, 경상대 등 주요 대학 진로 및 자기이해 프로그램 책임 강사",
+        "10년 이상의 교육·상담 경력(아웃소싱 교육기획팀 등 역임)",
+      ],
+      bioTitle: "전문가 Bio: 걸어온 길",
+      bioDescription:
+        "10년 넘게 사람의 '마음'과 '역량'을 연구하며, 개인이 가진 고유한 강점이 조직 내에서 어떻게 가장 빛날 수 있을지를 고민해 왔습니다. 어세스타 부산센터를 이끌며 MBTI와 NCS 등 검증된 도구를 기반으로 대학생의 진로 설계부터 기업의 인재 채용, 간부급 역량 평가까지 폭넓은 스펙트럼의 인사이트를 쌓았습니다. 단순히 진단에 그치지 않고, 그 결과를 삶의 구체적인 변화로 이끄는 '성장 조력자'로서 수많은 내담자와 조직을 만나오고 있습니다.",
+      philosophyTitle: "심리상담·성장코칭 철학",
+      philosophyDescription:
+        "첫째, 근거 있는 데이터를 바탕으로 개인의 고유한 성격과 역량을 편견 없이 바라보는 '객관적인 공정성'을 지향합니다.\n둘째, 모든 사람은 스스로 성장할 수 있는 동력을 내부에 가지고 있다는 믿음으로 '잠재력의 발현'을 돕습니다.\n셋째, 단순한 문제 해결을 넘어 개인의 심리적 건강과 조직 내 기능적 성장이 조화를 이루는 '통합적 성숙'을 추구합니다.",
     },
   },
   "7": {
@@ -372,21 +553,53 @@ const expertMetaById: Record<string, ExpertMeta> = {
         "직업상담사 2급",
       ],
     },
+    detailPage: {
+      quote: {
+        lead: "20년 임상경험의 통찰력과 과학적인 심리 평가를 통해",
+        highlight: "아이와 부모님의 관계를 이해하고",
+        trailing: " 소통방식을 제시합니다.",
+      },
+      historyTitle: "경력 및 이력",
+      historyItems: [
+        "동국대학교 대학원 박사과정 중(아동청소년심리상담 전공)",
+        "영남대학교 심리학과 석사(상담심리학 전공), 영남대학교 심리학과 학사",
+        "대전대학교 대학원 석사(미술치료 전공)",
+        "정신건강임상심리사 1급(보건복지부), 예술심리치료사 1급, 인지학습치료사 1급, 직업상담사 2급",
+        "근로복지공단 산재병원 재활사업부 근무, 법무복지공단 보호복지부 근무",
+        "카톨릭대학병원 정신의학과 수련, 직업상담사 및 임상심리사 강의",
+      ],
+      bioTitle: "전문가 Bio: 걸어온 길",
+      bioDescription:
+        "저는 유년시절부터 삶에서 가장 중요한 것은 무엇인가 하는 궁금증을 품고 있었고, 그 매듭을 심리학으로 풀어왔습니다. 대학원에서 상담심리를 전공하며 사람의 관계에 나름의 해답을 찾았습니다. 이를 보다 심층적으로 이해하기 위해 대학병원에서 임상 수련을 하며, 사람과 사람이 서로에게 끼치는 영향에 대해 과학적인 방식으로 탐구하려는 노력을 기울이기도 하였습니다. 앞으로는 특히 자녀와 부모님이 서로에게 어떠한 영향을 끼치는지 탐구하며, 보다 상호호혜적인 관계와 성장을 이끌어내기 위한 솔루션을 제공하는 데 집중하겠습니다.",
+      philosophyTitle: "심리상담·성장코칭 철학",
+      philosophyDescription:
+        "우리는 모두 태어나자 마자 관계를 시작하게 되며, 각각의 가족은 가족만의 고유한 문화와 부모와 자녀간의 관계성을 지니고 있습니다. 이러한 관계성에 대한 심리학적 이해를 바탕으로, 아이의 연령 및 특성을 고려한 소통 방식을 제시하겠습니다. 이러한 과정에서 아이들이 각 연령에 이루어야 할 발달 과업을 이루어 밝고 건강하게 성장하도록 돕고, 궁극적으로는 부모님과 자녀 모두 행복한 가정 생활을 영위하도록 조력하겠습니다.",
+    },
   },
 }
 
 function validateExpertDataConsistency() {
   const expertIds = experts.map((expert) => expert.id)
+  const expertSlugs = experts.map((expert) => expert.slug)
   const uniqueExpertIds = new Set(expertIds)
+  const uniqueExpertSlugs = new Set(expertSlugs)
   const metaIds = Object.keys(expertMetaById)
 
   if (uniqueExpertIds.size !== expertIds.length) {
     throw new Error("[experts] Duplicate expert id detected in experts array.")
   }
 
+  if (uniqueExpertSlugs.size !== expertSlugs.length) {
+    throw new Error("[experts] Duplicate expert slug detected in experts array.")
+  }
+
   for (const id of expertIds) {
     if (!expertMetaById[id]) {
       throw new Error(`[experts] Missing meta for expert id: ${id}`)
+    }
+
+    if (!expertMetaById[id].detailPage) {
+      throw new Error(`[experts] Missing longform detail page content for expert id: ${id}`)
     }
   }
 
@@ -435,6 +648,14 @@ export function getExpertById(id: string) {
   return experts.find((expert) => expert.id === id)
 }
 
+export function getExpertBySlug(slug: string) {
+  return experts.find((expert) => expert.slug === slug)
+}
+
+export function getExpertByIdentifier(identifier: string) {
+  return getExpertById(identifier) ?? getExpertBySlug(identifier)
+}
+
 export function getExpertMetaById(id: string) {
   return expertMetaById[id]
 }
@@ -453,6 +674,12 @@ export function getExpertDetailContent(expert: ExpertProfile): ExpertDetailConte
   return meta?.detail ?? createDefaultDetailContent(expert)
 }
 
+export function getExpertLongformContent(expert: ExpertProfile): ExpertLongformContent {
+  const detail = getExpertDetailContent(expert)
+  const meta = expertMetaById[expert.id]
+  return meta?.detailPage ?? createDefaultDetailPageContent(expert, detail)
+}
+
 export function getLandingExpertItems(limit = 3): LandingExpertItem[] {
   return experts.slice(0, limit).map((expert) => {
     const meta = expertMetaById[expert.id]
@@ -461,6 +688,7 @@ export function getLandingExpertItems(limit = 3): LandingExpertItem[] {
 
     return {
       id: expert.id,
+      slug: expert.slug,
       category,
       emoji,
       name: expert.name,
