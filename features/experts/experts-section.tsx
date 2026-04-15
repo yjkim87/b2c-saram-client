@@ -21,6 +21,7 @@ interface ExpertsSectionProps {
 
 type ExpertCardItem = {
   id: string
+  slug: string
   name: string
   specialty: string
   intro: string
@@ -47,6 +48,7 @@ function toCardItem(expert: ExpertProfile): ExpertCardItem {
 
   return {
     id: expert.id,
+    slug: expert.slug,
     name: expert.name,
     specialty: expert.specialty,
     intro: clampSingleLine(expert.shortIntro),
@@ -81,7 +83,7 @@ function ExpertsSectionPreview() {
           {landingExperts.map((expert) => (
             <Link
               key={expert.id}
-              href={`/experts/${expert.id}?from=landing`}
+              href={`/experts/${expert.slug}?from=landing`}
               className="group h-full basis-[calc(100%-3.5rem)] shrink-0 snap-start cursor-pointer sm:basis-[320px] md:basis-auto md:min-w-0 md:shrink"
             >
               <article className="flex h-full flex-col rounded-[1.5rem] border border-slate-200/60 bg-white p-4 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1.5 hover:border-blue-200/80 hover:shadow-[0_15px_35px_-10px_rgba(37,99,235,0.15)] active:scale-[0.98] md:rounded-[2rem] md:active:scale-100">
@@ -282,7 +284,7 @@ function ExpertsSectionFull() {
               </div>
 
               <Link
-                href={`/experts/${expert.id}?from=experts`}
+                href={`/experts/${expert.slug}?from=experts`}
                 className="mt-5 inline-flex w-full items-center justify-center rounded-lg border border-[#292828] bg-[#292828] px-3 py-2.5 text-sm font-semibold text-[#fff] transition-colors hover:bg-[#1f1f1f]"
               >
                 프로필 보기

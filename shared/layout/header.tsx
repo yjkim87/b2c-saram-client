@@ -24,6 +24,37 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mobileOpenGroup, setMobileOpenGroup] = useState<string | null>(null)
 
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false)
+    setMobileOpenGroup(null)
+  }
+
+  const getInitialMobileGroup = () => {
+    for (const entry of NAVIGATION) {
+      if (entry.type === "group" && isGroupActive(entry.children)) {
+        return entry.title
+      }
+    }
+
+    for (const entry of NAVIGATION) {
+      if (entry.type === "group") {
+        return entry.title
+      }
+    }
+
+    return null
+  }
+
+  const toggleMobileMenu = () => {
+    if (mobileMenuOpen) {
+      closeMobileMenu()
+      return
+    }
+
+    setMobileOpenGroup(getInitialMobileGroup())
+    setMobileMenuOpen(true)
+  }
+
   const toggleMobileGroup = (title: string) => {
     setMobileOpenGroup((prev) => (prev === title ? null : title))
   }
@@ -61,15 +92,7 @@ export function Header() {
 
           <button
             className="cursor-pointer p-2 text-[#1A1410]"
-            onClick={() => {
-              setMobileMenuOpen((prev) => {
-                const next = !prev
-                if (!next) {
-                  setMobileOpenGroup(null)
-                }
-                return next
-              })
-            }}
+            onClick={toggleMobileMenu}
             aria-label={mobileMenuOpen ? "메뉴 닫기" : "메뉴 열기"}
           >
             {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -154,10 +177,20 @@ export function Header() {
         </div>
       </div>
 
+      <button
+        type="button"
+        aria-label="메뉴 닫기"
+        onClick={closeMobileMenu}
+        className={cn(
+          "fixed inset-0 top-[64px] z-[105] bg-black/45 transition-opacity duration-300 md:hidden",
+          mobileMenuOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+        )}
+      />
+
       <div
         className={cn(
-          "absolute left-0 right-0 top-full overflow-hidden border-b border-[#E3D5C7] bg-[#fff] transition-all duration-300 md:hidden",
-          mobileMenuOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0"
+          "absolute left-0 right-0 top-full z-[110] overflow-hidden border-b border-[#E3D5C7] bg-[#fff] transition-all duration-300 md:hidden",
+          mobileMenuOpen ? "pointer-events-auto max-h-[80vh] opacity-100" : "pointer-events-none max-h-0 opacity-0"
         )}
       >
         <nav className="flex flex-col gap-2 p-4">
@@ -173,10 +206,7 @@ export function Header() {
                     "rounded-xl border bg-white px-4 py-3 text-base font-semibold transition-colors",
                     linkActive ? "border-[#E3D5C7] text-[#F07C33]" : "border-[#E3D5C7] text-[#1A1410]"
                   )}
-                  onClick={() => {
-                    setMobileMenuOpen(false)
-                    setMobileOpenGroup(null)
-                  }}
+                  onClick={closeMobileMenu}
                 >
                   {entry.title}
                 </Link>
@@ -220,10 +250,7 @@ export function Header() {
                               ? "bg-[#F8E9DB] text-[#1E1611]"
                               : "text-[#5F4E42] hover:bg-[#F8E9DB]"
                           )}
-                          onClick={() => {
-                            setMobileMenuOpen(false)
-                            setMobileOpenGroup(null)
-                          }}
+                          onClick={closeMobileMenu}
                         >
                           {item.title}
                         </Link>
@@ -237,10 +264,7 @@ export function Header() {
 
           <Link
             href="/reservation"
-            onClick={() => {
-              setMobileMenuOpen(false)
-              setMobileOpenGroup(null)
-            }}
+            onClick={closeMobileMenu}
           >
             <Button
               className="cursor-pointer mt-2 w-full rounded-full border-0 bg-[#F07C33] text-[#FFF] hover:bg-[#DA6727] hover:text-[#FFF]"

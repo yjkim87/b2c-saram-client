@@ -168,6 +168,10 @@ export function ReviewsSection() {
   const mobileCardRefs = useRef<Record<string, HTMLElement | null>>({})
   const [visibleCards, setVisibleCards] = useState<Record<string, boolean>>({})
   const [mobileCardMinHeight, setMobileCardMinHeight] = useState<number | null>(null)
+  const mobileLoopItems = Array.from(
+    { length: REVIEW_SUMMARY.length * 3 },
+    (_, index) => REVIEW_SUMMARY[index % REVIEW_SUMMARY.length]
+  )
 
   useEffect(() => {
     const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
@@ -243,7 +247,7 @@ export function ReviewsSection() {
     let rafId = 0
 
     const measureMobileCardHeight = () => {
-      if (window.innerWidth >= 768) {
+      if (window.innerWidth >= 1024) {
         setMobileCardMinHeight(null)
         return
       }
@@ -295,12 +299,27 @@ export function ReviewsSection() {
           </p>
         </div>
 
-        <div className="md:hidden">
+        <div className="lg:hidden">
           <Swiper
             className="reviews-swiper-motion"
             modules={[Autoplay]}
+            loop
+            loopAddBlankSlides
+            loopAdditionalSlides={mobileLoopItems.length}
+            watchOverflow={false}
+            slidesPerGroup={1}
             slidesPerView={1.08}
             spaceBetween={14}
+            breakpoints={{
+              640: {
+                slidesPerView: 1.3,
+                spaceBetween: 16,
+              },
+              768: {
+                slidesPerView: 2.2,
+                spaceBetween: 18,
+              },
+            }}
             speed={520}
             resistanceRatio={0.82}
             autoplay={{
@@ -309,28 +328,32 @@ export function ReviewsSection() {
               pauseOnMouseEnter: false,
             }}
           >
-            {REVIEW_SUMMARY.map((item, index) => (
+            {mobileLoopItems.map((item, index) => {
+              const mobileItemKey = `${item.key}-${index}`
+
+              return (
               <SwiperSlide
-                key={item.key}
+                key={mobileItemKey}
                 style={mobileCardMinHeight ? { height: `${mobileCardMinHeight}px` } : undefined}
               >
                 <ReviewCard
                   item={item}
-                  cardId={`mobile-${item.key}`}
+                  cardId={`mobile-${mobileItemKey}`}
                   index={index}
                   animate={true}
                   enableEntranceAnimation={false}
                   mobileMinHeight={mobileCardMinHeight}
                   cardRef={(node) => {
-                    mobileCardRefs.current[item.key] = node
+                    mobileCardRefs.current[mobileItemKey] = node
                   }}
                 />
               </SwiperSlide>
-            ))}
+              )
+            })}
           </Swiper>
         </div>
 
-        <div className="hidden gap-5 md:grid md:grid-cols-4">
+        <div className="hidden gap-5 lg:grid lg:grid-cols-4">
           {REVIEW_SUMMARY.map((item, index) => (
             <ReviewCard
               key={`${item.key}-desktop`}

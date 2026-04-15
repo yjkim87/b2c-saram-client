@@ -283,7 +283,7 @@ export function CounselingCoachingCards({
               transitionDelay: "0ms",
             }}
           >
-            <div className="md:grid md:grid-cols-[minmax(0,320px)_minmax(0,1fr)] md:items-start md:gap-8">
+            <div className="md:grid md:grid-cols-[minmax(0,200px)_minmax(0,1fr)] md:items-start md:gap-8 lg:grid-cols-[minmax(0,280px)_minmax(0,1fr)] xl:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
               <div>
                 <button
                   type="button"
@@ -342,7 +342,7 @@ export function CounselingCoachingCards({
                             <p className="inline-flex rounded-lg bg-[#FFF] px-2.5 py-1 text-[12px] font-bold leading-tight text-[#F07C33]">
                               {item.rangeLabel}
                             </p>
-                            <p className="mt-[10px] whitespace-pre-line text-[18px] font-bold leading-[1.35] tracking-[-0.01em] text-[#1B140F] md:overflow-hidden md:text-ellipsis md:whitespace-nowrap">
+                            <p className="mt-[10px] whitespace-pre-line text-[20px] font-bold leading-[1.35] tracking-[-0.01em] text-[#1B140F] md:overflow-hidden md:text-ellipsis md:whitespace-nowrap">
                               {item.question}
                             </p>
                           </div>

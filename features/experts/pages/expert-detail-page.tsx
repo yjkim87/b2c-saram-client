@@ -1,5 +1,5 @@
 ﻿import { notFound } from "next/navigation"
-import { getExpertById } from "@/features/experts/lib/experts"
+import { getExpertByIdentifier } from "@/features/experts/lib/experts"
 import { ExpertDetailView } from "../components/detail/expert-detail-view"
 import { createExpertProfileData } from "../lib/profile-data"
 
@@ -9,9 +9,9 @@ interface ExpertDetailPageProps {
 }
 
 export async function ExpertDetailPage({ params }: ExpertDetailPageProps) {
-  const { id } = await params
+  const { id: identifier } = await params
 
-  const expert = getExpertById(id)
+  const expert = getExpertByIdentifier(identifier)
   if (!expert) {
     notFound()
   }
