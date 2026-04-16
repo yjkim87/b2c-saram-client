@@ -1,5 +1,9 @@
-import { redirect } from "next/navigation"
+"use client"
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 
 export default function CenterRoutePage() {
-  redirect("/about/location")
+  const router = useRouter()
+  useEffect(() => { router.replace("/about/location") }, [router])
+  return null
 }

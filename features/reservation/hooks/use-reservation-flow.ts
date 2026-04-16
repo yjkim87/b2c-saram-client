@@ -8,7 +8,9 @@ import {
   formatBirthdateInput,
   isValidBirthdate,
 } from "../lib/birthdate.utils"
-import { submitReservation } from "../actions/submit-reservation"
+import type { ReservationSubmitPayload, ReservationSubmitResponse } from "../model/reservation-api.types"
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
 
 const BIRTHDATE_ERROR_MESSAGE = "날짜가 올바르지 않습니다. 다시 입력해 주세요."
 
@@ -194,7 +196,7 @@ export function useReservationFlow() {
     setSubmitError(null)
 
     try {
-      const result = await submitReservation({
+      const payload: ReservationSubmitPayload = {
         targetName: userInfo.name,
         targetGender: userInfo.gender === "남성" ? "male" : "female",
         targetBirthdate: userInfo.birthdate,
@@ -207,7 +209,15 @@ export function useReservationFlow() {
           date: s.date,
           time: s.time,
         })),
+      }
+
+      const response = await fetch(`${API_URL}/api/reservation/submit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       })
+
+      const result: ReservationSubmitResponse = await response.json()
 
       if (result.success) {
         setIsComplete(true)

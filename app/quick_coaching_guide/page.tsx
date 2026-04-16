@@ -1,30 +1,46 @@
-// ------------------------------------------------------------------------------
-// 화 일 명 : page.tsx
-// 용    도 : 퀵코칭가이드 라우트 진입점 (첫 Step 데이터를 서버에서 조회하여 페이지 컴포넌트에 전달)
-// 작성일시 : 2026-04-13 (김재국)
-// 수정일시 : 2026-04-14 (김재국) - gradeLevel 파라미터 전달 (자동선택은 클라이언트에서 처리)
-// 주의사항 :
-//-------------------------------------------------------------------------------
+"use client"
 
-export const dynamic = "force-dynamic"
-
+import { Suspense, useEffect, useState } from "react"
+import { useSearchParams } from "next/navigation"
 import { getStepData } from "@/features/quick_coaching_guide/actions/Quick_Coaching_Guide_Actions"
 import { QuickCoachingGuide_Page, type GradeLevelKey, type QuickGuideType } from "@/features/quick_coaching_guide/pages/Quick_Coaching_Guide_Page"
 import { QUICK_COACHING_GUIDE_INITIAL_STEP_ID } from "@/features/quick_coaching_guide/lib/Quick_Coaching_Guide_Data"
+import type { StepGroup } from "@/features/quick_coaching_guide/model/Quick_Coaching_Guide_Model"
 
 const VALID_GRADE_LEVELS: GradeLevelKey[] = ["elementary-lower", "elementary-upper", "middle", "high"]
-const VALID_TYPES:        QuickGuideType[] = ["Mind", "Coaching"]
+const VALID_TYPES: QuickGuideType[] = ["Mind", "Coaching"]
 
-export default async function QuickCoachingGuideRoutePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ gradeLevel?: string; type?: string }>
-}) {
-  const { gradeLevel: rawGrade, type: rawType } = await searchParams
+function QuickCoachingGuideInner() {
+  const searchParams = useSearchParams()
+  const [initialStep, setInitialStep] = useState<StepGroup | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  const rawGrade = searchParams.get("gradeLevel")
+  const rawType = searchParams.get("type")
   const gradeLevel = VALID_GRADE_LEVELS.includes(rawGrade as GradeLevelKey) ? (rawGrade as GradeLevelKey) : null
-  const guideType  = VALID_TYPES.includes(rawType as QuickGuideType) ? (rawType as QuickGuideType) : "Mind"
+  const guideType = VALID_TYPES.includes(rawType as QuickGuideType) ? (rawType as QuickGuideType) : "Mind"
 
-  const initialStep = await getStepData(QUICK_COACHING_GUIDE_INITIAL_STEP_ID, guideType)
+  useEffect(() => {
+    getStepData(QUICK_COACHING_GUIDE_INITIAL_STEP_ID, guideType)
+      .then(setInitialStep)
+      .catch((e) => setError(e.message))
+  }, [guideType])
+
+  if (error) {
+    return (
+      <section className="bg-white px-4 pb-16 pt-10 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl text-center text-red-600">{error}</div>
+      </section>
+    )
+  }
+
+  if (!initialStep) {
+    return (
+      <section className="bg-white px-4 pb-16 pt-10 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl text-center text-gray-500">로딩 중...</div>
+      </section>
+    )
+  }
 
   return (
     <QuickCoachingGuide_Page
@@ -32,5 +48,13 @@ export default async function QuickCoachingGuideRoutePage({
       presetGradeLevel={gradeLevel}
       guideType={guideType}
     />
+  )
+}
+
+export default function QuickCoachingGuideRoutePage() {
+  return (
+    <Suspense>
+      <QuickCoachingGuideInner />
+    </Suspense>
   )
 }

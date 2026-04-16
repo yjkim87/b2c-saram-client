@@ -1,28 +1,56 @@
-// ------------------------------------------------------------------------------
-// 화 일 명 : Quick_Coaching_Guide_Actions.ts
-// 용    도 : Server Action + 비즈니스 로직 (DB 조회(DAO)를 호출하고 결과를 화면에 맞는 형태로 가공하여 반환)
-// 작성일시 : 2026-04-13 (김재국)
-// 수정일시 : 
-// 주의사항 :
-//-------------------------------------------------------------------------------
-
-"use server"
-
-import { QuickCoachingGuideDao } from "@/features/quick_coaching_guide/dao/Quick_Coaching_Guide_Dao"
 import { transformToStepGroup } from "@/features/quick_coaching_guide/lib/Quick_Coaching_Guide_Data"
-import type { StepGroup } from "@/features/quick_coaching_guide/model/Quick_Coaching_Guide_Model"
+import type { StepGroup, QuickCoachingGuideRow } from "@/features/quick_coaching_guide/model/Quick_Coaching_Guide_Model"
 
-const dao = new QuickCoachingGuideDao()
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
 
-// ─────────────────────────────────────────────────────────────────────────────
-// 2026-04-13 (김재국) - 퀵코칭가이드 정보 조회
-// ─────────────────────────────────────────────────────────────────────────────
+interface CoachingGuideApiResponse {
+  success: boolean
+  contents: Array<{
+    seq: number
+    stepId: string
+    guideContent: string
+    contentType: string
+    nextStepId: string | null
+    sort: number
+  }>
+  buttons: Array<{
+    seq: number
+    stepId: string
+    guideContent: string
+    contentType: string
+    nextStepId: string | null
+    sort: number
+  }>
+  errorMessage?: string
+}
+
+function mapRows(
+  items: CoachingGuideApiResponse["contents"]
+): QuickCoachingGuideRow[] {
+  return items.map((r) => ({
+    Seq: r.seq,
+    Step_Id: r.stepId,
+    Guide_Content: r.guideContent,
+    Content_Type: r.contentType as "message" | "button" | "reservation",
+    Next_Step_Id: r.nextStepId,
+    Sort: r.sort,
+    Reg_Date: "",
+  }))
+}
+
 export async function getStepData(stepId: string, type: string = "Mind"): Promise<StepGroup> {
-  try {
-    const { contents, buttons } = await dao.LF_Quick_Coaching_Guide_Info(stepId, type)
-    return transformToStepGroup(contents, buttons)
-  } catch (e) {
-    const err = e as Error
-    throw new Error(`퀵코칭가이드 조회 오류: ${err.message}`)
+  const params = new URLSearchParams({ stepId, type })
+  const response = await fetch(`${API_URL}/api/coaching-guide/step?${params}`)
+
+  if (!response.ok) {
+    throw new Error(`퀵코칭가이드 조회 오류: ${response.status}`)
   }
+
+  const data: CoachingGuideApiResponse = await response.json()
+
+  if (!data.success) {
+    throw new Error(`퀵코칭가이드 조회 오류: ${data.errorMessage || "unknown"}`)
+  }
+
+  return transformToStepGroup(mapRows(data.contents), mapRows(data.buttons))
 }

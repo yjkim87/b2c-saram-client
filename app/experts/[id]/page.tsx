@@ -1,4 +1,12 @@
-﻿import { ExpertDetailPage } from "@/features/experts/pages/expert-detail-page"
+﻿import { experts } from "@/features/experts/lib/experts"
+import { ExpertDetailPage } from "@/features/experts/pages/expert-detail-page"
+
+export function generateStaticParams() {
+  return experts.flatMap((e) => [
+    { id: e.id },
+    { id: e.slug },
+  ])
+}
 
 interface ExpertDetailRouteProps {
   params: Promise<{ id: string }>

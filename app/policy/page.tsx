@@ -1,35 +1,21 @@
+"use client"
+
+import { Suspense } from "react"
+import { useSearchParams } from "next/navigation"
 import { POLICY_TYPES, type PolicyType } from "@/features/policy/model/policy.types"
 import { PolicyPage } from "@/features/policy/pages/policy-page"
 
-type PageProps = {
-  searchParams?:
-    | Promise<{
-        type?: string | string[]
-        version?: string | string[]
-      }>
-    | {
-        type?: string | string[]
-        version?: string | string[]
-      }
-}
-
-function toInitialPolicyType(rawType?: string | string[]): PolicyType {
-  if (Array.isArray(rawType)) {
-    return "privacy"
-  }
-
+function toInitialPolicyType(rawType: string | null): PolicyType {
   if (rawType && POLICY_TYPES.includes(rawType as PolicyType)) {
     return rawType as PolicyType
   }
-
   return "privacy"
 }
 
-export default async function Page({ searchParams }: PageProps) {
-  const resolvedSearchParams = searchParams ? await Promise.resolve(searchParams) : undefined
-  const initialType = toInitialPolicyType(resolvedSearchParams?.type)
-  const initialVersion =
-    typeof resolvedSearchParams?.version === "string" ? resolvedSearchParams.version : undefined
+function PolicyPageInner() {
+  const searchParams = useSearchParams()
+  const initialType = toInitialPolicyType(searchParams.get("type"))
+  const initialVersion = searchParams.get("version") ?? undefined
 
   return (
     <PolicyPage
@@ -37,5 +23,13 @@ export default async function Page({ searchParams }: PageProps) {
       initialType={initialType}
       initialVersion={initialVersion}
     />
+  )
+}
+
+export default function Page() {
+  return (
+    <Suspense>
+      <PolicyPageInner />
+    </Suspense>
   )
 }
