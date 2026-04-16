@@ -18,6 +18,13 @@ interface AgeAccordionItem {
   quickGuideGradeLevel: "elementary-lower" | "elementary-upper" | "middle" | "high"
 }
 
+interface CounselingServiceItem {
+  key: string
+  badge: string
+  headline: ReactNode
+  body: string
+}
+
 interface FeatureCard {
   key: FeatureCardKey
   eyebrow: string
@@ -26,7 +33,8 @@ interface FeatureCard {
     regular: string
     emphasized: string
   }
-  ageItems: AgeAccordionItem[]
+  ageItems?: AgeAccordionItem[]
+  serviceItems?: CounselingServiceItem[]
 }
 
 interface CounselingCoachingCardsProps {
@@ -137,7 +145,30 @@ const AGE_ITEMS: AgeAccordionItem[] = [
   },
 ]
 
-const FEATURE_CARDS = [
+const COUNSELING_SERVICE_ITEMS: CounselingServiceItem[] = [
+  {
+    key: "psychological-counseling",
+    badge: "심리상담",
+    headline: (
+      <>
+        심리상담은 전 생애주기에 걸친 <strong className="font-extrabold">개인의 심리적 안녕과 관계의 회복을 목표</strong>로 하는 전문적인 조력 과정입니다.
+      </>
+    ),
+    body: "대상별 맞춤형 접근을 통해 개인의 성장을 도모하고 삶의 질을 높이는 통합적인 심리 지원 체계를 제공합니다.",
+  },
+  {
+    key: "psychological-assessment",
+    badge: "심리검사",
+    headline: (
+      <>
+        심리검사는 과학적이고 전문적인 도구를 통해 개인의 인지 기능, 정서 상태, 성격 특성 및 대인관계 등 <strong className="font-extrabold">심리적 기능을 다각도로 탐색하는 '마음의 검진' 과정</strong> 입니다.
+      </>
+    ),
+    body: "개인이 가진 지적 잠재력과 심리적 자원을 객관적으로 지표화함으로써, 단순한 진단을 넘어 심화된 자기 이해를 돕고 전문적인 치료 계획 수립이나 법적·의료적 증빙을 위한 공인 보고서로도 활용되는 핵심적인 진단 체계입니다.",
+  },
+]
+
+const FEATURE_CARDS: readonly FeatureCard[] = [
   {
     key: "counseling",
     eyebrow: "마음의 어려움을 읽고 치유하는 과정",
@@ -146,7 +177,7 @@ const FEATURE_CARDS = [
       regular: "심리적 문제나 감정적 어려움을 전문가와 함께 탐색하고 해결하는 치료적 접근법입니다.",
       emphasized: "아이의 현재 심리 상태를 이해하고 정서적 안정을 회복하는 데 초점을 맞춥니다.",
     },
-    ageItems: AGE_ITEMS,
+    serviceItems: COUNSELING_SERVICE_ITEMS,
   },
   {
     key: "coaching",
@@ -158,7 +189,7 @@ const FEATURE_CARDS = [
     },
     ageItems: AGE_ITEMS,
   },
-] as const satisfies readonly FeatureCard[]
+]
 
 export function CounselingCoachingCards({
   bubbleAlign = "center",
@@ -320,109 +351,125 @@ export function CounselingCoachingCards({
 
               <AnimatedCollapse open={isExpanded} innerClassName={isDesktop ? "pt-0" : "pt-8"}>
                 <div className="space-y-3">
-                  {card.ageItems.map((item) => {
-                    const isAgeOpen = openAgeByCard[card.key] === item.key
-                    const quickGuideHref = useAgePresetQuickGuide
-                      ? `/quick_coaching_guide?gradeLevel=${encodeURIComponent(item.quickGuideGradeLevel)}`
-                      : `/quick_coaching_guide`
-                    const shouldShowCustomConsultButton = card.key !== "counseling"
+                  {card.serviceItems && card.serviceItems.length > 0
+                    ? card.serviceItems.map((item) => (
+                        <div key={item.key} className="rounded-2xl bg-[#FFF7EF] px-5 py-7 md:px-6 md:py-8">
+                          <p className="inline-flex rounded-lg bg-[#FFFFFF] px-2.5 py-1 text-[12px] font-bold leading-tight text-[#FF7A33]">
+                            {item.badge}
+                          </p>
+                          <p className="mt-5 text-[18px] leading-[1.6] text-[#1E1712]">{item.headline}</p>
+                          <p className="mt-4 text-[16px] leading-[1.6] text-[#1E1712]">{item.body}</p>
+                          <Link
+                            href="/reservation"
+                            className="mt-7 inline-flex h-12 w-full items-center justify-center rounded-full bg-[#090909] px-3 text-[14px] font-semibold text-white transition-opacity hover:opacity-90"
+                          >
+                            빠른상담 예약하기
+                          </Link>
+                        </div>
+                      ))
+                    : (card.ageItems ?? []).map((item) => {
+                        const isAgeOpen = openAgeByCard[card.key] === item.key
+                        const quickGuideHref = useAgePresetQuickGuide
+                          ? `/quick_coaching_guide?gradeLevel=${encodeURIComponent(item.quickGuideGradeLevel)}`
+                          : `/quick_coaching_guide`
+                        const shouldShowCustomConsultButton = card.key !== "counseling"
 
-                    return (
-                      <div
-                        key={item.key}
-                        className="rounded-2xl bg-[#FFF7EF] px-4 py-8 transition-colors duration-200 hover:bg-[#FFEFDF]"
-                      >
-                        <button
-                          type="button"
-                          onClick={() => toggleAgeItem(card.key, item.key)}
-                          className="flex w-full items-center justify-between gap-4 text-left"
-                          aria-expanded={isAgeOpen}
-                        >
-                          <div>
-                            <p className="inline-flex rounded-lg bg-[#FFF] px-2.5 py-1 text-[12px] font-bold leading-tight text-[#F07C33]">
-                              {item.rangeLabel}
-                            </p>
-                            <p className="mt-[10px] whitespace-pre-line text-[20px] font-bold leading-[1.35] tracking-[-0.01em] text-[#1B140F] md:overflow-hidden md:text-ellipsis md:whitespace-nowrap">
-                              {item.question}
-                            </p>
-                          </div>
-                          {isAgeOpen ? (
-                            <ChevronUp className="h-5 w-5 shrink-0 text-[#C49B7C]" />
-                          ) : (
-                            <ChevronDown className="h-5 w-5 shrink-0 text-[#C49B7C]" />
-                          )}
-                        </button>
-
-                        <AnimatedCollapse open={isAgeOpen} innerClassName="pt-5">
-                          <div className="space-y-5">
-                            <div
-                              className={cn(
-                                "flex flex-col space-y-2.5",
-                                bubbleAlign === "left" ? "items-start" : "items-center"
-                              )}
+                        return (
+                          <div
+                            key={item.key}
+                            className="rounded-2xl bg-[#FFF7EF] px-4 py-8 transition-colors duration-200 hover:bg-[#FFEFDF]"
+                          >
+                            <button
+                              type="button"
+                              onClick={() => toggleAgeItem(card.key, item.key)}
+                              className="flex w-full items-center justify-between gap-4 text-left"
+                              aria-expanded={isAgeOpen}
                             >
-                              {item.details.map((detail, detailIndex) => {
-                                const tailGradientId = `${idPrefix}-bubble-tail-${card.key}-${item.key}-${detailIndex}`
-
-                                return (
-                                  <div key={detail} className="relative inline-block w-fit max-w-full pb-[14px]">
-                                    <p className="relative z-10 rounded-[36px] bg-[linear-gradient(90deg,#FFF7EF_0%,#FFE3C7_100%)] px-5 py-3 text-[14px] font-medium leading-[1.5] text-[#7E5F41]">
-                                      {detail}
-                                    </p>
-                                    <svg
-                                      aria-hidden="true"
-                                      viewBox="0 0 30 18"
-                                      className="pointer-events-none absolute -bottom-[1px] left-8 h-[18px] w-[30px]"
-                                    >
-                                      <defs>
-                                        <linearGradient id={tailGradientId} x1="0%" y1="50%" x2="100%" y2="50%">
-                                          <stop offset="0%" stopColor="#FFF7EF" />
-                                          <stop offset="100%" stopColor="#FFE3C7" />
-                                        </linearGradient>
-                                      </defs>
-                                      <path
-                                        d="M1 1H29C22 3 19 8 15 13C11 18 3 18 2 12C1 9 1 5 1 1Z"
-                                        fill={`url(#${tailGradientId})`}
-                                      />
-                                    </svg>
-                                  </div>
-                                )
-                              })}
-                            </div>
-
-                            <div
-                              className={cn(
-                                buttonWidth === "full" && shouldShowCustomConsultButton
-                                  ? "grid grid-cols-1 gap-2.5 md:grid-cols-2"
-                                  : "flex flex-col space-y-2.5 items-center"
+                              <div>
+                                <p className="inline-flex rounded-lg bg-[#FFF] px-2.5 py-1 text-[12px] font-bold leading-tight text-[#F07C33]">
+                                  {item.rangeLabel}
+                                </p>
+                                <p className="mt-[10px] whitespace-pre-line text-[20px] font-bold leading-[1.35] tracking-[-0.01em] text-[#1B140F] md:overflow-hidden md:text-ellipsis md:whitespace-nowrap">
+                                  {item.question}
+                                </p>
+                              </div>
+                              {isAgeOpen ? (
+                                <ChevronUp className="h-5 w-5 shrink-0 text-[#C49B7C]" />
+                              ) : (
+                                <ChevronDown className="h-5 w-5 shrink-0 text-[#C49B7C]" />
                               )}
-                            >
-                              <Link
-                                href="/reservation"
-                                className={cn(
-                                  "inline-flex h-12 w-full items-center justify-center rounded-full bg-[#090909] px-3 text-[14px] font-semibold text-white transition-opacity hover:opacity-90",
-                                  buttonWidth === "full" ? "" : "mx-auto max-w-[280px]"
-                                )}
-                              >
-                                빠른상담 예약하기
-                              </Link>
-                              {shouldShowCustomConsultButton ? (
-                                <Link
-                                  href={quickGuideHref}
+                            </button>
+
+                            <AnimatedCollapse open={isAgeOpen} innerClassName="pt-5">
+                              <div className="space-y-5">
+                                <div
                                   className={cn(
-                                    "inline-flex h-12 w-full items-center justify-center rounded-full bg-[#090909] px-3 text-[14px] font-semibold text-white transition-opacity hover:opacity-90",
-                                    buttonWidth === "full" ? "" : "mx-auto max-w-[280px]"
+                                    "flex flex-col space-y-2.5",
+                                    bubbleAlign === "left" ? "items-start" : "items-center"
                                   )}
                                 >
-                                  맞춤상담 예약하기
-                                </Link>
-                              ) : null}
-                            </div>
+                                  {item.details.map((detail, detailIndex) => {
+                                    const tailGradientId = `${idPrefix}-bubble-tail-${card.key}-${item.key}-${detailIndex}`
+
+                                    return (
+                                      <div key={detail} className="relative inline-block w-fit max-w-full pb-[14px]">
+                                        <p className="relative z-10 rounded-[36px] bg-[linear-gradient(90deg,#FFF7EF_0%,#FFE3C7_100%)] px-5 py-3 text-[14px] font-medium leading-[1.5] text-[#7E5F41]">
+                                          {detail}
+                                        </p>
+                                        <svg
+                                          aria-hidden="true"
+                                          viewBox="0 0 30 18"
+                                          className="pointer-events-none absolute -bottom-[1px] left-8 h-[18px] w-[30px]"
+                                        >
+                                          <defs>
+                                            <linearGradient id={tailGradientId} x1="0%" y1="50%" x2="100%" y2="50%">
+                                              <stop offset="0%" stopColor="#FFF7EF" />
+                                              <stop offset="100%" stopColor="#FFE3C7" />
+                                            </linearGradient>
+                                          </defs>
+                                          <path
+                                            d="M1 1H29C22 3 19 8 15 13C11 18 3 18 2 12C1 9 1 5 1 1Z"
+                                            fill={`url(#${tailGradientId})`}
+                                          />
+                                        </svg>
+                                      </div>
+                                    )
+                                  })}
+                                </div>
+
+                                <div
+                                  className={cn(
+                                    buttonWidth === "full" && shouldShowCustomConsultButton
+                                      ? "grid grid-cols-1 gap-2.5 md:grid-cols-2"
+                                      : "flex flex-col space-y-2.5 items-center"
+                                  )}
+                                >
+                                  <Link
+                                    href="/reservation"
+                                    className={cn(
+                                      "inline-flex h-12 w-full items-center justify-center rounded-full bg-[#090909] px-3 text-[14px] font-semibold text-white transition-opacity hover:opacity-90",
+                                      buttonWidth === "full" ? "" : "mx-auto max-w-[280px]"
+                                    )}
+                                  >
+                                    빠른상담 예약하기
+                                  </Link>
+                                  {shouldShowCustomConsultButton ? (
+                                    <Link
+                                      href={quickGuideHref}
+                                      className={cn(
+                                        "inline-flex h-12 w-full items-center justify-center rounded-full bg-[#090909] px-3 text-[14px] font-semibold text-white transition-opacity hover:opacity-90",
+                                        buttonWidth === "full" ? "" : "mx-auto max-w-[280px]"
+                                      )}
+                                    >
+                                      맞춤상담 예약하기
+                                    </Link>
+                                  ) : null}
+                                </div>
+                              </div>
+                            </AnimatedCollapse>
                           </div>
-                        </AnimatedCollapse>
-                      </div>
-                    )
-                  })}
+                        )
+                      })}
 
                   {!isDesktop ? (
                     <div className="flex justify-center pt-1">

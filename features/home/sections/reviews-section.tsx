@@ -15,14 +15,11 @@ import {
 interface ReviewItem {
   key: string
   ageLabel: string
-  reviewType: "부모님 후기" | "학생 후기"
   name: string
   meta: string
   summary: string
-  quote: string
   tone: {
     ageBadge: string
-    accentBar: string
   }
 }
 
@@ -30,60 +27,45 @@ const REVIEW_SUMMARY: ReviewItem[] = [
   {
     key: "elementary-lower-parent",
     ageLabel: "초등 저학년",
-    reviewType: "부모님 후기",
     name: "박OO 어머니",
     meta: "만 7세 자녀 · 비대면",
     summary:
       "3회 코칭만으로도 아이의 성향 파악이 잘 되었고, 비대면이었지만 충분한 소통이 가능했습니다.",
-    quote:
-      "몰랐던 관심 분야를 알게 되었습니다. 아이와 부모의 성향을 함께 알아갈 수 있어서 좋았습니다.",
     tone: {
       ageBadge: "border border-[#3378F6] bg-[#EAF3FF] text-[#3378F6]",
-      accentBar: "bg-[#F07C33]",
     },
   },
   {
     key: "elementary-upper-student",
     ageLabel: "초등 고학년",
-    reviewType: "학생 후기",
     name: "이OO 학생",
     meta: "만 11세 · 대면",
     summary:
       "진로 상담 선생님이 잘 이끌어주셨습니다. 한 번쯤 이런 경험을 하는 것도 중요하다고 생각해요.",
-    quote: "코칭을 한 후 앞으로의 방향이 조금 더 확고해졌습니다. 추천하고 싶어요.",
     tone: {
       ageBadge: "border border-[#12905D] bg-[#EAFBF2] text-[#12905D]",
-      accentBar: "bg-[#D6783F]",
     },
   },
   {
     key: "middle-parent",
     ageLabel: "중학생",
-    reviewType: "부모님 후기",
     name: "김OO 어머니",
     meta: "만 14세 자녀 · 대면",
     summary:
       "직장맘으로 자녀에 대해 많이 무심했던 것 같았는데, 이번 상담을 통해 많은 것을 듣고 자녀를 다시 한번 되돌아보는 시간이었습니다.",
-    quote:
-      "정확한 데이터를 통해 아이를 보게 되어 더욱 좋았습니다. 사춘기 자녀에게 본인을 돌아볼 수 있는 시간이었습니다.",
     tone: {
       ageBadge: "border border-[#D9821B] bg-[#FFF5E7] text-[#D9821B]",
-      accentBar: "bg-[#A76843]",
     },
   },
   {
     key: "high-student",
     ageLabel: "고등학생",
-    reviewType: "학생 후기",
     name: "김OO 학생",
     meta: "만 18세 · 대면",
     summary:
       "부모님이 아는 나와 내가 생각하는 나의 차이를 알아가며, 미래의 나를 그릴 때 도움을 잘 조율해볼 수 있었습니다.",
-    quote:
-      "나를 좀 더 알게 되었고, 내가 진정으로 원하는 것이 무엇인지 앞으로의 진로 설정에 큰 도움이 되었습니다.",
     tone: {
       ageBadge: "border border-[#D0527E] bg-[#FFF0F4] text-[#D0527E]",
-      accentBar: "bg-[#7E543A]",
     },
   },
 ]

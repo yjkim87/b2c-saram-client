@@ -2,18 +2,13 @@
 
 import { cn } from "@/shared/lib/utils"
 import { CounselingCoachingCards } from "@/features/home/components/counseling-coaching-cards"
-import type { HomeServiceTab } from "@/features/home/model/home-tab"
 import {
   landingLayoutTokens,
   landingSectionTokens,
   landingTypeTokens,
 } from "@/features/home/styles/landing-tokens"
 
-interface AgeGuideSectionProps {
-  tab: HomeServiceTab
-}
-
-export function AgeGuideSection({ tab }: AgeGuideSectionProps) {
+export function AgeGuideSection() {
   return (
     <section id="age-guide" className={cn("bg-[#FFF7EF]", landingSectionTokens.base)}>
       <div className={landingLayoutTokens.containerWide}>
@@ -28,9 +23,7 @@ export function AgeGuideSection({ tab }: AgeGuideSectionProps) {
           </p>
         </div>
 
-        <div key={`age-${tab}`}>
-          <CounselingCoachingCards bubbleAlign="left" buttonWidth="full" useAgePresetQuickGuide />
-        </div>
+        <CounselingCoachingCards bubbleAlign="left" buttonWidth="full" useAgePresetQuickGuide />
       </div>
     </section>
   )
