@@ -166,6 +166,8 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
     removeSchedule,
     formatScheduleDisplay,
     handleSubmit,
+    isSubmitting,
+    submitError,
     getAgeGroupLabel,
     formatPhoneNumber,
     isStep1Valid,
@@ -1495,8 +1497,14 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                           </div>
                         </div>
 
-                        <Button onClick={handleSubmit} disabled={phoneNumber.length < 13 || !privacyConsent} className="w-full">
-                          {"최종 예약 접수하기"}
+                        {submitError && (
+                          <div className="rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-600">
+                            {submitError}
+                          </div>
+                        )}
+
+                        <Button onClick={handleSubmit} disabled={phoneNumber.length < 13 || !privacyConsent || isSubmitting} className="w-full">
+                          {isSubmitting ? "접수중..." : "최종 예약 접수하기"}
                         </Button>
                       </div>
                     </div>

@@ -8,6 +8,7 @@ import {
   formatBirthdateInput,
   isValidBirthdate,
 } from "../lib/birthdate.utils"
+import { submitReservation } from "../actions/submit-reservation"
 
 const BIRTHDATE_ERROR_MESSAGE = "날짜가 올바르지 않습니다. 다시 입력해 주세요."
 
@@ -52,6 +53,8 @@ export function useReservationFlow() {
   const [privacyConsent, setPrivacyConsent] = useState(false)
   const [showPrivacyModal, setShowPrivacyModal] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   useEffect(() => {
     const isMobile = window.innerWidth < 1024
@@ -146,6 +149,8 @@ export function useReservationFlow() {
     setPrivacyConsent(false)
     setShowPrivacyModal(false)
     setIsComplete(false)
+    setIsSubmitting(false)
+    setSubmitError(null)
   }
 
   const handleAttendanceSelect = (value: Attendance) => {
@@ -182,9 +187,39 @@ export function useReservationFlow() {
     return `${parseInt(month)}/${parseInt(day)} ${schedule.time}`
   }
 
-  const handleSubmit = () => {
-    setIsComplete(true)
-    window.scrollTo({ top: 0, behavior: "auto" })
+  const handleSubmit = async () => {
+    if (isSubmitting) return
+
+    setIsSubmitting(true)
+    setSubmitError(null)
+
+    try {
+      const result = await submitReservation({
+        targetName: userInfo.name,
+        targetGender: userInfo.gender === "남성" ? "male" : "female",
+        targetBirthdate: userInfo.birthdate,
+        targetEducation: ageGroup || "",
+        applicantRelation: userInfo.relationship,
+        applicantPhone: phoneNumber.replace(/-/g, ""),
+        attendance: attendance || "both",
+        mainConcern: "",
+        preferredSlots: selectedSchedules.map((s) => ({
+          date: s.date,
+          time: s.time,
+        })),
+      })
+
+      if (result.success) {
+        setIsComplete(true)
+        window.scrollTo({ top: 0, behavior: "auto" })
+      } else {
+        setSubmitError(result.errorMessage || "예약 처리 중 오류가 발생했습니다.")
+      }
+    } catch {
+      setSubmitError("서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const isStep1Valid =
@@ -212,6 +247,8 @@ export function useReservationFlow() {
     privacyConsent,
     showPrivacyModal,
     isComplete,
+    isSubmitting,
+    submitError,
     setUserInfo,
     setPhoneNumber,
     setPrivacyConsent,
