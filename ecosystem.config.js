@@ -9,6 +9,8 @@ module.exports = {
     max_memory_restart: "500M",
     env: {
       NODE_ENV: "production",
+      B2C_API_URL: "http://localhost:80",
+      NEXT_PUBLIC_SITE_URL: "https://www.saram.me",
     }
   }]
 }
