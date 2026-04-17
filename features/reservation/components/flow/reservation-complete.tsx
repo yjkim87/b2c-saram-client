@@ -44,6 +44,7 @@ export function ReservationComplete({ flow }: ReservationCompleteProps) {
     userInfo,
     attendance,
     selectedSchedules,
+    concernTheme,
     phoneNumber,
     getAgeGroupLabel,
     formatScheduleDisplay,
@@ -53,6 +54,7 @@ export function ReservationComplete({ flow }: ReservationCompleteProps) {
     attendance === "both" ? "부모와 자녀 함께" : attendance === "child" ? "자녀만" : attendance === "parent" ? "부모만" : "-"
 
   const schedulesLabel = selectedSchedules.length > 0 ? selectedSchedules.map((schedule) => formatScheduleDisplay(schedule)).join(", ") : "-"
+  const concernThemeLabel = concernTheme.trim() || "-"
 
   const nextSteps = [
     "24시간 이내 일정 확정 안내를 드립니다.",
@@ -145,6 +147,11 @@ export function ReservationComplete({ flow }: ReservationCompleteProps) {
                 <InfoRow label="참석 인원" value={attendanceLabel} />
               </div>
 
+              <div className="rounded-2xl border border-gray-100 bg-gray-50 p-5">
+                <p className="text-[13px] font-bold text-gray-500">고민 테마</p>
+                <p className="mt-2 break-words whitespace-pre-wrap text-[15px] font-bold text-gray-900">{concernThemeLabel}</p>
+              </div>
+
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="rounded-2xl border border-blue-100/60 bg-blue-50/60 p-4">
                   <div className="mb-1 flex items-center gap-2 text-[13px] font-bold text-blue-600">
@@ -170,11 +177,11 @@ export function ReservationComplete({ flow }: ReservationCompleteProps) {
 
             <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
               <a
-                href="tel:02-1234-5678"
+                href="tel:051-928-0944"
                 className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-6 py-3 text-[15px] font-bold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 sm:w-auto"
               >
                 <Phone className="h-4 w-4" />
-                02-1234-5678
+                051-928-0944
               </a>
 
               <a

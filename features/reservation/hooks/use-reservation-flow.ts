@@ -49,6 +49,7 @@ export function useReservationFlow() {
   const [birthdateError, setBirthdateError] = useState<string | null>(null)
   const [ageGroup, setAgeGroup] = useState<AgeGroup | null>(null)
   const [attendance, setAttendance] = useState<Attendance | null>(null)
+  const [concernTheme, setConcernTheme] = useState("")
   const [showNudge, setShowNudge] = useState(false)
   const [selectedSchedules, setSelectedSchedules] = useState<SelectedSchedule[]>([])
   const [phoneNumber, setPhoneNumber] = useState("")
@@ -61,7 +62,7 @@ export function useReservationFlow() {
   useEffect(() => {
     const isMobile = window.innerWidth < 1024
 
-    if (isMobile || step === 1 || step === 2 || step === 3 || !showContent) {
+    if (isMobile || step === 1 || step === 2 || step === 3 || step === 4 || !showContent) {
       return
     }
 
@@ -145,6 +146,7 @@ export function useReservationFlow() {
     setBirthdateError(null)
     setAgeGroup(null)
     setAttendance(null)
+    setConcernTheme("")
     setShowNudge(false)
     setSelectedSchedules([])
     setPhoneNumber("")
@@ -204,7 +206,7 @@ export function useReservationFlow() {
         applicantRelation: userInfo.relationship,
         applicantPhone: phoneNumber.replace(/-/g, ""),
         attendance: attendance || "both",
-        mainConcern: "",
+        mainConcern: concernTheme.trim(),
         preferredSlots: selectedSchedules.map((s) => ({
           date: s.date,
           time: s.time,
@@ -251,6 +253,7 @@ export function useReservationFlow() {
     birthdateError,
     ageGroup,
     attendance,
+    concernTheme,
     showNudge,
     selectedSchedules,
     phoneNumber,
@@ -261,6 +264,7 @@ export function useReservationFlow() {
     submitError,
     setUserInfo,
     setPhoneNumber,
+    setConcernTheme,
     setPrivacyConsent,
     setShowPrivacyModal,
     goToNextStep,

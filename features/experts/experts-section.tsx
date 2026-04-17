@@ -9,7 +9,6 @@ import {
   experts,
   getExpertCardMeta,
   getLandingExpertItems,
-  type ExpertBadge,
   type ExpertProfile,
 } from "@/features/experts/lib/experts"
 
@@ -29,7 +28,6 @@ type ExpertCardItem = {
   visibleTags: string[]
   extraTagCount: number
   avatar: string
-  badge?: ExpertBadge
 }
 
 const landingExperts = getLandingExpertItems(3)
@@ -56,7 +54,6 @@ function toCardItem(expert: ExpertProfile): ExpertCardItem {
     visibleTags: expert.tags.slice(0, 2).map((tag) => `#${tag}`),
     extraTagCount: Math.max(expert.tags.length - 2, 0),
     avatar: meta.avatar,
-    badge: meta.badge,
   }
 }
 
@@ -228,7 +225,7 @@ function ExpertsSectionFull() {
               id="expert-search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="예) 김명준 박사, 아동 발달"
+              placeholder="예) 김명준, 아동 발달"
               className="h-11 border-slate-300 bg-white pl-9 text-slate-700 placeholder:text-slate-400"
             />
           </div>
@@ -257,12 +254,6 @@ function ExpertsSectionFull() {
                     <h2 className="truncate text-[15px] font-bold text-slate-900 md:text-base">{expert.name}</h2>
                   </div>
                 </div>
-
-                {expert.badge && (
-                  <span className="shrink-0 rounded-md border border-blue-200 bg-blue-50 px-2 py-1 text-[11px] font-semibold text-blue-700">
-                    {expert.badge}
-                  </span>
-                )}
               </div>
 
               <p className="mt-4 truncate text-sm text-slate-700" title={expert.intro}>

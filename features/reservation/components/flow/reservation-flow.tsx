@@ -2,36 +2,23 @@
 
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useEffect, useRef, useState, type ReactNode } from "react"
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react"
 import {
   ArrowUp,
-  Baby,
   Check,
-  GraduationCap,
-  Heart,
-  MessageCircle,
   Phone,
   RotateCcw,
-  School,
-  Users,
   X,
-  type LucideIcon,
 } from "lucide-react"
+import { usePolicyDocument } from "@/features/policy/hooks/use-policy-document"
+import { buildPolicyHtmlModel } from "@/features/policy/lib/policy-html"
 import { Button } from "@/shared/ui/button"
 import { FieldLabel } from "@/shared/ui/field-label"
 import { cn } from "@/shared/lib/utils"
 import { Footer } from "@/shared/layout/footer"
 import type { UseReservationFlowReturn } from "../../hooks/use-reservation-flow"
 import { genders, relationships } from "../../data/reservation.constants"
-import {
-  QUICK_TOPICS,
-  QUICK_TOPIC_ORDER,
-  normalizeQuickTopicActions,
-  type QuickTopicAction,
-  type QuickTopicId,
-  type QuickTopicItem,
-} from "../../data/quick-topics"
-import type { Gender, Relationship } from "../../model/reservation.types"
+import type { AgeGroup, Gender, Relationship } from "../../model/reservation.types"
 import { BotMessage, CalendarPicker, UserMessage } from "../shared/reservation-primitives"
 import { Step1Service } from "./step1-service"
 import { Step2Expert } from "./step2-expert"
@@ -54,44 +41,60 @@ interface EditableUserMessageProps {
   onEdit: () => void
 }
 
-interface QuickTopicChatEntry {
-  id: string
-  topicId?: QuickTopicId
-  userMessage: string
-  botMessage: string
-  tips?: string[]
-  actions?: QuickTopicAction[]
-}
-
-interface QuickIntroAgeOption {
-  id: "age_0_2" | "age_3_6" | "age_7_12" | "age_13_18"
-  label: string
-}
-
-const QUICK_TOPIC_ICON_MAP: Record<QuickTopicItem["icon"], LucideIcon> = {
-  baby: Baby,
-  speech: MessageCircle,
-  school: School,
-  teen: GraduationCap,
-  heart: Heart,
-  users: Users,
-}
-
 const STEP1_TYPING_DELAY_MS = 1200
-const QUICK_TOPIC_GUIDE_MESSAGE =
-  "안녕하세요! 🌱\n\n아이의 발달과 관련된 궁금증이나 걱정을 편하게 말씀해 주세요.\n발달심리학을 기반으로 도움이 되는 정보와 방향을 안내해 드리겠습니다.\n\n먼저, 아이가 몇 살인지 알려주실 수 있을까요?"
-const QUICK_INTRO_AGE_OPTIONS: QuickIntroAgeOption[] = [
-  { id: "age_0_2", label: "0-2세 (영아기)" },
-  { id: "age_3_6", label: "3-6세 (유아기)" },
-  { id: "age_7_12", label: "7-12세 (아동기)" },
-  { id: "age_13_18", label: "13-18세 (청소년기)" },
-]
-const QUICK_INTRO_RESERVATION_LABEL = "전문가 상담 바로 시작하기"
-const QUICK_INTRO_TYPING_DELAY_MS = 900
-const QUICK_TOPIC_TYPING_DELAY_MS = 900
 const RIGHT_BUBBLE_GRADIENT_CLASS = "bg-[linear-gradient(144.37deg,#FFB836_7.06%,#F57220_90.82%)]"
 const RIGHT_INTERACTIVE_PANEL_CLASS = "w-full max-w-md rounded-[20px] rounded-tr-[5px] border border-[#DFDFDF] bg-white"
 const WIDE_INTERACTIVE_PANEL_CLASS = "w-full rounded-[20px] border border-[#DFDFDF] bg-white"
+const CONCERN_THEME_PLACEHOLDERS = {
+  elementaryLower: "예: 도와주면 의존하고, 혼자 하라니 더 느려지는 것 같아요. 아이의 성향에 맞는 학습/양육 방법을 알고 싶어요.",
+  elementaryUpper: "예: 아이가 뭔가 좋아하는 건 있는데, 공부랑 어떻게 연결해야 할지 모르겠어요.",
+  middle: "예: 제가 도와주려 하면 간섭이래요. 그렇다고 놔두면 아무것도 안 해요. 어떻게 소통해야 할지 막막해요.",
+  high: "예: 제 방식으로 도와주려 하면 아이가 답답해해요. 아이의 성향에 맞춰 효과적으로 조력하고 싶어요.",
+} as const
+
+function getAgeFromBirthdate(birthdate: string) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(birthdate)
+
+  if (!match) {
+    return null
+  }
+
+  const year = Number(match[1])
+  const month = Number(match[2])
+  const day = Number(match[3])
+  const now = new Date()
+
+  let age = now.getFullYear() - year
+  const hasBirthdayPassed = now.getMonth() + 1 > month || (now.getMonth() + 1 === month && now.getDate() >= day)
+
+  if (!hasBirthdayPassed) {
+    age -= 1
+  }
+
+  return age
+}
+
+function getConcernThemePlaceholder(ageGroup: AgeGroup | null, birthdate: string) {
+  if (ageGroup === "middle") {
+    return CONCERN_THEME_PLACEHOLDERS.middle
+  }
+
+  if (ageGroup === "high" || ageGroup === "adult") {
+    return CONCERN_THEME_PLACEHOLDERS.high
+  }
+
+  if (ageGroup === "elementary") {
+    const age = getAgeFromBirthdate(birthdate)
+
+    if (age !== null && age <= 10) {
+      return CONCERN_THEME_PLACEHOLDERS.elementaryLower
+    }
+
+    return CONCERN_THEME_PLACEHOLDERS.elementaryUpper
+  }
+
+  return CONCERN_THEME_PLACEHOLDERS.elementaryLower
+}
 
 function AttendanceOptionButton({ isSelected, onClick, children }: AttendanceOptionButtonProps) {
   return (
@@ -127,14 +130,6 @@ function EditableUserMessage({ content, onEdit }: EditableUserMessageProps) {
   )
 }
 
-function isQuickIntroAgeEntryId(id: string) {
-  return id.startsWith("quick-intro:age_")
-}
-
-function isQuickTopicRootEntryId(id: string): id is QuickTopicId {
-  return QUICK_TOPIC_ORDER.includes(id as QuickTopicId)
-}
-
 export function ReservationFlow({ flow }: ReservationFlowProps) {
   const router = useRouter()
   const {
@@ -147,6 +142,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
     birthdateError,
     ageGroup,
     attendance,
+    concernTheme,
     showNudge,
     selectedSchedules,
     phoneNumber,
@@ -154,6 +150,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
     showPrivacyModal,
     setUserInfo,
     setPhoneNumber,
+    setConcernTheme,
     setPrivacyConsent,
     setShowPrivacyModal,
     goToNextStep,
@@ -173,41 +170,39 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
     isStep1Valid,
   } = flow
 
+  const { activeState: privacyPolicyState, fetchCurrent: fetchPrivacyPolicy } = usePolicyDocument("privacy")
+  const privacyPolicyHtml = useMemo(() => {
+    if (privacyPolicyState.status !== "success" || !privacyPolicyState.data) {
+      return ""
+    }
+
+    return buildPolicyHtmlModel(privacyPolicyState.data.content).html
+  }, [privacyPolicyState.data, privacyPolicyState.status])
+
   const [nameDraft, setNameDraft] = useState(userInfo.name)
   const headerRef = useRef<HTMLElement>(null)
-  const mobileQuickTopicsRef = useRef<HTMLDivElement>(null)
-  const quickIntroMessageRef = useRef<HTMLDivElement>(null)
-  const latestQuickTopicEntryRef = useRef<HTMLDivElement>(null)
-  const reservationFlowStartRef = useRef<HTMLDivElement>(null)
+  const mobileStepHeaderRef = useRef<HTMLDivElement>(null)
   const step2StartRef = useRef<HTMLDivElement>(null)
   const step3StartRef = useRef<HTMLDivElement>(null)
   const step4StartRef = useRef<HTMLDivElement>(null)
+  const step5StartRef = useRef<HTMLDivElement>(null)
   const step1LatestUserBubbleRef = useRef<HTMLDivElement>(null)
   const step1LatestBotBubbleRef = useRef<HTMLDivElement>(null)
   const step1AnswerRef = useRef<HTMLDivElement>(null)
   const step2AnswerRef = useRef<HTMLDivElement>(null)
   const step3AnswerRef = useRef<HTMLDivElement>(null)
+  const step4AnswerRef = useRef<HTMLDivElement>(null)
   const [showExitModal, setShowExitModal] = useState(false)
-  const [quickTopicHistory, setQuickTopicHistory] = useState<QuickTopicChatEntry[]>([])
-  const [activeQuickTopicId, setActiveQuickTopicId] = useState<QuickTopicId | null>(null)
-  const [selectedQuickAgeId, setSelectedQuickAgeId] = useState<QuickIntroAgeOption["id"] | null>(null)
-  const [isQuickIntroReady, setIsQuickIntroReady] = useState(false)
-  const [quickIntroSeed, setQuickIntroSeed] = useState(0)
-  const [isReservationFlowStarted, setIsReservationFlowStarted] = useState(true)
   const [editingField, setEditingField] = useState<"name" | "relationship" | "birthdate" | "gender" | null>(null)
   const [isMobileStepCompact, setIsMobileStepCompact] = useState(false)
   const [isRelationshipPromptReady, setIsRelationshipPromptReady] = useState(false)
   const [isBirthdatePromptReady, setIsBirthdatePromptReady] = useState(false)
   const [isGenderPromptReady, setIsGenderPromptReady] = useState(false)
   const [isNudgePromptReady, setIsNudgePromptReady] = useState(false)
-  const [quickTopicTypingEntryIds, setQuickTopicTypingEntryIds] = useState<string[]>([])
   const relationshipPromptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const birthdatePromptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const genderPromptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const nudgePromptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const quickTopicTypingTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
-  const quickIntroTypingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const reservationStartTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const isOnlyKoreanJamo = (value: string) => /^[ㄱ-ㅎㅏ-ㅣ]+$/.test(value)
   const isValidName = (value: string) => {
     const trimmed = value.trim()
@@ -264,7 +259,12 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
   const hasBirthdateAnswer =
     userInfo.birthdate.length === 10 && birthdateError === null && userInfo.birthdate === birthdateInput
   const hasGenderAnswer = Boolean(userInfo.gender)
-  const stepLabels = ["정보입력", "참석자", "일정", "연락처"]
+  const isConcernThemeValid = concernTheme.trim().length > 0
+  const concernThemePlaceholder = useMemo(
+    () => getConcernThemePlaceholder(ageGroup, userInfo.birthdate),
+    [ageGroup, userInfo.birthdate],
+  )
+  const stepLabels = ["정보입력", "참석자", "고민테마", "일정", "연락처"]
   const totalSteps = stepLabels.length
   const currentStep = Math.min(step, totalSteps)
   const currentStepLabel = stepLabels[currentStep - 1] ?? stepLabels[0]
@@ -285,14 +285,14 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
   ) => {
     const isMobileView = window.innerWidth < 1024
     const headerHeight = headerRef.current?.offsetHeight ?? (window.innerWidth >= 768 ? 78 : 64)
-    const mobileQuickTopicsHeight = isMobileView ? (mobileQuickTopicsRef.current?.offsetHeight ?? 0) : 0
+    const mobileStepHeaderHeight = isMobileView ? (mobileStepHeaderRef.current?.offsetHeight ?? 0) : 0
     const spacing = isMobileView ? 16 : 24
     const contextPeekOffset = isMobileView ? (options?.mobileContextPeek ?? 56) : (options?.desktopContextPeek ?? 72)
     const mobileSafeOffset = isMobileView ? 28 : 0
     const top =
       target.getBoundingClientRect().top +
       window.scrollY -
-      (headerHeight + mobileQuickTopicsHeight + spacing + contextPeekOffset + mobileSafeOffset)
+      (headerHeight + mobileStepHeaderHeight + spacing + contextPeekOffset + mobileSafeOffset)
 
     return Math.max(0, top)
   }
@@ -439,28 +439,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
   }, [showNudge])
 
   useEffect(() => {
-    setIsQuickIntroReady(false)
-
-    if (quickIntroTypingTimerRef.current) {
-      clearTimeout(quickIntroTypingTimerRef.current)
-      quickIntroTypingTimerRef.current = null
-    }
-
-    quickIntroTypingTimerRef.current = setTimeout(() => {
-      setIsQuickIntroReady(true)
-      quickIntroTypingTimerRef.current = null
-    }, QUICK_INTRO_TYPING_DELAY_MS)
-
-    return () => {
-      if (quickIntroTypingTimerRef.current) {
-        clearTimeout(quickIntroTypingTimerRef.current)
-        quickIntroTypingTimerRef.current = null
-      }
-    }
-  }, [quickIntroSeed])
-
-  useEffect(() => {
-    if (!isReservationFlowStarted || step < 2) {
+    if (step < 2) {
       return
     }
 
@@ -471,6 +450,8 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
           ? step3StartRef
           : step === 4
             ? step4StartRef
+            : step === 5
+              ? step5StartRef
             : null
 
     const isMobileView = window.innerWidth < 1024
@@ -481,6 +462,8 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
           ? step2AnswerRef
           : step === 4
             ? step3AnswerRef
+            : step === 5
+              ? step4AnswerRef
             : null
     const target = isMobileView ? (mobileAnswerTargetRef?.current ?? stepStartTargetRef?.current) : stepStartTargetRef?.current
 
@@ -502,34 +485,10 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
       window.cancelAnimationFrame(frameId)
       clearSettledScroll?.()
     }
-  }, [isReservationFlowStarted, step, showContent])
+  }, [step, showContent])
 
   useEffect(() => {
-    if (!isReservationFlowStarted || !reservationFlowStartRef.current) {
-      return
-    }
-
-    let clearSettledScroll: (() => void) | null = null
-    const frameId = window.requestAnimationFrame(() => {
-      const target = quickTopicHistory.length > 0 ? (latestQuickTopicEntryRef.current ?? reservationFlowStartRef.current) : reservationFlowStartRef.current
-      if (!target) {
-        return
-      }
-
-      clearSettledScroll = scrollTargetWithOffsets(target, {
-        mobileContextPeek: quickTopicHistory.length > 0 ? 28 : 0,
-        desktopContextPeek: quickTopicHistory.length > 0 ? 72 : 0,
-      })
-    })
-
-    return () => {
-      window.cancelAnimationFrame(frameId)
-      clearSettledScroll?.()
-    }
-  }, [isReservationFlowStarted, quickTopicHistory.length])
-
-  useEffect(() => {
-    if (!isReservationFlowStarted || step !== 1 || !showContent || isTyping) {
+    if (step !== 1 || !showContent || isTyping) {
       return
     }
 
@@ -571,7 +530,6 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
       window.cancelAnimationFrame(frameId)
     }
   }, [
-    isReservationFlowStarted,
     step,
     showContent,
     isTyping,
@@ -588,192 +546,8 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
     isEditingGender,
   ])
 
-  useEffect(() => {
-    if (isReservationFlowStarted || quickTopicHistory.length === 0) {
-      return
-    }
-
-    const isDesktopView = window.innerWidth >= 1024
-    const latestEntry = quickTopicHistory[quickTopicHistory.length - 1]
-
-    if (isDesktopView && latestEntry) {
-      const ageSelectionCount = quickTopicHistory.filter((entry) => isQuickIntroAgeEntryId(entry.id)).length
-      const quickTopicSelectionCount = quickTopicHistory.filter((entry) => isQuickTopicRootEntryId(entry.id)).length
-      const isFirstAgeSelection = isQuickIntroAgeEntryId(latestEntry.id) && ageSelectionCount === 1
-      const isFirstQuickTopicSelection =
-        isQuickTopicRootEntryId(latestEntry.id) &&
-        quickTopicSelectionCount === 1 &&
-        ageSelectionCount === 0
-
-      if (isFirstAgeSelection || isFirstQuickTopicSelection) {
-        const frameId = window.requestAnimationFrame(() => {
-          window.scrollTo({ top: 0, behavior: "smooth" })
-        })
-
-        return () => {
-          window.cancelAnimationFrame(frameId)
-        }
-      }
-    }
-
-    const target = latestQuickTopicEntryRef.current
-    if (!target) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-      return
-    }
-
-    let clearSettledScroll: (() => void) | null = null
-    const frameId = window.requestAnimationFrame(() => {
-      clearSettledScroll = scrollTargetWithOffsets(target, {
-        mobileContextPeek: 28,
-        desktopContextPeek: 72,
-      })
-    })
-
-    return () => {
-      window.cancelAnimationFrame(frameId)
-      clearSettledScroll?.()
-    }
-  }, [quickTopicHistory, isReservationFlowStarted, messagesEndRef])
-
-  useEffect(() => {
-    return () => {
-      Object.values(quickTopicTypingTimersRef.current).forEach((timerId) => {
-        clearTimeout(timerId)
-      })
-      quickTopicTypingTimersRef.current = {}
-      if (reservationStartTimerRef.current) {
-        clearTimeout(reservationStartTimerRef.current)
-        reservationStartTimerRef.current = null
-      }
-    }
-  }, [])
-
-  const enqueueQuickTopicReplyWithTyping = (entry: QuickTopicChatEntry) => {
-    if (quickTopicTypingTimersRef.current[entry.id] || quickTopicHistory.some((item) => item.id === entry.id)) {
-      return
-    }
-
-    const { botMessage, tips, actions, ...baseEntry } = entry
-
-    setQuickTopicHistory((previous) => [
-      ...previous,
-      {
-        ...baseEntry,
-        botMessage: "",
-      },
-    ])
-    setQuickTopicTypingEntryIds((previous) => (previous.includes(entry.id) ? previous : [...previous, entry.id]))
-
-    quickTopicTypingTimersRef.current[entry.id] = setTimeout(() => {
-      setQuickTopicHistory((previous) =>
-        previous.map((item) =>
-          item.id === entry.id
-            ? {
-                ...item,
-                botMessage,
-                tips,
-                actions,
-              }
-            : item,
-        ),
-      )
-      setQuickTopicTypingEntryIds((previous) => previous.filter((itemId) => itemId !== entry.id))
-      delete quickTopicTypingTimersRef.current[entry.id]
-    }, QUICK_TOPIC_TYPING_DELAY_MS)
-  }
-
-  const startReservationFlowWithTyping = (entry: QuickTopicChatEntry) => {
-    const alreadyQueued = Boolean(quickTopicTypingTimersRef.current[entry.id]) || quickTopicHistory.some((item) => item.id === entry.id)
-    const delay = alreadyQueued ? 0 : QUICK_TOPIC_TYPING_DELAY_MS
-
-    if (!alreadyQueued) {
-      enqueueQuickTopicReplyWithTyping(entry)
-    }
-
-    if (reservationStartTimerRef.current) {
-      clearTimeout(reservationStartTimerRef.current)
-      reservationStartTimerRef.current = null
-    }
-
-    reservationStartTimerRef.current = setTimeout(() => {
-      setIsReservationFlowStarted(true)
-      reservationStartTimerRef.current = null
-    }, delay)
-  }
-
-  const handleQuickIntroAgeSelect = (option: QuickIntroAgeOption) => {
-    setSelectedQuickAgeId(option.id)
-    const ageEntryId = `quick-intro:${option.id}`
-    enqueueQuickTopicReplyWithTyping({
-      id: ageEntryId,
-      userMessage: option.label,
-      botMessage:
-        "좋아요. 해당 연령대에 맞는 관점으로 안내해 드릴게요.\n빠른 상담 주제를 선택해 질문을 이어가 보세요.",
-    })
-  }
-
-  const handleQuickIntroReservationStart = () => {
-    startReservationFlowWithTyping({
-      id: "quick-intro:reservation-start",
-      userMessage: QUICK_INTRO_RESERVATION_LABEL,
-      botMessage: "좋아요. 예약 플로우를 바로 시작할게요.",
-    })
-  }
-
-  const handleQuickTopicSelect = (topicId: QuickTopicId) => {
-    setActiveQuickTopicId(topicId)
-    const topic = QUICK_TOPICS[topicId]
-    enqueueQuickTopicReplyWithTyping({
-      id: topic.id,
-      topicId: topic.id,
-      userMessage: topic.userMessage,
-      botMessage: topic.botMessage,
-      tips: topic.tips,
-      actions: normalizeQuickTopicActions(topic.actions),
-    })
-  }
-
-  const handleQuickTopicActionClick = (topicId: QuickTopicId, action: QuickTopicAction) => {
-    setActiveQuickTopicId(topicId)
-    const normalizedTopicActions = normalizeQuickTopicActions(QUICK_TOPICS[topicId].actions)
-    const reservationAction = normalizedTopicActions[normalizedTopicActions.length - 1]
-
-    if (action.type === "reservation") {
-      startReservationFlowWithTyping({
-        id: `${topicId}:reservation-intro`,
-        topicId,
-        userMessage: "전문가 상담 예약을 진행하고 싶어요",
-        botMessage: "좋아요. 지금부터 예약 플로우를 이어서 진행할게요.",
-      })
-      return
-    }
-
-    if (!action.botReply) {
-      return
-    }
-
-    enqueueQuickTopicReplyWithTyping({
-      id: `${topicId}:${action.id}`,
-      topicId,
-      userMessage: action.label,
-      botMessage: action.botReply,
-      actions: reservationAction ? [reservationAction] : [],
-    })
-  }
-
-  const handleQuickTopicReset = () => {
+  const handleFlowReset = () => {
     resetAll()
-    Object.values(quickTopicTypingTimersRef.current).forEach((timerId) => {
-      clearTimeout(timerId)
-    })
-    quickTopicTypingTimersRef.current = {}
-    setQuickTopicHistory([])
-    setQuickTopicTypingEntryIds([])
-    setActiveQuickTopicId(null)
-    setSelectedQuickAgeId(null)
-    setQuickIntroSeed((previous) => previous + 1)
-    setIsReservationFlowStarted(true)
     setEditingField(null)
     setIsRelationshipPromptReady(false)
     setIsBirthdatePromptReady(false)
@@ -800,19 +574,8 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
       nudgePromptTimerRef.current = null
     }
 
-    if (reservationStartTimerRef.current) {
-      clearTimeout(reservationStartTimerRef.current)
-      reservationStartTimerRef.current = null
-    }
-
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
-
-  const selectedQuickTopicSet = new Set(
-    quickTopicHistory.flatMap((entry) => (entry.topicId ? [entry.topicId] : [])),
-  )
-  const hasQuickTopicActivity =
-    quickTopicHistory.length > 0 || selectedQuickAgeId !== null || isReservationFlowStarted || activeQuickTopicId !== null
 
   const handleExit = () => {
     resetAll()
@@ -882,7 +645,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                       {index === 0 && (
                         <button
                           type="button"
-                          onClick={handleQuickTopicReset}
+                          onClick={handleFlowReset}
                           className="absolute right-0 top-1/2 inline-flex -translate-y-1/2 cursor-pointer items-center gap-1 text-sm font-medium text-[#6570A5] transition-colors hover:text-[#4A83D8]"
                         >
                           <RotateCcw className="h-3.5 w-3.5" />
@@ -897,7 +660,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
 
             <div className="min-w-0 space-y-4">
               <div
-                ref={mobileQuickTopicsRef}
+                ref={mobileStepHeaderRef}
                 className={cn(
                   "sticky top-[74px] z-30 rounded-[15px] border border-[#D6D9F3] bg-white transition-all duration-300 md:top-[90px] lg:hidden",
                   isMobileStepCompact ? "space-y-[6px] p-[10px]" : "space-y-2 p-[15px]",
@@ -914,7 +677,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                   </p>
                   <button
                     type="button"
-                    onClick={handleQuickTopicReset}
+                    onClick={handleFlowReset}
                     className="inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-[#2F2A23] transition-opacity hover:opacity-70"
                   >
                     <RotateCcw className="h-3.5 w-3.5" />
@@ -939,121 +702,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                 </div>
               </div>
 
-              {!isReservationFlowStarted && (
-                <>
-                  <div ref={quickIntroMessageRef}>
-                    {isQuickIntroReady ? (
-                      <BotMessage
-                        content={
-                          <div className="space-y-3">
-                            <p className="text-sm leading-relaxed whitespace-pre-line text-foreground md:text-base">
-                              {QUICK_TOPIC_GUIDE_MESSAGE}
-                            </p>
-                            <div className="flex flex-wrap gap-2 pt-1">
-                              {QUICK_INTRO_AGE_OPTIONS.map((option) => (
-                                <button
-                                  key={option.id}
-                                  type="button"
-                                  onClick={() => handleQuickIntroAgeSelect(option)}
-                                  className={cn(
-                                    "inline-flex max-w-full items-center rounded-full border px-3 py-1.5 text-left text-sm font-semibold whitespace-normal transition-colors",
-                                    selectedQuickAgeId === option.id
-                                      ? "border-primary bg-[#EEF3FF] text-primary"
-                                      : "border-[#D8CEBC] bg-white text-[#2F2A23] hover:bg-[#F4F0E7]",
-                                  )}
-                                >
-                                  {option.label}
-                                </button>
-                              ))}
-                              <button
-                                type="button"
-                                onClick={handleQuickIntroReservationStart}
-                                className="inline-flex max-w-full items-center rounded-full bg-primary px-3 py-1.5 text-left text-sm font-semibold whitespace-normal text-primary-foreground transition-colors hover:bg-primary/90"
-                              >
-                                {QUICK_INTRO_RESERVATION_LABEL}
-                              </button>
-                            </div>
-                          </div>
-                        }
-                      />
-                    ) : (
-                      <BotMessage content="" isTyping />
-                    )}
-                  </div>
-
-                  {quickTopicHistory.map((entry, index) => {
-                    const normalizedActions = entry.actions ? normalizeQuickTopicActions(entry.actions) : []
-                    const isQuickEntryTyping = quickTopicTypingEntryIds.includes(entry.id)
-                    const isLatestQuickTopicEntry = index === quickTopicHistory.length - 1
-
-                    return (
-                      <div
-                        key={entry.id}
-                        ref={isLatestQuickTopicEntry ? latestQuickTopicEntryRef : undefined}
-                        className="space-y-3"
-                      >
-                        <UserMessage content={entry.userMessage} />
-                        {isQuickEntryTyping ? (
-                          <BotMessage content="" isTyping />
-                        ) : (
-                          entry.botMessage && (
-                            <BotMessage
-                              content={
-                                <div className="space-y-3">
-                                  <p className="text-sm leading-relaxed whitespace-pre-line text-foreground md:text-base">
-                                    {entry.botMessage}
-                                  </p>
-                                  {entry.tips && entry.tips.length > 0 && (
-                                    <div className="space-y-1.5">
-                                      <p className="text-sm font-semibold text-[#2F2A23]">{"해당 연령에 대한 구체적인 팁:"}</p>
-                                      <ul className="space-y-1">
-                                        {entry.tips.map((tip) => (
-                                          <li key={tip} className="text-sm leading-relaxed text-foreground md:text-base">
-                                            {"•"} {tip}
-                                          </li>
-                                        ))}
-                                      </ul>
-                                    </div>
-                                  )}
-                                  {normalizedActions.length > 0 && (
-                                    <div className="flex flex-wrap gap-2 pt-1">
-                                      {normalizedActions.map((action) => (
-                                        <button
-                                          key={`${entry.id}-${action.id}`}
-                                          type="button"
-                                          onClick={() => {
-                                            if (!entry.topicId) {
-                                              return
-                                            }
-                                            handleQuickTopicActionClick(entry.topicId, action)
-                                          }}
-                                          className={cn(
-                                            "inline-flex max-w-full items-center rounded-full px-3 py-1.5 text-left text-sm font-semibold whitespace-normal transition-colors",
-                                            action.type === "reservation"
-                                              ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                                              : "border border-[#D8CEBC] bg-white text-[#2F2A23] hover:bg-[#F4F0E7]",
-                                          )}
-                                        >
-                                          {action.label}
-                                        </button>
-                                      ))}
-                                    </div>
-                                  )}
-                                </div>
-                              }
-                            />
-                          )
-                        )}
-                      </div>
-                    )
-                  })}
-                </>
-              )}
-
-              {isReservationFlowStarted && (
-                <>
-                  <div ref={reservationFlowStartRef} />
-                  {/* Step 1: Service */}
+              {/* Step 1: Service */}
           <Step1Service flow={flow}>
             {step >= 1 && (
               <>
@@ -1375,86 +1024,130 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
             )}
           </Step2Expert>
 
-          {/* Step 3: Schedule */}
+          {/* Step 3: Concern Theme */}
           <Step3Schedule flow={flow}>
             {step >= 3 && (
-            <>
-              <div ref={step3StartRef} />
-              {isTyping && step === 3 ? (
-                <BotMessage content="" isTyping />
-              ) : (
-                <>
-                  <BotMessage
-                    content={
-                      <div className="space-y-2">
-                        <p>
-                          {"일정 조율을 위해 희망 일정은 "}<strong>{"최소 2개 이상"}</strong>{" 선택해 주세요."}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {"선택하신 일정 중 전문가 스케줄과 교차 확인하여 최종 일정을 확정해 드립니다. 가능한 시간을 넉넉히 선택해 주시면 예약이 더 빠르게 진행됩니다."}
-                        </p>
-                      </div>
-                    }
-                  />
+              <>
+                <div ref={step3StartRef} />
+                {isTyping && step === 3 ? (
+                  <BotMessage content="" isTyping />
+                ) : (
+                  <>
+                    <BotMessage content={"현재 가장 고민되는 부분은 무엇인가요? 전문가의 도움이 필요한 상황을 편하게 적어주세요."} />
 
-                  {showContent && step === 3 && (
-                    <div className="space-y-4 animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
-                      <CalendarPicker selectedDates={selectedSchedules} onDateSelect={handleScheduleSelect} />
-
-                      {/* Selected Schedules Chips */}
-                      {selectedSchedules.length > 0 && (
-                        <div className="bg-card rounded-xl p-4 border border-border">
-                          <p className="text-sm font-medium text-muted-foreground mb-3">{"선택한 일정"} ({selectedSchedules.length}{"개"})</p>
-                          <div className="flex flex-wrap gap-2">
-                            {selectedSchedules.map((schedule, index) => (
-                              <div
-                                key={index}
-                                className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm"
-                              >
-                                <span>{formatScheduleDisplay(schedule)}</span>
-                                <button
-                                  onClick={() => removeSchedule(index)}
-                                  className="hover:bg-primary/20 rounded-full p-0.5"
-                                >
-                                  <X className="w-3 h-3" />
-                                </button>
-                              </div>
-                            ))}
+                    {showContent && step === 3 && (
+                      <div className="flex justify-end animate-in fade-in-0 slide-in-from-right-4 duration-300">
+                        <div className={cn(RIGHT_INTERACTIVE_PANEL_CLASS, "w-full max-w-2xl p-4 md:p-5")}>
+                          <textarea
+                            value={concernTheme}
+                            onChange={(event) => setConcernTheme(event.target.value)}
+                            placeholder={concernThemePlaceholder}
+                            className="h-44 w-full resize-none overflow-y-auto rounded-2xl border border-[#FFC6AA] bg-[#F4F5F7] px-4 py-3 text-sm leading-relaxed text-foreground placeholder:text-[#9CA3AF] caret-[#FF7A33] focus:border-[#FF7A33] focus:outline-none focus:ring-2 focus:ring-[#FF7A33]/25"
+                          />
+                          <div className="mt-4 flex items-center justify-between gap-3">
+                            <p className="text-sm text-[#6B7280]">{"* 한 줄만 적으셔도 괜찮습니다."}</p>
+                            <Button
+                              type="button"
+                              onClick={goToNextStep}
+                              disabled={!isConcernThemeValid}
+                              className="h-11 rounded-xl bg-[#FF7A33] px-5 text-base font-semibold text-white hover:bg-[#E86F2F] disabled:bg-[#FFC8AC] disabled:text-white"
+                            >
+                              {"작성 완료"}
+                            </Button>
                           </div>
                         </div>
-                      )}
+                      </div>
+                    )}
+                  </>
+                )}
 
-                      <Button
-                        onClick={goToNextStep}
-                        disabled={selectedSchedules.length < 2}
-                        className="mt-5 h-[50px] w-full bg-[#333333] text-[18px] font-semibold text-white hover:bg-[#333333] disabled:bg-[#333333] disabled:text-white"
-                      >
-                        {"다음으로"} {selectedSchedules.length < 2 && `(${2 - selectedSchedules.length}개 더 선택)`}
-                      </Button>
-                    </div>
-                  )}
-                </>
-              )}
-
-              {step > 3 && selectedSchedules.length > 0 && (
-                <div ref={step3AnswerRef}>
-                  <UserMessage content={`희망 일정: ${selectedSchedules.map((s) => formatScheduleDisplay(s)).join(", ")}`} />
-                </div>
-              )}
-            </>
+                {step > 3 && concernTheme.trim().length > 0 && (
+                  <div ref={step3AnswerRef}>
+                    <UserMessage content={concernTheme.trim()} />
+                  </div>
+                )}
+              </>
             )}
 
-            {/* Step 4: Phone Number */}
+            {/* Step 4: Schedule */}
             {step >= 4 && (
+              <>
+                <div ref={step4StartRef} />
+                {isTyping && step === 4 ? (
+                  <BotMessage content="" isTyping />
+                ) : (
+                  <>
+                    <BotMessage
+                      content={
+                        <div className="space-y-2">
+                          <p>
+                            {"일정 조율을 위해 희망 일정은 "}<strong>{"최소 2개 이상"}</strong>{" 선택해 주세요."}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {"선택하신 일정 중 전문가 스케줄과 교차 확인하여 최종 일정을 확정해 드립니다. 가능한 시간을 넉넉히 선택해 주시면 예약이 더 빠르게 진행됩니다."}
+                          </p>
+                        </div>
+                      }
+                    />
+
+                    {showContent && step === 4 && (
+                      <div className="space-y-4 animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
+                        <CalendarPicker selectedDates={selectedSchedules} onDateSelect={handleScheduleSelect} />
+
+                        {/* Selected Schedules Chips */}
+                        {selectedSchedules.length > 0 && (
+                          <div className="bg-card rounded-xl p-4 border border-border">
+                            <p className="text-sm font-medium text-muted-foreground mb-3">{"선택한 일정"} ({selectedSchedules.length}{"개"})</p>
+                            <div className="flex flex-wrap gap-2">
+                              {selectedSchedules.map((schedule, index) => (
+                                <div
+                                  key={index}
+                                  className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm"
+                                >
+                                  <span>{formatScheduleDisplay(schedule)}</span>
+                                  <button
+                                    onClick={() => removeSchedule(index)}
+                                    className="hover:bg-primary/20 rounded-full p-0.5"
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        <Button
+                          onClick={goToNextStep}
+                          disabled={selectedSchedules.length < 2}
+                          className="mt-5 h-[50px] w-full bg-[#333333] text-[18px] font-semibold text-white hover:bg-[#333333] disabled:bg-[#333333] disabled:text-white"
+                        >
+                          {"다음으로"} {selectedSchedules.length < 2 && `(${2 - selectedSchedules.length}개 더 선택)`}
+                        </Button>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {step > 4 && selectedSchedules.length > 0 && (
+                  <div ref={step4AnswerRef}>
+                    <UserMessage content={`희망 일정: ${selectedSchedules.map((s) => formatScheduleDisplay(s)).join(", ")}`} />
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* Step 5: Phone Number */}
+            {step >= 5 && (
             <>
-              <div ref={step4StartRef} />
-              {isTyping && step === 4 ? (
+              <div ref={step5StartRef} />
+              {isTyping && step === 5 ? (
                 <BotMessage content="" isTyping />
               ) : (
                 <>
                   <BotMessage content={"거의 완료되었습니다. 예약자분의 연락처를 남겨주시면 센터에서 일정 확인 후 카카오 알림톡으로 최종 확정 안내를 보내드립니다."} />
 
-                  {showContent && step === 4 && (
+                  {showContent && step === 5 && (
                     <div className="bg-card rounded-2xl p-5 shadow-sm border border-border animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
                       <div className="space-y-4">
                         <div>
@@ -1514,8 +1207,8 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                   {showPrivacyModal && (
                     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 animate-in fade-in-0 duration-200">
                       <div className="bg-card rounded-2xl max-w-lg w-full max-h-[80vh] overflow-hidden shadow-xl animate-in zoom-in-95 duration-200">
-                                                <div className="flex items-center justify-between p-4 border-b border-border">
-                          <h3 className="font-semibold text-foreground">{"개인정보 수집 및 이용 동의"}</h3>
+                        <div className="flex items-center justify-between p-4 border-b border-border">
+                          <h3 className="font-semibold text-foreground">{privacyPolicyState.data?.title ?? "개인정보 수집 및 이용 동의"}</h3>
                           <button
                             onClick={() => setShowPrivacyModal(false)}
                             className="p-1 hover:bg-muted rounded-lg transition-colors"
@@ -1524,40 +1217,43 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                           </button>
                         </div>
                         <div className="p-5 overflow-y-auto max-h-[60vh]">
-                          <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
-                            <div>
-                              <h4 className="font-medium text-foreground mb-2">{"1. 수집하는 개인정보 항목"}</h4>
-                              <p>{"에세스타 부모코칭은 상담 예약 및 서비스 제공을 위해 아래와 같은 개인정보를 수집합니다."}</p>
-                              <ul className="list-disc list-inside mt-2 space-y-1">
-                                <li>{"필수 항목: 예약자 이름, 대상자와의 관계, 대상자 생년월일, 대상자 성별, 휴대폰 번호"}</li>
-                                <li>{"선택 항목: 상담 희망 일정, 상담 고민 내용"}</li>
-                              </ul>
+                          {(privacyPolicyState.status === "idle" || privacyPolicyState.status === "loading") && (
+                            <div className="space-y-3" aria-busy="true">
+                              <div className="h-4 w-2/3 animate-pulse rounded-md bg-muted" />
+                              <div className="h-4 w-full animate-pulse rounded-md bg-muted" />
+                              <div className="h-4 w-[92%] animate-pulse rounded-md bg-muted" />
+                              <div className="h-4 w-[85%] animate-pulse rounded-md bg-muted" />
                             </div>
-                            <div>
-                              <h4 className="font-medium text-foreground mb-2">{"2. 개인정보 수집 및 이용 목적"}</h4>
-                              <ul className="list-disc list-inside space-y-1">
-                                <li>{"상담 예약 접수 및 일정 조율"}</li>
-                                <li>{"카카오 알림톡을 통한 예약 확정 안내"}</li>
-                                <li>{"맞춤형 상담 서비스 제공을 위한 사전 정보 파악"}</li>
-                                <li>{"서비스 개선을 위한 통계 분석 (비식별 처리)"}</li>
-                              </ul>
-                            </div>
-                            <div>
-                              <h4 className="font-medium text-foreground mb-2">{"3. 개인정보 보유 및 이용 기간"}</h4>
-                              <p>
-                                {"수집된 개인정보는 "}<strong className="text-foreground">{"상담 완료 후 1년간"}</strong>{" 보관되며, 이후 지체 없이"}
-                                {"파기됩니다. 단, 관계 법령에 따라 보존이 필요한 경우 해당 기간 동안 보관될 수 있습니다."}
+                          )}
+
+                          {privacyPolicyState.status === "error" && (
+                            <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+                              <p className="text-sm leading-relaxed text-red-700">
+                                {privacyPolicyState.error ?? "개인정보처리방침을 불러오지 못했습니다."}
                               </p>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => void fetchPrivacyPolicy(true)}
+                                className="mt-3 border-red-300 bg-white text-red-700 hover:bg-red-100"
+                              >
+                                다시 시도
+                              </Button>
                             </div>
-                            <div>
-                              <h4 className="font-medium text-foreground mb-2">{"4. 동의 거부권 및 불이익"}</h4>
-                              <p>
-                                {"귀하는 개인정보 수집 및 이용 동의를 거부할 권리가 있습니다. 다만, 필수 항목에 대한 동의를 거부하실 경우 상담"}
-                                {"예약 서비스 이용이 제한될 수 있습니다."}
-                              </p>
-                            </div>
-                          </div>
-                        </div>                        <div className="p-4 border-t border-border">
+                          )}
+
+                          {privacyPolicyState.status === "success" && privacyPolicyState.data && (
+                            <article
+                              className="min-w-0 text-sm leading-[1.8] text-muted-foreground [overflow-wrap:anywhere] [&_h2]:mt-8 [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:text-foreground [&_h3]:mt-6 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-foreground [&_li]:mt-1.5 [&_ol]:mt-3 [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:mt-3 [&_strong]:font-semibold [&_strong]:text-foreground [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:pl-5 [&_.policy-table-wrap]:mt-4 [&_.policy-table-wrap]:w-full [&_.policy-table-wrap]:overflow-x-auto [&_.policy-table-wrap]:[-webkit-overflow-scrolling:touch] [&_.policy-table]:min-w-[640px] [&_.policy-table]:w-full [&_.policy-table]:border-collapse [&_.policy-table]:border [&_.policy-table]:border-slate-300 [&_.policy-table_th]:border [&_.policy-table_th]:border-slate-300 [&_.policy-table_th]:bg-slate-100 [&_.policy-table_th]:px-4 [&_.policy-table_th]:py-3 [&_.policy-table_th]:text-left [&_.policy-table_th]:text-xs [&_.policy-table_th]:font-semibold [&_.policy-table_td]:border [&_.policy-table_td]:border-slate-300 [&_.policy-table_td]:px-4 [&_.policy-table_td]:py-3 [&_.policy-table_td]:align-top"
+                              dangerouslySetInnerHTML={{ __html: privacyPolicyHtml }}
+                            />
+                          )}
+
+                          {privacyPolicyState.status === "success" && !privacyPolicyState.data && (
+                            <p className="text-sm text-muted-foreground leading-relaxed">개인정보처리방침 내용을 찾지 못했습니다.</p>
+                          )}
+                        </div>
+                        <div className="p-4 border-t border-border">
                           <Button
                             onClick={() => {
                               setPrivacyConsent(true)
@@ -1576,8 +1272,6 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
             </>
             )}
           </Step3Schedule>
-                </>
-              )}
 
               <div ref={messagesEndRef} />
             </div>
@@ -1589,7 +1283,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/45 p-4">
           <div className="w-full max-w-sm rounded-2xl border border-[#E4DBCC] bg-white p-6 shadow-xl">
             <p className="whitespace-pre-line text-base font-medium leading-relaxed text-[#2F2A23]">
-              {"작성 중인 내용이 모두 사라집니다.\n정말 나가시겠어요?"}
+              {"작성 중인 내용은 모두 사라집니다.\n정말 나가시겠어요?"}
             </p>
             <div className="mt-6 grid grid-cols-2 gap-3">
               <Button

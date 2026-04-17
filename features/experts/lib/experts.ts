@@ -69,7 +69,7 @@ export const experts: ExpertProfile[] = [
   {
     id: "1",
     slug: "kim-myungjun",
-    name: "김명준 박사",
+    name: "김명준",
     specialty: "진로·성장 코칭",
     shortIntro: "정밀한 심리 진단과 글로벌 수준의 코칭으로 무한한 가능성을 엽니다.",
     experienceSummary:
@@ -80,7 +80,7 @@ export const experts: ExpertProfile[] = [
   {
     id: "2",
     slug: "kim-youngjae",
-    name: "김영재 박사",
+    name: "김영재",
     specialty: "AI 기반 심리성장 코칭",
     shortIntro:
       "글로벌 MBTI 파트너십과 AI 시스템이 그리는, 우리 아이를 위한 과학적이고 균일한 성장 지도.",
@@ -91,7 +91,7 @@ export const experts: ExpertProfile[] = [
   {
     id: "3",
     slug: "choi-yoonhee",
-    name: "최윤희 박사",
+    name: "최윤희",
     specialty: "아동·청소년 발달 코칭",
     shortIntro:
       "어린이용 성격 유형 검사 한국 표준화 전문가로서, 아이 고유의 성향에 맞춘 발달 중심의 따뜻한 성장 지도를 그립니다.",
@@ -138,7 +138,7 @@ export const experts: ExpertProfile[] = [
   {
     id: "7",
     slug: "kim-hayoung",
-    name: "김하영 원장",
+    name: "김하영",
     specialty: "임상·가족관계 코칭",
     shortIntro:
       "20년 임상경험의 통찰력과 과학적인 심리 평가를 통해 아이와 부모님의 관계를 이해하고 소통방식을 제시합니다.",
@@ -191,7 +191,6 @@ function createDefaultDetailPageContent(
 const expertMetaById: Record<string, ExpertMeta> = {
   "1": {
     imageUrl: "/expert-profile-photos/Kim-mj.jpg",
-    listBadge: "추천",
     landingCredentials: "코칭심리사 1급",
     landingThemeColor: "text-blue-600",
     landingThemeBg: "bg-blue-50",
@@ -243,7 +242,6 @@ const expertMetaById: Record<string, ExpertMeta> = {
   },
   "2": {
     imageUrl: "/expert-profile-photos/Kim-yj.jpg",
-    listBadge: "추천",
     landingCredentials: "심리학 박사",
     landingThemeColor: "text-amber-700",
     landingThemeBg: "bg-amber-50",
@@ -301,7 +299,6 @@ const expertMetaById: Record<string, ExpertMeta> = {
   },
   "3": {
     imageUrl: "/expert-profile-photos/Choi-yh.jpg",
-    listBadge: "추천",
     landingCredentials: "아동·청소년 표준화 전문가",
     landingThemeColor: "text-emerald-700",
     landingThemeBg: "bg-emerald-50",
