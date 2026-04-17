@@ -9,6 +9,7 @@ module.exports = {
     max_memory_restart: "500M",
     env: {
       NODE_ENV: "production",
+      NEXT_PUBLIC_API_URL: "https://admin.saram.me",
     }
   }]
 }
