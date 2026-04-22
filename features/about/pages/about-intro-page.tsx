@@ -186,15 +186,6 @@ export function AboutIntroPage() {
                 </p>
               </div>
 
-              <div className="shrink-0">
-                <Link
-                  href="/reservation"
-                  className="group inline-flex items-center gap-2 rounded-xl bg-white px-7 py-4 text-[16px] font-bold text-gray-900 transition-all duration-300 hover:-translate-y-0.5 hover:bg-gray-50 hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] active:scale-[0.98]"
-                >
-                  무료 초기상담 신청하기
-                  <ArrowRight className="h-5 w-5 text-gray-400 transition-all group-hover:translate-x-1 group-hover:text-gray-900" />
-                </Link>
-              </div>
             </div>
           </div>
         </section>

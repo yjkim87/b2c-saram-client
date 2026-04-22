@@ -1,6 +1,5 @@
 "use client"
 
-import Link from "next/link"
 import { cn } from "@/shared/lib/utils"
 import {
   landingLayoutTokens,
@@ -69,7 +68,7 @@ export function CenterSection() {
           사람의 발견을 지향하는 '사발면' 센터입니다.
         </p>
 
-        <div className="mx-auto mt-8 grid w-full max-w-full min-w-0 gap-[var(--landing-space-grid-md)] md:mt-10 md:max-w-none md:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] md:items-stretch">
+        <div className="mx-auto mt-8 grid w-full max-w-full min-w-0 gap-[var(--landing-space-grid-md)] md:mt-10 md:max-w-none md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] md:items-stretch">
           <div className="w-full min-w-0 md:h-full">
             <a
               href={NAVER_MAP_URL}
@@ -91,19 +90,9 @@ export function CenterSection() {
             <div className="space-y-[var(--landing-space-grid-sm)] md:hidden">
               <div className="space-y-[var(--landing-space-chip-y)]">
                 <p className={cn(landingTypeTokens.stepDescription, "text-[#1E1611] font-bold")}>운영시간</p>
-                <p className={landingTypeTokens.stepDescription}>평일 09:00 ~ 20:00, 주말 09:00 ~ 17:00</p>
+                <p className={landingTypeTokens.stepDescription}>월~수: 10시~ 19시/화 휴무/목~토: 10시~21시/일: 10시~18시</p>
                 <p className={cn("mt-[var(--landing-space-grid-sm)]", landingTypeTokens.stepDescription)}>
                   <span className="font-bold">전화상담</span> 051-928-0944
-                </p>
-                <p
-                  className={cn(
-                    "inline-block w-fit bg-[#F1E4D8] text-[#5A4433]",
-                    landingTypeTokens.noteText,
-                    landingRadiusTokens.note,
-                    landingSpaceTokens.notePadding
-                  )}
-                >
-                  * 일요일은 휴무이며, 사전 예약제 운영됩니다.
                 </p>
               </div>
 
@@ -163,20 +152,10 @@ export function CenterSection() {
               >
                 <p className={cn(landingTypeTokens.stepDescription, "text-[#1E1611] font-bold")}>운영시간</p>
                 <p className={cn("mt-[var(--landing-space-chip-y)]", landingTypeTokens.stepDescription)}>
-                  평일 09:00 ~ 20:00, 주말 09:00 ~ 17:00
+                  월~수: 10시~ 19시/화 휴무/목~토: 10시~21시/일: 10시~18시
                 </p>
                 <p className={cn("mt-[var(--landing-space-grid-sm)]", landingTypeTokens.stepDescription)}>
                   <span className="font-bold">전화상담</span> 051-928-0944
-                </p>
-                <p
-                  className={cn(
-                    "mt-[var(--landing-space-chip-y)] inline-block w-fit bg-[#F1E4D8] text-[#5A4433]",
-                    landingTypeTokens.noteText,
-                    landingRadiusTokens.note,
-                    landingSpaceTokens.notePadding
-                  )}
-                >
-                  * 일요일은 휴무이며, 사전 예약제 운영됩니다.
                 </p>
               </article>
             </div>
@@ -201,20 +180,6 @@ export function CenterSection() {
           </div>
         </div>
 
-        <div className="mt-12">
-          <Link
-            href="/reservation"
-            data-home-center-reservation-cta
-            className={cn(
-              "inline-flex min-w-[280px] items-center justify-center bg-[#25170F] text-white shadow-[0_14px_30px_rgba(37,23,15,0.24)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#1B110B]",
-              landingRadiusTokens.pill,
-              landingSpaceTokens.buttonPaddingLg,
-              landingTypeTokens.buttonLg
-            )}
-          >
-            무료 상담 예약 →
-          </Link>
-        </div>
       </div>
     </section>
   )

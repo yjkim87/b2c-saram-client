@@ -35,6 +35,10 @@ function getInitialPolicyType(initialType?: PolicyType): PolicyType {
   return "privacy"
 }
 
+function isArticleHeading(text: string) {
+  return /^제\s*\d+조\s*/.test(text.trim())
+}
+
 function PolicyLoadingState() {
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8" aria-busy="true">
@@ -93,9 +97,18 @@ export function PolicyPage({ initialType, initialVersion }: PolicyPageProps) {
     return buildPolicyHtmlModel(activeState.data.content)
   }, [activeState.data, activeState.status])
 
-  const hasSidebar = activeState.status === "success" && !!activeState.data && htmlModel.headings.length > 0
+  const sidebarHeadings = useMemo(
+    () => htmlModel.headings.filter((heading) => heading.level === 2 && isArticleHeading(heading.text)),
+    [htmlModel.headings]
+  )
 
-  const activeHeadingId = useActivePolicyHeading(contentRef, hasSidebar ? htmlModel.headings : [])
+  const hasSidebar = activeState.status === "success" && !!activeState.data && sidebarHeadings.length > 0
+
+  const activeHeadingId = useActivePolicyHeading(
+    contentRef,
+    hasSidebar ? sidebarHeadings : [],
+    HEADING_SCROLL_OFFSET
+  )
 
   const handleSelectHeading = useCallback((headingId: string) => {
     const targetHeading = document.getElementById(headingId)
@@ -169,7 +182,7 @@ export function PolicyPage({ initialType, initialVersion }: PolicyPageProps) {
 
   const sidebar = hasSidebar ? (
     <PolicySidebar
-      headings={htmlModel.headings}
+      headings={sidebarHeadings}
       activeHeadingId={activeHeadingId}
       onSelectHeading={handleSelectHeading}
     />

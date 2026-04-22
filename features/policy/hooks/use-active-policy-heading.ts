@@ -15,7 +15,8 @@ function escapeSelector(value: string) {
 
 export function useActivePolicyHeading(
   contentRootRef: RefObject<HTMLElement | null>,
-  headings: PolicyHeading[]
+  headings: PolicyHeading[],
+  scrollOffset = DEFAULT_SCROLL_OFFSET
 ) {
   const [activeHeadingId, setActiveHeadingId] = useState("")
 
@@ -31,31 +32,40 @@ export function useActivePolicyHeading(
       return
     }
 
-    const headingElements = headings
-      .map((heading) => {
-        const selector = `#${escapeSelector(heading.id)}`
-        const element = root.querySelector(selector) as HTMLElement | null
+    const resolveHeadingElements = () =>
+      headings
+        .map((heading) => {
+          const selector = `#${escapeSelector(heading.id)}`
+          let element: HTMLElement | null = null
 
-        if (!element) {
-          return null
-        }
+          try {
+            element = root.querySelector(selector) as HTMLElement | null
+          } catch {
+            return null
+          }
 
-        return { id: heading.id, element }
-      })
-      .filter((item): item is { id: string; element: HTMLElement } => item !== null)
+          if (!element || !element.isConnected || !root.contains(element)) {
+            return null
+          }
 
-    if (!headingElements.length) {
-      setActiveHeadingId("")
-      return
-    }
+          return { id: heading.id, element }
+        })
+        .filter((item): item is { id: string; element: HTMLElement } => item !== null)
 
     const updateActiveHeading = () => {
+      const headingElements = resolveHeadingElements()
+
+      if (!headingElements.length) {
+        setActiveHeadingId("")
+        return
+      }
+
       let currentActiveId = headingElements[0].id
 
       for (const heading of headingElements) {
         const top = heading.element.getBoundingClientRect().top
 
-        if (top - DEFAULT_SCROLL_OFFSET <= 0) {
+        if (top <= scrollOffset) {
           currentActiveId = heading.id
           continue
         }
@@ -81,7 +91,7 @@ export function useActivePolicyHeading(
       window.removeEventListener("scroll", updateActiveHeading)
       window.removeEventListener("resize", updateActiveHeading)
     }
-  }, [contentRootRef, headings])
+  }, [contentRootRef, headings, scrollOffset])
 
   return activeHeadingId
 }

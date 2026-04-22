@@ -3,8 +3,7 @@
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { usePathname } from "next/navigation"
-import { ChevronDown, Menu, X } from "lucide-react"
-import { Button } from "@/shared/ui/button"
+import { ChevronDown, ChevronRight, Menu, X } from "lucide-react"
 import { cn } from "@/shared/lib/utils"
 import { NAVIGATION } from "@/shared/navigation"
 
@@ -116,7 +115,7 @@ export function Header() {
                       href={entry.href}
                       className={cn(
                         "inline-flex items-center gap-1 text-[1.05rem] font-semibold transition-colors",
-                        linkActive ? "text-[#F07C33]" : "text-[#1A1410] hover:opacity-70"
+                        linkActive ? "text-[#F07C33]" : "text-[#1A1410] hover:text-[#F07C33]"
                       )}
                     >
                       {entry.title}
@@ -133,7 +132,7 @@ export function Header() {
                       type="button"
                       className={cn(
                         "inline-flex items-center gap-1 text-[1.05rem] font-semibold transition-colors",
-                        groupActive ? "text-[#F07C33]" : "text-[#1A1410] hover:opacity-70"
+                        groupActive ? "text-[#F07C33]" : "text-[#1A1410] hover:text-[#F07C33]"
                       )}
                       aria-haspopup="menu"
                       aria-expanded={groupActive}
@@ -166,13 +165,6 @@ export function Header() {
               })}
             </nav>
 
-            <Link href="/reservation">
-              <Button
-                className="cursor-pointer h-10 rounded-full border-0 bg-[#F07C33] px-7 text-base font-semibold text-[#FFF] shadow-none hover:bg-[#DA6727]"
-              >
-                무료 상담 예약
-              </Button>
-            </Link>
           </div>
         </div>
       </div>
@@ -189,11 +181,11 @@ export function Header() {
 
       <div
         className={cn(
-          "absolute left-0 right-0 top-full z-[110] overflow-hidden border-b border-[#E3D5C7] bg-[#fff] transition-all duration-300 md:hidden",
+          "absolute left-0 right-0 top-full z-[110] overflow-hidden border-b border-[#D5D5D5] bg-[#fff] transition-all duration-300 md:hidden",
           mobileMenuOpen ? "pointer-events-auto max-h-[80vh] opacity-100" : "pointer-events-none max-h-0 opacity-0"
         )}
       >
-        <nav className="flex flex-col gap-2 p-4">
+        <nav className="flex flex-col px-6 py-3">
           {NAVIGATION.map((entry) => {
             if (entry.type === "link") {
               const linkActive = isPathActive(pathname, entry.href)
@@ -203,12 +195,13 @@ export function Header() {
                   key={entry.title}
                   href={entry.href}
                   className={cn(
-                    "rounded-xl border bg-white px-4 py-3 text-base font-semibold transition-colors",
-                    linkActive ? "border-[#E3D5C7] text-[#F07C33]" : "border-[#E3D5C7] text-[#1A1410]"
+                    "flex items-center justify-between border-b border-[#D5D5D5] py-5 text-[20px] font-bold leading-tight transition-colors",
+                    linkActive ? "text-[#F07C33]" : "text-[#1A1410]"
                   )}
                   onClick={closeMobileMenu}
                 >
-                  {entry.title}
+                  <span>{entry.title}</span>
+                  <ChevronRight className="h-7 w-7 text-[#2C2C2C]" />
                 </Link>
               )
             }
@@ -221,34 +214,34 @@ export function Header() {
               <div
                 key={group.title}
                 className={cn(
-                  "rounded-xl border bg-white transition-colors",
-                  groupActive ? "border-[#E3D5C7]" : "border-[#E3D5C7]"
+                  "border-b border-[#D5D5D5] transition-colors",
+                  groupActive ? "text-[#F07C33]" : "text-[#1A1410]"
                 )}
               >
                 <button
                   type="button"
                   className={cn(
-                    "flex w-full items-center justify-between px-4 py-3 text-left text-base font-semibold",
+                    "flex w-full items-center justify-between py-5 text-left text-[20px] font-bold leading-tight",
                     groupActive ? "text-[#F07C33]" : "text-[#1A1410]"
                   )}
                   onClick={() => toggleMobileGroup(group.title)}
                   aria-expanded={isOpen}
                 >
                   <span>{group.title}</span>
-                  <ChevronDown className={cn("h-4 w-4 transition-transform", isOpen ? "rotate-180" : "rotate-0")} />
+                  <ChevronRight className={cn("h-7 w-7 text-[#2C2C2C] transition-transform", isOpen ? "rotate-90" : "rotate-0")} />
                 </button>
 
-                <div className={cn("overflow-hidden transition-all duration-200", isOpen ? "max-h-64 pb-2" : "max-h-0")}>
-                  <ul className="space-y-1 px-3">
+                <div className={cn("overflow-hidden transition-all duration-200", isOpen ? "max-h-80 pb-3" : "max-h-0")}>
+                  <ul className="space-y-1 pb-1 pl-5">
                     {group.children.map((item) => (
                       <li key={item.href}>
                         <Link
                           href={item.href}
                           className={cn(
-                            "block rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                            "block py-2 text-lg font-medium transition-colors",
                             isChildActive(item.href)
-                              ? "bg-[#F8E9DB] text-[#1E1611]"
-                              : "text-[#5F4E42] hover:bg-[#F8E9DB]"
+                              ? "text-[#F07C33]"
+                              : "text-[#3B332D] hover:text-[#F07C33]"
                           )}
                           onClick={closeMobileMenu}
                         >
@@ -262,16 +255,6 @@ export function Header() {
             )
           })}
 
-          <Link
-            href="/reservation"
-            onClick={closeMobileMenu}
-          >
-            <Button
-              className="cursor-pointer mt-2 w-full rounded-full border-0 bg-[#F07C33] text-[#FFF] hover:bg-[#DA6727] hover:text-[#FFF]"
-            >
-              무료 상담 예약
-            </Button>
-          </Link>
         </nav>
       </div>
     </header>

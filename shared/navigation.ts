@@ -19,12 +19,18 @@ export type NavigationEntry = NavigationGroup | NavigationLink
 
 export const NAVIGATION: NavigationEntry[] = [
   {
-    type: "group",
-    title: "사발면 스토리",
-    children: [
-      { title: "사발면 소개", href: "/about/intro" },
-      { title: "전문가 소개", href: "/about/experts" },
-      { title: "오시는 길", href: "/about/location" },
-    ],
+    type: "link",
+    title: "사발면 소개",
+    href: "/about/intro",
+  },
+  {
+    type: "link",
+    title: "전문가 소개",
+    href: "/about/experts",
+  },
+  {
+    type: "link",
+    title: "오시는 길",
+    href: "/about/location",
   },
 ]

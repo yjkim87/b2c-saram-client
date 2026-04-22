@@ -13,8 +13,7 @@ const TEXT = {
   directions: "\uC624\uC2DC\uB294 \uAE38",
   subway: "\uB3D9\uD574\uC120 \uC13C\uD140\uC5ED 2\uBC88 \uCD9C\uAD6C \uB3C4\uBCF4 10\uBD84",
   businessHours: "\uC6B4\uC601\uC2DC\uAC04",
-  businessHoursValue: "\uD3C9\uC77C 09:00 ~ 20:00, \uC8FC\uB9D0 09:00 ~ 17:00",
-  closedNote: "* \uC77C\uC694\uC77C\uC740 \uD734\uBB34\uC774\uBA70, \uC0AC\uC804 \uC608\uC57D\uC81C \uC6B4\uC601\uB429\uB2C8\uB2E4.",
+  businessHoursValue: "월~수: 10시~ 19시/화 휴무/목~토: 10시~21시/일: 10시~18시",
   phoneConsult: "\uC804\uD654\uC0C1\uB2F4",
   phoneNumber: "051-928-0944",
 } as const
@@ -67,7 +66,7 @@ export function CenterPage() {
       <PageHeader label={TEXT.headerLabel} title={TEXT.headerTitle} description={TEXT.headerDescription} />
 
       <section className="bg-[#fff] px-4 py-14 sm:px-6 md:py-16 lg:px-8">
-        <div className="mx-auto grid w-full max-w-[1200px] gap-[var(--landing-space-grid-md)] md:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] md:items-stretch">
+        <div className="mx-auto grid w-full max-w-[1200px] gap-[var(--landing-space-grid-md)] md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] md:items-stretch">
           <div className="w-full min-w-0">
             <a
               href={NAVER_MAP_URL}
@@ -125,17 +124,6 @@ export function CenterPage() {
                 <p className={cn(landingTypeTokens.stepDescription, "font-bold text-[#0C0C0C]")}>{TEXT.businessHours}</p>
                 <p className={cn("mt-[var(--landing-space-chip-y)]", landingTypeTokens.stepDescription)}>
                   {TEXT.businessHoursValue}
-                </p>
-                <p
-                  className={cn(
-                    "mt-[var(--landing-space-chip-y)] inline-block w-fit bg-[#c5c5c5] text-[#111827]",
-                    landingTypeTokens.noteText,
-                    landingRadiusTokens.note,
-                    landingSpaceTokens.notePadding,
-                    "font-medium"
-                  )}
-                >
-                  {TEXT.closedNote}
                 </p>
               </article>
 

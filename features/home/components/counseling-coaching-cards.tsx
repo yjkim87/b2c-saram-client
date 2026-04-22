@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { ChevronDown, ChevronUp } from "lucide-react"
-import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from "react"
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react"
 
 import { cn } from "@/shared/lib/utils"
 import { landingRadiusTokens } from "@/features/home/styles/landing-tokens"
@@ -210,7 +210,6 @@ export function CounselingCoachingCards({
     counseling: null,
     coaching: null,
   })
-  const idPrefix = useId().replace(/:/g, "")
 
   useEffect(() => {
     if (typeof window === "undefined") return
@@ -409,7 +408,7 @@ export function CounselingCoachingCards({
                                   )}
                                 >
                                   {item.details.map((detail, detailIndex) => {
-                                    const tailGradientId = `${idPrefix}-bubble-tail-${card.key}-${item.key}-${detailIndex}`
+                                    const tailGradientId = `bubble-tail-${card.key}-${item.key}-${detailIndex}`
 
                                     return (
                                       <div key={detail} className="relative inline-block w-fit max-w-full pb-[14px]">

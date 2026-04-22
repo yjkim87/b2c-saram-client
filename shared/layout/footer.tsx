@@ -2,6 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
+import { useEffect, useState } from "react"
 import {
   Select,
   SelectContent,
@@ -87,9 +88,24 @@ function SocialLinks() {
 }
 
 function SiteSelects({ mobile = false }: { mobile?: boolean }) {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   const triggerClass = mobile
     ? "h-12 w-full rounded-[10px] border-[#4A505A] bg-[#21262E] px-4 text-base font-normal text-[#F1F5F9] data-[placeholder]:text-[#F1F5F9]"
     : "h-12 w-[210px] rounded-[10px] border-[#4A505A] bg-[#21262E] px-4 text-base font-normal text-[#F1F5F9] data-[placeholder]:text-[#F1F5F9]"
+
+  if (!mounted) {
+    return (
+      <div className={mobile ? "footer-select-theme space-y-3" : "footer-select-theme flex items-center gap-3"}>
+        <div className={`${triggerClass} inline-flex items-center border`}>관련기관 사이트</div>
+        <div className={`${triggerClass} inline-flex items-center border`}>어세스타 패밀리사이트</div>
+      </div>
+    )
+  }
 
   return (
     <div className={mobile ? "footer-select-theme space-y-3" : "footer-select-theme flex items-center gap-3"}>
@@ -147,7 +163,9 @@ export function Footer() {
               <span className="mx-3 text-[#4A505A]">|</span>
               <span className="whitespace-nowrap">통신판매업신고 : 제2022-서울영등포-0184호</span>
               <Link
-                href="#"
+                href="https://www.ftc.go.kr/bizCommPop.do?wrkr_no=1078676668"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="ml-3 inline-flex h-6 cursor-pointer items-center rounded-full bg-[#F5F5F5] px-3 text-[11px] font-medium leading-none text-[#111318]"
               >
                 사업자정보확인
@@ -197,7 +215,9 @@ export function Footer() {
             <p>사업자등록번호 : 107-86-76668</p>
             <p>통신판매업신고 : 제2013-서울영등포-0153호</p>
             <Link
-              href="#"
+              href="https://www.ftc.go.kr/bizCommPop.do?wrkr_no=1078676668"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex h-6 cursor-pointer items-center rounded-full bg-[#F5F5F5] px-3 text-[11px] font-medium leading-none text-[#111318]"
             >
               사업자정보확인
