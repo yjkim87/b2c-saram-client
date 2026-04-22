@@ -41,7 +41,7 @@ const REVIEW_SUMMARY: ReviewItem[] = [
     name: "이OO 학생",
     meta: "만 11세 · 대면",
     summary:
-      "진로 상담 선생님이 잘 이끌어주셨습니다. 한 번쯤 이런 경험을 하는 것도 중요하다고 생각해요.",
+      "진로 상담 선생님이 잘 이끌어 주셨습니다. 고민이 있던 시기에 방향성을 정하는데 많은 도움이 될 것 같아요.",
     tone: {
       ageBadge: "border border-[#12905D] bg-[#EAFBF2] text-[#12905D]",
     },

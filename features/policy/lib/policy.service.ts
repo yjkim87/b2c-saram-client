@@ -1,7 +1,7 @@
-import { mockPolicyHistory } from "@/features/policy/data/mock-policy"
 import { POLICY_TYPES, type PolicyDocument, type PolicyFetchResult, type PolicyType } from "@/features/policy/model/policy.types"
+import { PolicyDao } from "@/features/policy/dao/policy.dao"
 
-const MOCK_API_DELAY_MS = 250
+const policyDao = new PolicyDao()
 
 export function isPolicyType(value: string): value is PolicyType {
   return POLICY_TYPES.includes(value as PolicyType)
@@ -20,11 +20,7 @@ function getDistinctVersions(documents: PolicyDocument[]) {
 }
 
 export async function getPolicyByType(type: PolicyType, requestedVersion?: string): Promise<PolicyFetchResult> {
-  await new Promise((resolve) => {
-    setTimeout(resolve, MOCK_API_DELAY_MS)
-  })
-
-  const documents = mockPolicyHistory[type]
+  const documents = await policyDao.getPublishedPoliciesByType(type)
   const versions = getDistinctVersions(documents)
   const latestVersion = versions[0] ?? null
   const selectedVersion =

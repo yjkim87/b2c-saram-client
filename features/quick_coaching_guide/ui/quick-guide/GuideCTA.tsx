@@ -1,27 +1,42 @@
-// ------------------------------------------------------------------------------
-// 화 일 명 : GuideCTA.tsx
-// 용    도 : 상담 예약 유도 버튼 컴포넌트. 가이드 흐름 마지막에 표시되며
-//            예약 페이지로 이동하는 링크를 제공한다.
-// 작성일시 : 2026-04-13 (김재국)
-// 수정일시 :
-// 주의사항 :
-//-------------------------------------------------------------------------------
+"use client"
 
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/shared/ui/button"
 
 interface GuideCTAProps {
-  href?:  string
+  href?: string
   label?: string
+  resetLabel?: string
+  onReset?: () => void
 }
 
 export function GuideCTA({
-  href  = "/reservation",
+  href = "/reservation",
   label = "상담 예약하기",
+  resetLabel = "고민 다시 선택하기",
+  onReset,
 }: GuideCTAProps) {
+  const handleReset = () => {
+    if (onReset) {
+      onReset()
+      return
+    }
+
+    window.location.reload()
+  }
+
   return (
-    <div className="flex justify-end border-t border-[#DFDFDF] pt-3">
+    <div className="flex items-center justify-between gap-3 border-t border-[#DFDFDF] pt-3">
+      <Button
+        type="button"
+        variant="ghost"
+        onClick={handleReset}
+        className="h-10 cursor-pointer rounded-full border border-[#0C0C0C] bg-[#FFFFFF] px-4 text-sm font-semibold text-[#0C0C0C] hover:bg-[#FFFFFF] hover:text-[#0C0C0C]"
+      >
+        {resetLabel}
+      </Button>
+
       <Button asChild className="h-10 cursor-pointer rounded-full bg-[#0C0C0C] px-5 text-sm font-semibold text-white hover:bg-[#000000]">
         <Link href={href}>
           {label}
