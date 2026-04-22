@@ -53,6 +53,17 @@ function MapButtons({ className }: { className?: string }) {
   )
 }
 
+function OperatingHoursGrid({ className }: { className?: string }) {
+  return (
+    <div className={cn("mt-[var(--landing-space-chip-y)] grid grid-cols-2 gap-x-6 gap-y-1", landingTypeTokens.stepDescription, className)}>
+      <p>· 월~수 : 10 ~19시</p>
+      <p>· 목~토: 10시~21시</p>
+      <p>· 화 : 휴무</p>
+      <p>· 일: 10시~18시</p>
+    </div>
+  )
+}
+
 export function CenterSection() {
   return (
     <section id="center" className={cn("relative overflow-hidden bg-[#FFF7EF]", landingSectionTokens.roomy)}>
@@ -90,7 +101,7 @@ export function CenterSection() {
             <div className="space-y-[var(--landing-space-grid-sm)] md:hidden">
               <div className="space-y-[var(--landing-space-chip-y)]">
                 <p className={cn(landingTypeTokens.stepDescription, "text-[#1E1611] font-bold")}>운영시간</p>
-                <p className={landingTypeTokens.stepDescription}>월~수: 10시~ 19시/화 휴무/목~토: 10시~21시/일: 10시~18시</p>
+                <OperatingHoursGrid />
                 <p className={cn("mt-[var(--landing-space-grid-sm)]", landingTypeTokens.stepDescription)}>
                   <span className="font-bold">전화상담</span> 051-928-0944
                 </p>
@@ -151,9 +162,7 @@ export function CenterSection() {
                 )}
               >
                 <p className={cn(landingTypeTokens.stepDescription, "text-[#1E1611] font-bold")}>운영시간</p>
-                <p className={cn("mt-[var(--landing-space-chip-y)]", landingTypeTokens.stepDescription)}>
-                  월~수: 10시~ 19시/화 휴무/목~토: 10시~21시/일: 10시~18시
-                </p>
+                <OperatingHoursGrid />
                 <p className={cn("mt-[var(--landing-space-grid-sm)]", landingTypeTokens.stepDescription)}>
                   <span className="font-bold">전화상담</span> 051-928-0944
                 </p>

@@ -13,12 +13,17 @@ const TEXT = {
   directions: "\uC624\uC2DC\uB294 \uAE38",
   subway: "\uB3D9\uD574\uC120 \uC13C\uD140\uC5ED 2\uBC88 \uCD9C\uAD6C \uB3C4\uBCF4 10\uBD84",
   businessHours: "\uC6B4\uC601\uC2DC\uAC04",
-  businessHoursValue: "월~수: 10시~ 19시/화 휴무/목~토: 10시~21시/일: 10시~18시",
   phoneConsult: "\uC804\uD654\uC0C1\uB2F4",
   phoneNumber: "051-928-0944",
 } as const
 
 const CENTER_MAP_IMAGE_URL = "https://img.assesta.com/saram-me/center_map.png"
+const BUSINESS_HOURS_ITEMS = [
+  "· 월~수 : 10 ~19시",
+  "· 목~토: 10시~21시",
+  "· 화 : 휴무",
+  "· 일: 10시~18시",
+] as const
 
 const NAVER_MAP_URL = `https://map.naver.com/p/search/${encodeURIComponent(TEXT.centerAddress)}`
 const KAKAO_MAP_URL = `https://map.kakao.com/?q=${encodeURIComponent(TEXT.centerAddress)}`
@@ -56,6 +61,16 @@ function MapButtons({ className }: { className?: string }) {
       >
         {TEXT.kakaoMap}
       </a>
+    </div>
+  )
+}
+
+function OperatingHoursGrid({ className }: { className?: string }) {
+  return (
+    <div className={cn("mt-[var(--landing-space-chip-y)] grid grid-cols-2 gap-x-6 gap-y-1", landingTypeTokens.stepDescription, className)}>
+      {BUSINESS_HOURS_ITEMS.map((item) => (
+        <p key={item}>{item}</p>
+      ))}
     </div>
   )
 }
@@ -122,9 +137,7 @@ export function CenterPage() {
                 )}
               >
                 <p className={cn(landingTypeTokens.stepDescription, "font-bold text-[#0C0C0C]")}>{TEXT.businessHours}</p>
-                <p className={cn("mt-[var(--landing-space-chip-y)]", landingTypeTokens.stepDescription)}>
-                  {TEXT.businessHoursValue}
-                </p>
+                <OperatingHoursGrid />
               </article>
 
               <article
