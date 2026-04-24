@@ -164,20 +164,68 @@ function IntroSection() {
       <div className="mx-auto max-w-5xl">
         <FadeInBlock className="rounded-3xl bg-white p-7 text-center md:p-10">
           <h2 className="mb-6 text-3xl font-bold leading-tight text-slate-900 md:text-4xl">
-            <span className="text-[#ff7a33]">보석</span>을 만드는 전문가의 손길,
+            <span className="title-highlight inline-block">
+              <span className="text-[#ff7a33]">보석</span>을 만드는 전문가의 손길,
+            </span>
             <br />
-            <span className="text-[#ff7a33]">발견하면 달라</span>집니다.
+            <span className="title-highlight title-highlight-delay inline-block">
+              <span className="text-[#ff7a33]">발견하면 달라</span>집니다.
+            </span>
           </h2>
           <div className="space-y-4 text-base leading-relaxed text-slate-700 md:text-lg md:leading-8">
             <p>아무리 귀한 구슬이라도 전문가의 안목으로 꿰어지지 않으면 보석이 될 수 없습니다.</p>
             <p>
-              사발면(사람의 발견을 원하면)은 세계에서 가장 많이 사용되는 마음발견 검사인 정식 MBTI와 불확실한
+              사발면(<span className="text-[#ff7a33]">사</span>
+              <span className="text-[#ff7a33]">람</span>의 발견을 원하
+              <span className="text-[#ff7a33]">면</span>)은 세계에서 가장 많이 사용되는 마음발견 검사인 정식 MBTI와 불확실한
               미래의 직업을 발견하는 검사인 Strong 흥미검사를 도구 삼아, 자녀의 내면에 숨겨진 원석을 발견합니다.
               사발면의 상담사와 코치들은 단순한 결과 수치를 넘어, 아이의 고유한 강점들을 정교하게 연결하여 단
               하나뿐인 &apos;진로 설계도&apos;를 완성합니다.
             </p>
             <p>우리는 부모님께 아이의 마음을 읽는 법을 알려드리고, 아이에게는 스스로의 미래를 결정할 확신을 선물합니다.</p>
           </div>
+          <style jsx>{`
+            .title-highlight {
+              position: relative;
+              z-index: 0;
+            }
+
+            .title-highlight::after {
+              content: "";
+              position: absolute;
+              left: -0.06em;
+              right: -0.06em;
+              bottom: 0.08em;
+              height: 0.45em;
+              border-radius: 0.2em;
+              background: rgba(255, 122, 51, 0.2);
+              transform: scaleX(0);
+              transform-origin: left center;
+              animation: titleHighlightSweep 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+              animation-delay: 1.05s;
+              z-index: -1;
+            }
+
+            .title-highlight-delay::after {
+              animation-delay: 1.4s;
+            }
+
+            @keyframes titleHighlightSweep {
+              from {
+                transform: scaleX(0);
+              }
+              to {
+                transform: scaleX(1);
+              }
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+              .title-highlight::after {
+                animation: none;
+                transform: scaleX(1);
+              }
+            }
+          `}</style>
         </FadeInBlock>
       </div>
     </section>
