@@ -139,7 +139,7 @@ export function ReservationComplete({ flow }: ReservationCompleteProps) {
               </a>
 
               <a
-                href="https://open.kakao.com/"
+                href="https://pf.kakao.com/_PDadX"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#FEE500] px-6 py-3 text-[15px] font-bold text-[#191919] shadow-sm transition-colors hover:bg-[#FDD800] sm:w-auto"
