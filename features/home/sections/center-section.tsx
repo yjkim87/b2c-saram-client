@@ -10,7 +10,12 @@ import {
 } from "@/features/home/styles/landing-tokens"
 
 const CENTER_MAP_IMAGE_URL = "https://img.assesta.com/saram-me/center_map.png"
-const CENTER_GALLERY_IMAGES = ["/placeholder.jpg", "/placeholder.jpg", "/placeholder.jpg", "/placeholder.jpg"]
+const CENTER_GALLERY_IMAGES = [
+  "https://img.assesta.com/saram-me/center_01.jpg",
+  "https://img.assesta.com/saram-me/center_02.jpg",
+  "https://img.assesta.com/saram-me/center_03.jpg",
+  "https://img.assesta.com/saram-me/center_04.jpg",
+]
 
 const CENTER_ADDRESS_QUERY = "부산시 해운대구 센텀동로 99, 백산센텀클래스원(1차) 406호"
 const NAVER_MAP_URL = `https://map.naver.com/p/search/${encodeURIComponent(CENTER_ADDRESS_QUERY)}`

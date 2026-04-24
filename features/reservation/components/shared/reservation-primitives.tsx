@@ -1,7 +1,7 @@
 ﻿"use client"
 
 import { useMemo, useState, type ReactNode } from "react"
-import { CheckCircle2, ChevronLeft, ChevronRight, Clock, Sprout } from "lucide-react"
+import { CalendarDays, CheckCircle2, ChevronLeft, ChevronRight, Clock, Sprout, X } from "lucide-react"
 import { Button } from "@/shared/ui/button"
 import { Calendar } from "@/shared/ui/calendar"
 import { cn } from "@/shared/lib/utils"
@@ -27,6 +27,7 @@ interface ConcernCardProps {
 interface CalendarPickerProps {
   selectedDates: SelectedSchedule[]
   onDateSelect: (date: string, time: string) => void
+  onDateRemove: (index: number) => void
 }
 
 function BotAvatar() {
@@ -121,6 +122,7 @@ export function ConcernCard({
 export function CalendarPicker({
   selectedDates,
   onDateSelect,
+  onDateRemove,
 }: CalendarPickerProps) {
   const [currentMonth, setCurrentMonth] = useState(() => {
     const now = new Date()
@@ -144,10 +146,6 @@ export function CalendarPicker({
     return `${year}-${month}-${dayStr}`
   }
 
-  const formatDisplayDate = (date: Date) => {
-    return `${date.getMonth() + 1}/${date.getDate()}`
-  }
-
   const formatSelectedDateDetail = (date: Date) => {
     return new Intl.DateTimeFormat("ko-KR", {
       month: "long",
@@ -161,6 +159,11 @@ export function CalendarPicker({
     const month = String(date.getMonth() + 1).padStart(2, "0")
     const day = String(date.getDate()).padStart(2, "0")
     return `${year}. ${month}. ${day}`
+  }
+
+  const formatSelectedScheduleDisplay = (schedule: SelectedSchedule) => {
+    const [, month, day] = schedule.date.split("-")
+    return `${parseInt(month, 10)}/${parseInt(day, 10)} ${schedule.time}`
   }
 
   const today = useMemo(() => {
@@ -258,7 +261,7 @@ export function CalendarPicker({
           />
         </div>
 
-        <div className="border-t border-[#E7DCCB] bg-[#F6F1E9] p-4 md:p-6 lg:border-t-0">
+        <div className="flex flex-col border-t border-[#E7DCCB] bg-[#F6F1E9] p-4 md:p-6 lg:border-t-0">
           <div className="mb-4">
             <p className="text-xs font-bold tracking-[0.2em] text-[#D2893B]">STEP 2</p>
             <h3 className="mt-1 text-[22px] font-extrabold leading-none text-[#2E2822]">시간 선택</h3>
@@ -324,6 +327,35 @@ export function CalendarPicker({
               </p>
             ) : null}
           </div>
+
+          {selectedDates.length > 0 && (
+            <div className="lg:mt-auto">
+              <div className="mt-4 rounded-2xl border border-[#DCCEBB] bg-white p-4">
+                <p className="mb-3 inline-flex items-center gap-1.5 text-sm font-semibold text-[#2E2822]">
+                  <CalendarDays className="h-4 w-4 text-[#2AA873]" />
+                  {"선택한 일정"} ({selectedDates.length}{"개"})
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {selectedDates.map((schedule, index) => (
+                    <div
+                      key={`${schedule.date}-${schedule.time}-${index}`}
+                      className="flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-sm text-primary"
+                    >
+                      <span>{formatSelectedScheduleDisplay(schedule)}</span>
+                      <button
+                        type="button"
+                        onClick={() => onDateRemove(index)}
+                        className="rounded-full p-0.5 hover:bg-primary/20"
+                        aria-label="선택 일정 제거"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

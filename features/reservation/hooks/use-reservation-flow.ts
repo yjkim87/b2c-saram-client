@@ -138,6 +138,14 @@ export function useReservationFlow() {
     }
   }
 
+  const goToStep = (targetStep: number) => {
+    const normalizedStep = Number.isFinite(targetStep) ? Math.max(1, Math.floor(targetStep)) : 1
+
+    setStep(normalizedStep)
+    setStepHistory(Array.from({ length: normalizedStep }, (_, index) => index + 1))
+    setShowNudge(false)
+  }
+
   const resetAll = () => {
     setStep(1)
     setStepHistory([1])
@@ -269,6 +277,7 @@ export function useReservationFlow() {
     setShowPrivacyModal,
     goToNextStep,
     goToPrevStep,
+    goToStep,
     resetAll,
     handleBirthdateChange,
     handleBirthdateBlur,

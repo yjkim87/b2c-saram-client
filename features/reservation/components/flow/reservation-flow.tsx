@@ -18,8 +18,8 @@ import { cn } from "@/shared/lib/utils"
 import { Footer } from "@/shared/layout/footer"
 import type { UseReservationFlowReturn } from "../../hooks/use-reservation-flow"
 import { genders, relationships } from "../../data/reservation.constants"
-import type { AgeGroup, Gender, Relationship } from "../../model/reservation.types"
-import { BotMessage, CalendarPicker, UserMessage } from "../shared/reservation-primitives"
+import type { AgeGroup, Gender } from "../../model/reservation.types"
+import { BotMessage, CalendarPicker } from "../shared/reservation-primitives"
 import { Step1Service } from "./step1-service"
 import { Step2Expert } from "./step2-expert"
 import { Step3Schedule } from "./step3-schedule"
@@ -41,14 +41,19 @@ interface EditableUserMessageProps {
   onEdit: () => void
 }
 
+interface BackStepButtonProps {
+  onClick: () => void
+  className?: string
+}
+
 const STEP1_TYPING_DELAY_MS = 1200
 const RIGHT_BUBBLE_GRADIENT_CLASS = "bg-[linear-gradient(144.37deg,#FFB836_7.06%,#F57220_90.82%)]"
 const RIGHT_INTERACTIVE_PANEL_CLASS = "w-full max-w-md rounded-[20px] rounded-tr-[5px] border border-[#DFDFDF] bg-white"
-const WIDE_INTERACTIVE_PANEL_CLASS = "w-full rounded-[20px] border border-[#DFDFDF] bg-white"
+const WIDE_INTERACTIVE_PANEL_CLASS = "w-full max-w-md rounded-[20px] border border-[#DFDFDF] bg-white"
 const CONCERN_THEME_PLACEHOLDERS = {
-  elementaryLower: "예: 도와주면 의존하고, 혼자 하라니 더 느려지는 것 같아요. 아이의 성향에 맞는 학습/양육 방법을 알고 싶어요.",
-  elementaryUpper: "예: 아이가 뭔가 좋아하는 건 있는데, 공부랑 어떻게 연결해야 할지 모르겠어요.",
-  middle: "예: 제가 도와주려 하면 간섭이래요. 그렇다고 놔두면 아무것도 안 해요. 어떻게 소통해야 할지 막막해요.",
+  elementaryLower: "예: 아이가 도와주면 의존하고, 혼자 하라 하면 더 느려지는 것 같아요. 아이의 성향에 맞는 학습/양육 방법을 알고 싶어요.",
+  elementaryUpper: "예: 아이가 뭔가 좋아하는 건 있는데, 공부와 어떻게 연결해야 할지 모르겠어요.",
+  middle: "예: 제가 도와주려 하면 간섭이라고 해요. 그렇다고 놔두면 아무것도 안 해요. 어떻게 소통해야 할지 막막해요.",
   high: "예: 제 방식으로 도와주려 하면 아이가 답답해해요. 아이의 성향에 맞춰 효과적으로 조력하고 싶어요.",
 } as const
 
@@ -115,8 +120,8 @@ function AttendanceOptionButton({ isSelected, onClick, children }: AttendanceOpt
 function EditableUserMessage({ content, onEdit }: EditableUserMessageProps) {
   return (
     <div className="flex justify-end items-end gap-2 animate-in fade-in-0 slide-in-from-right-4 duration-300">
-      <button type="button" onClick={onEdit} className="px-1 text-sm text-[#6E6352] hover:text-[#4F4537]">
-        {"수정"}
+      <button type="button" onClick={onEdit} className="cursor-pointer px-1 text-sm text-[#6E6352] hover:text-[#4F4537]">
+        {"\uC218\uC815"}
       </button>
       <div
         className={cn(
@@ -128,6 +133,42 @@ function EditableUserMessage({ content, onEdit }: EditableUserMessageProps) {
       </div>
     </div>
   )
+}
+
+function BackStepButton({ onClick, className }: BackStepButtonProps) {
+  return (
+    <Button
+      type="button"
+      variant="default"
+      onClick={onClick}
+      className={cn(
+        "h-[50px] rounded-[0.7rem] border-0 bg-[#DFDFDF] px-5 text-[18px] font-semibold text-[#0C0C0C] shadow-none hover:bg-[#D4D4D4] hover:text-[#0C0C0C]",
+        className,
+      )}
+    >
+      {"\uC774\uC804\uC73C\uB85C"}
+    </Button>
+  )
+}
+
+function getAttendanceLabel(attendance: UseReservationFlowReturn["attendance"]) {
+  if (attendance === "both") {
+    return "\uBD80\uBAA8\uC640 \uC790\uB140 \uBAA8\uB450 \uCC38\uC11D"
+  }
+
+  if (attendance === "child") {
+    return "\uC790\uB140\uB9CC \uCC38\uC11D"
+  }
+
+  if (attendance === "parent") {
+    return "\uBD80\uBAA8\uB9CC \uCC38\uC11D"
+  }
+
+  if (attendance === "self") {
+    return "\uBCF8\uC778\uB9CC \uCC38\uC11D (\uAC1C\uC778 \uC0C1\uB2F4 \uBC0F \uCF54\uCE6D)"
+  }
+
+  return "-"
 }
 
 export function ReservationFlow({ flow }: ReservationFlowProps) {
@@ -154,6 +195,8 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
     setPrivacyConsent,
     setShowPrivacyModal,
     goToNextStep,
+    goToPrevStep,
+    goToStep,
     resetAll,
     handleBirthdateChange,
     handleBirthdateBlur,
@@ -165,7 +208,6 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
     handleSubmit,
     isSubmitting,
     submitError,
-    getAgeGroupLabel,
     formatPhoneNumber,
     isStep1Valid,
   } = flow
@@ -203,11 +245,14 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
   const birthdatePromptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const genderPromptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const nudgePromptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const isOnlyKoreanJamo = (value: string) => /^[ㄱ-ㅎㅏ-ㅣ]+$/.test(value)
+  const isOnlyKoreanJamo = (value: string) => /^[\u3131-\u314e\u314f-\u3163]+$/.test(value)
   const isValidName = (value: string) => {
     const trimmed = value.trim()
     return trimmed.length >= 2 && !isOnlyKoreanJamo(trimmed)
   }
+  const [otherRelationshipDraft, setOtherRelationshipDraft] = useState("")
+  const isPresetRelationship = (value: string) => value === "\uBCF8\uC778" || value === "\uBD80\uBAA8"
+  const isCustomRelationship = (value: string) => value.trim().length > 0 && !isPresetRelationship(value)
 
   useEffect(() => {
     setNameDraft(userInfo.name)
@@ -253,7 +298,19 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
     setEditingField(null)
   }
 
+  const handleOtherRelationshipSubmit = () => {
+    const trimmed = otherRelationshipDraft.trim()
+    if (trimmed.length === 0) {
+      return
+    }
+
+    setUserInfo((prev) => ({ ...prev, relationship: trimmed }))
+    setOtherRelationshipDraft(trimmed)
+    setEditingField(null)
+  }
+
   const isBothSelected = attendance === "both"
+  const isAdultTarget = ageGroup === "adult"
   const hasNameAnswer = isValidName(userInfo.name)
   const hasRelationshipAnswer = Boolean(userInfo.relationship)
   const hasBirthdateAnswer =
@@ -264,7 +321,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
     () => getConcernThemePlaceholder(ageGroup, userInfo.birthdate),
     [ageGroup, userInfo.birthdate],
   )
-  const stepLabels = ["정보입력", "참석자", "고민테마", "일정", "연락처"]
+  const stepLabels = ["\uC815\uBCF4\uC785\uB825", "\uCC38\uC11D\uC790", "\uACE0\uBBFC\uD14C\uB9C8", "\uC77C\uC815", "\uC5F0\uB77D\uCC98"]
   const totalSteps = stepLabels.length
   const currentStep = Math.min(step, totalSteps)
   const currentStepLabel = stepLabels[currentStep - 1] ?? stepLabels[0]
@@ -549,6 +606,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
   const handleFlowReset = () => {
     resetAll()
     setEditingField(null)
+    setOtherRelationshipDraft("")
     setIsRelationshipPromptReady(false)
     setIsBirthdatePromptReady(false)
     setIsGenderPromptReady(false)
@@ -596,7 +654,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                 setShowExitModal(true)
               }}
             >
-              <img src={LOGO_IMAGE_URL} alt="사람ME 로고" className="h-10 w-auto md:h-11" />
+              <img src={LOGO_IMAGE_URL} alt="SaramME Logo" className="h-10 w-auto md:h-11" />
             </Link>
             <Button
               type="button"
@@ -604,7 +662,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
               onClick={() => setShowExitModal(true)}
               className="h-9 shrink-0 cursor-pointer rounded-full border-[#0C0C0C] bg-white px-4 text-sm font-semibold text-[#0C0C0C] shadow-none hover:bg-[#0C0C0C] hover:text-white sm:h-10 sm:px-6 sm:text-base"
             >
-              {"나가기"}
+              {"\uB098\uAC00\uAE30"}
             </Button>
           </div>
         </div>
@@ -613,7 +671,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
       <main className="pt-28 pb-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <section className="mb-10">
-            <h1 className="text-[30px] font-bold text-[#1F1F1F]">{"예약하기"}</h1>
+            <h1 className="text-[30px] font-bold text-[#1F1F1F]">{"\uC608\uC57D\uD558\uAE30"}</h1>
             <p className="mt-2 text-[18px] font-normal text-[#3D372F]">
               {"아이의 성장 단계에 맞는 전문적인 솔루션을 제공합니다."}
             </p>
@@ -649,7 +707,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                           className="absolute right-0 top-1/2 inline-flex -translate-y-1/2 cursor-pointer items-center gap-1 text-sm font-medium text-[#6570A5] transition-colors hover:text-[#4A83D8]"
                         >
                           <RotateCcw className="h-3.5 w-3.5" />
-                          <span>{"초기화"}</span>
+                          <span>{"\uCD08\uAE30\uD654"}</span>
                         </button>
                       )}
                     </li>
@@ -681,7 +739,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                     className="inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-[#2F2A23] transition-opacity hover:opacity-70"
                   >
                     <RotateCcw className="h-3.5 w-3.5" />
-                    <span>{"초기화"}</span>
+                    <span>{"\uCD08\uAE30\uD654"}</span>
                   </button>
                 </div>
 
@@ -711,16 +769,13 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                 ) : (
                   <>
                     <div ref={step1LatestBotBubbleRef}>
-                      <BotMessage content={"안녕하세요! 어세스타 코칭 매니저입니다."} />
-                    </div>
-                    <div ref={step1LatestBotBubbleRef}>
-                      <BotMessage content={"가장 최적화된 코칭을 위해 예약자분의 이름과 대상자와의 관계,\n그리고 대상자의 생년월일을 입력해 주십시오."} />
+                      <BotMessage content={"안녕하세요! 어세스타 사람의 발견을 원하면 상담 및 코칭 매니저입니다."} />
                     </div>
 
                     {showContent && step === 1 && (
                       <div className="space-y-4 animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
                         <div ref={step1LatestBotBubbleRef}>
-                          <BotMessage content={"예약자분 성함을 알려주세요."} />
+                          <BotMessage content={"먼저, 예약자분 성함을 알려주세요."} />
                         </div>
                         {hasNameAnswer && !isEditingName ? (
                           <div ref={step1LatestUserBubbleRef}>
@@ -748,7 +803,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                                         handleNameSubmit()
                                       }
                                     }}
-                                    placeholder={"예약자 이름을 입력해 주세요"}
+                                    placeholder={"\uC608\uC57D\uC790 \uC774\uB984\uC744 \uC785\uB825\uD574 \uC8FC\uC138\uC694"}
                                     className="w-full bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none"
                                   />
                                 </div>
@@ -762,7 +817,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                                       ? "border-transparent bg-[#FFF7EF] text-[#2E5FD7] hover:bg-[#FFEBD7]"
                                       : "bg-muted border-transparent text-muted-foreground cursor-not-allowed",
                                   )}
-                                  aria-label={"이름 전송"}
+                                  aria-label={"\uC774\uB984 \uC804\uC1A1"}
                                 >
                                   <ArrowUp className="w-4 h-4" />
                                 </button>
@@ -776,23 +831,27 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                             {isRelationshipPromptReady ? (
                               <>
                                 <div ref={step1LatestBotBubbleRef}>
-                                  <BotMessage content={"대상자와의 관계를 선택해 주세요."} />
+                                  <BotMessage content={"상담 또는 코칭을 받을 대상을 선택해 주세요."} />
                                 </div>
                                 {hasRelationshipAnswer && !isEditingRelationship ? (
                                   <div ref={step1LatestUserBubbleRef}>
                                     <EditableUserMessage
                                       content={userInfo.relationship}
-                                      onEdit={() => setEditingField("relationship")}
+                                      onEdit={() => {
+                                        setEditingField("relationship")
+                                        setOtherRelationshipDraft(isCustomRelationship(userInfo.relationship) ? userInfo.relationship : "")
+                                      }}
                                     />
                                   </div>
                                 ) : (
                                   <div className="flex justify-end animate-in fade-in-0 slide-in-from-right-4 duration-300">
                                     <div className={cn(RIGHT_INTERACTIVE_PANEL_CLASS, "p-3 space-y-2")}>
-                                      {relationships.map((rel) => (
+                                      {relationships.filter((rel) => rel !== "\uAE30\uD0C0").map((rel) => (
                                         <button
                                           key={rel}
                                           onClick={() => {
-                                            setUserInfo((prev) => ({ ...prev, relationship: rel as Relationship }))
+                                            setUserInfo((prev) => ({ ...prev, relationship: rel }))
+                                            setOtherRelationshipDraft("")
                                             setEditingField(null)
                                           }}
                                           className={cn(
@@ -805,6 +864,40 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                                           {rel}
                                         </button>
                                       ))}
+                                      <div className="pt-1">
+                                        <p className="mb-2 px-1 text-xs font-medium text-[#6E6352]">{"기타(직접 입력)"}</p>
+                                        <div className="flex items-center gap-2">
+                                          <div className="flex-1 rounded-xl border border-[#D8CEBC] bg-white px-4 py-2.5">
+                                            <input
+                                              type="text"
+                                              value={otherRelationshipDraft}
+                                              onChange={(e) => setOtherRelationshipDraft(e.target.value)}
+                                              onKeyDown={(e) => {
+                                                if (e.key === "Enter") {
+                                                  e.preventDefault()
+                                                  handleOtherRelationshipSubmit()
+                                                }
+                                              }}
+                                              placeholder={"\uAE30\uD0C0 \uB300\uC0C1\uC744 \uC785\uB825\uD574 \uC8FC\uC138\uC694"}
+                                              className="w-full bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none"
+                                            />
+                                          </div>
+                                          <button
+                                            type="button"
+                                            onClick={handleOtherRelationshipSubmit}
+                                            disabled={otherRelationshipDraft.trim().length === 0}
+                                            className={cn(
+                                              "w-9 h-9 rounded-full border flex items-center justify-center transition-all flex-shrink-0",
+                                              otherRelationshipDraft.trim().length > 0
+                                                ? "border-transparent bg-[#FFF7EF] text-[#2E5FD7] hover:bg-[#FFEBD7]"
+                                                : "bg-muted border-transparent text-muted-foreground cursor-not-allowed",
+                                            )}
+                                            aria-label={"\uAE30\uD0C0 \uAD00\uACC4 \uC804\uC1A1"}
+                                          >
+                                            <ArrowUp className="w-4 h-4" />
+                                          </button>
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
                                 )}
@@ -820,12 +913,12 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                             {isBirthdatePromptReady ? (
                               <>
                                 <div ref={step1LatestBotBubbleRef}>
-                                  <BotMessage content={"대상자의 생년월일을 입력해 주세요. 숫자만 입력하세요. (예: 20021225)"} />
+                                  <BotMessage content={"대상자의 생년월일을 숫자로만 입력해 주세요. (예: 20021225)"} />
                                 </div>
                                 {hasBirthdateAnswer && !isEditingBirthdate ? (
                                   <div ref={step1LatestUserBubbleRef}>
                                     <EditableUserMessage
-                                      content={`${userInfo.birthdate}${ageGroup ? ` (${getAgeGroupLabel(ageGroup)})` : ""}`}
+                                      content={userInfo.birthdate}
                                       onEdit={() => setEditingField("birthdate")}
                                     />
                                   </div>
@@ -845,7 +938,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                                                 handleBirthdateBlur()
                                               }
                                             }}
-                                            placeholder={"숫자만 입력하세요 (예: 20021225)"}
+                                            placeholder={"숫자만 입력해 주세요(예: 20021225)"}
                                             maxLength={10}
                                             className="w-full bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none"
                                           />
@@ -860,7 +953,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                                               ? "border-transparent bg-[#FFF7EF] text-[#2E5FD7] hover:bg-[#FFEBD7]"
                                               : "bg-muted border-transparent text-muted-foreground cursor-not-allowed",
                                           )}
-                                          aria-label={"생년월일 전송"}
+                                          aria-label={"\uC0DD\uB144\uC6D4\uC77C \uC804\uC1A1"}
                                         >
                                           <ArrowUp className="w-4 h-4" />
                                         </button>
@@ -897,7 +990,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                                         disabled={!isStep1Valid}
                                         className="mt-5 h-[50px] w-full bg-[#333333] text-[18px] font-semibold text-white hover:bg-[#333333] disabled:bg-[#333333] disabled:text-white"
                                       >
-                                        {"다음으로"}
+                                        {"\uB2E4\uC74C\uC73C\uB85C"}
                                       </Button>
                                     </div>
                                   </>
@@ -937,7 +1030,10 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
 
                 {step > 1 && (
                   <div ref={step1AnswerRef}>
-                    <UserMessage content={`${userInfo.name} / ${userInfo.relationship} / ${userInfo.birthdate} / ${userInfo.gender}`} />
+                    <EditableUserMessage
+                      content={`${userInfo.name} / ${userInfo.relationship} / ${userInfo.birthdate} / ${userInfo.gender}`}
+                      onEdit={() => goToStep(1)}
+                    />
                   </div>
                 )}
               </>
@@ -953,26 +1049,37 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                 <BotMessage content="" isTyping />
               ) : (
                 <>
-                  <BotMessage content={"이번 코칭/상담에는 누가 참석하시나요?"} />
+                  <BotMessage content={"이번 상담 및 코칭에는 누가 참석하시나요?"} />
 
-                  {showContent && step === 2 && !showNudge && attendance !== "both" && (
-                    <div className="space-y-3 animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
+                  {showContent && step === 2 && !showNudge && (
+                    <div className="flex justify-end animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
                       <div className={cn(WIDE_INTERACTIVE_PANEL_CLASS, "space-y-3 p-3")}>
                         <AttendanceOptionButton isSelected={isBothSelected} onClick={() => handleAttendanceSelect("both")}>
                           <div className="flex items-center justify-between">
-                            <span className="font-semibold">{"부모와 자녀 모두 참석"}</span>
+                            <span className="font-semibold">{"\uBD80\uBAA8\uC640 \uC790\uB140 \uBAA8\uB450 \uCC38\uC11D"}</span>
                             <span className="rounded-full bg-[#E6F4FF] px-3 py-1 text-xs font-semibold text-[#4A83D8]">
-                              {"강력 추천"}
+                              {"\uAC15\uB825 \uCD94\uCC9C"}
                             </span>
                           </div>
                         </AttendanceOptionButton>
                         <AttendanceOptionButton isSelected={attendance === "child"} onClick={() => handleAttendanceSelect("child")}>
-                          <span className="font-semibold">{"자녀만 참석"}</span>
+                          <span className="font-semibold">{"\uC790\uB140\uB9CC \uCC38\uC11D"}</span>
                         </AttendanceOptionButton>
                         <AttendanceOptionButton isSelected={attendance === "parent"} onClick={() => handleAttendanceSelect("parent")}>
-                          <span className="font-semibold">{"부모만 참석"}</span>
+                          <span className="font-semibold">{"\uBD80\uBAA8\uB9CC \uCC38\uC11D"}</span>
                         </AttendanceOptionButton>
+                        {isAdultTarget && (
+                          <AttendanceOptionButton isSelected={attendance === "self"} onClick={() => handleAttendanceSelect("self")}>
+                            <span className="font-semibold">{"\uBCF8\uC778\uB9CC \uCC38\uC11D (\uAC1C\uC778 \uC0C1\uB2F4 \uBC0F \uCF54\uCE6D)"}</span>
+                          </AttendanceOptionButton>
+                        )}
                       </div>
+                    </div>
+                  )}
+
+                  {showContent && step === 2 && !showNudge && (
+                    <div className="mt-4 flex justify-end animate-in fade-in-0 slide-in-from-right-4 duration-300">
+                      <BackStepButton onClick={goToPrevStep} />
                     </div>
                   )}
 
@@ -985,22 +1092,25 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                             content={
                               <div className="space-y-3">
                                 <p className="leading-relaxed">
-                                  {"물론 홀로 참석도 가능합니다. 하지만 에세스타 맞춤형 코칭은 부모님과 자녀가 함께 오실 때 서로의 성향을 확인하고 소통하는 효과가 훨씬 커집니다."}
+                                  {"물론 홀로 참석도 가능합니다. 하지만 에세스타 맞춤형 상담 및 코칭은 부모님과 자녀가 함께 오실 때 서로의 성향을 확인하고 소통하는 효과가 훨씬 커집니다."}
                                 </p>
                                 <p className="leading-relaxed">
-                                  {"아이의 현재 상태와 부모님의 양육 성향을 함께 점검하는 과정은 코칭 방향을 더 정확하게 잡는 데 큰 도움이 됩니다."}
+                                  {"자녀의 현재 상태와 부모님의 양육 성향을 함께 점검하는 과정은 상담 및 코칭 방향을 더 정확하게 잡는 데 큰 도움이 됩니다."}
                                 </p>
-                                <p className="font-medium">{"상담 효과를 위해 두 분이 함께 참석하시는 일정으로 잡아볼까요?"}</p>
+                                <p className="font-medium">{"상담 및 코칭의 효과를 위해 두 분이 함께 참석하시는 일정으로 잡아볼까요?"}</p>
                               </div>
                             }
                           />
                           <div className="mt-5 flex gap-3 animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
                             <Button onClick={() => handleNudgeResponse(true)} className="h-[50px] flex-1 text-[18px] font-semibold">
-                              {"네, 함께 참석할게요"}
+                              {"\uB124, \uD568\uAED8 \uCC38\uC11D\uD560\uAC8C\uC694"}
                             </Button>
                             <Button variant="outline" onClick={() => handleNudgeResponse(false)} className="h-[50px] flex-1 text-[18px] font-semibold">
-                              {"이번에는 홀로 참석할게요"}
+                              {"\uC774\uBC88\uC5D0\uB294 \uD640\uB85C \uCC38\uC11D\uD560\uAC8C\uC694"}
                             </Button>
+                          </div>
+                          <div className="mt-3 flex justify-end animate-in fade-in-0 slide-in-from-right-4 duration-300">
+                            <BackStepButton onClick={goToPrevStep} />
                           </div>
                         </>
                       ) : (
@@ -1013,11 +1123,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
 
               {step > 2 && attendance && (
                 <div ref={step2AnswerRef}>
-                  <UserMessage
-                    content={
-                      attendance === "both" ? "부모와 자녀 모두 참석" : attendance === "child" ? "자녀만 참석" : "부모만 참석"
-                    }
-                  />
+                  <EditableUserMessage content={getAttendanceLabel(attendance)} onEdit={() => goToStep(2)} />
                 </div>
               )}
             </>
@@ -1044,7 +1150,8 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                             placeholder={concernThemePlaceholder}
                             className="h-44 w-full resize-none overflow-y-auto rounded-2xl border border-[#FFC6AA] bg-[#F4F5F7] px-4 py-3 text-sm leading-relaxed text-foreground placeholder:text-[#9CA3AF] caret-[#FF7A33] focus:border-[#FF7A33] focus:outline-none focus:ring-2 focus:ring-[#FF7A33]/25"
                           />
-                          <div className="mt-4 flex items-center justify-between gap-3">
+                          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                            <BackStepButton onClick={goToPrevStep} />
                             <p className="text-sm text-[#6B7280]">{"* 한 줄만 적으셔도 괜찮습니다."}</p>
                             <Button
                               type="button"
@@ -1052,7 +1159,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                               disabled={!isConcernThemeValid}
                               className="h-11 rounded-xl bg-[#FF7A33] px-5 text-base font-semibold text-white hover:bg-[#E86F2F] disabled:bg-[#FFC8AC] disabled:text-white"
                             >
-                              {"작성 완료"}
+                              {"\uC791\uC131 \uC644\uB8CC"}
                             </Button>
                           </div>
                         </div>
@@ -1063,7 +1170,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
 
                 {step > 3 && concernTheme.trim().length > 0 && (
                   <div ref={step3AnswerRef}>
-                    <UserMessage content={concernTheme.trim()} />
+                    <EditableUserMessage content={concernTheme.trim()} onEdit={() => goToStep(3)} />
                   </div>
                 )}
               </>
@@ -1081,10 +1188,12 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                       content={
                         <div className="space-y-2">
                           <p>
-                            {"일정 조율을 위해 희망 일정은 "}<strong>{"최소 2개 이상"}</strong>{" 선택해 주세요."}
+                            {"상담 및 코칭이 가능한 시간은 "}
+                            <strong>{"\u0032\uAC1C \uC774\uC0C1"}</strong>
+                            {" 선택해 주세요. 전문가 일정과 조율하여 최종 예약 시간을 확정해 드립니다."}
                           </p>
                           <p className="text-sm text-muted-foreground">
-                            {"선택하신 일정 중 전문가 스케줄과 교차 확인하여 최종 일정을 확정해 드립니다. 가능한 시간을 넉넉히 선택해 주시면 예약이 더 빠르게 진행됩니다."}
+                            {"최대한 많은 시간을 선택해 주시면 빠른 진행이 가능합니다."}
                           </p>
                         </div>
                       }
@@ -1092,38 +1201,22 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
 
                     {showContent && step === 4 && (
                       <div className="space-y-4 animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
-                        <CalendarPicker selectedDates={selectedSchedules} onDateSelect={handleScheduleSelect} />
+                        <CalendarPicker
+                          selectedDates={selectedSchedules}
+                          onDateSelect={handleScheduleSelect}
+                          onDateRemove={removeSchedule}
+                        />
 
-                        {/* Selected Schedules Chips */}
-                        {selectedSchedules.length > 0 && (
-                          <div className="bg-card rounded-xl p-4 border border-border">
-                            <p className="text-sm font-medium text-muted-foreground mb-3">{"선택한 일정"} ({selectedSchedules.length}{"개"})</p>
-                            <div className="flex flex-wrap gap-2">
-                              {selectedSchedules.map((schedule, index) => (
-                                <div
-                                  key={index}
-                                  className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm"
-                                >
-                                  <span>{formatScheduleDisplay(schedule)}</span>
-                                  <button
-                                    onClick={() => removeSchedule(index)}
-                                    className="hover:bg-primary/20 rounded-full p-0.5"
-                                  >
-                                    <X className="w-3 h-3" />
-                                  </button>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        <Button
-                          onClick={goToNextStep}
-                          disabled={selectedSchedules.length < 2}
-                          className="mt-5 h-[50px] w-full bg-[#333333] text-[18px] font-semibold text-white hover:bg-[#333333] disabled:bg-[#333333] disabled:text-white"
-                        >
-                          {"다음으로"} {selectedSchedules.length < 2 && `(${2 - selectedSchedules.length}개 더 선택)`}
-                        </Button>
+                        <div className="grid grid-cols-4 gap-3">
+                          <BackStepButton onClick={goToPrevStep} className="col-span-1 w-full" />
+                          <Button
+                            onClick={goToNextStep}
+                            disabled={selectedSchedules.length < 2}
+                            className="col-span-3 h-[50px] w-full rounded-[0.7rem] bg-[#0C0C0C] text-[18px] font-semibold text-white hover:bg-[#0C0C0C] disabled:bg-[#0C0C0C] disabled:text-white"
+                          >
+                            {"\uB2E4\uC74C\uC73C\uB85C"} {selectedSchedules.length < 2 && `(${2 - selectedSchedules.length}\uAC1C \uB354 \uC120\uD0DD)`}
+                          </Button>
+                        </div>
                       </div>
                     )}
                   </>
@@ -1131,7 +1224,10 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
 
                 {step > 4 && selectedSchedules.length > 0 && (
                   <div ref={step4AnswerRef}>
-                    <UserMessage content={`희망 일정: ${selectedSchedules.map((s) => formatScheduleDisplay(s)).join(", ")}`} />
+                    <EditableUserMessage
+                      content={`희망 일정: ${selectedSchedules.map((s) => formatScheduleDisplay(s)).join(", ")}`}
+                      onEdit={() => goToStep(4)}
+                    />
                   </div>
                 )}
               </>
@@ -1145,13 +1241,21 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                 <BotMessage content="" isTyping />
               ) : (
                 <>
-                  <BotMessage content={"거의 완료되었습니다. 예약자분의 연락처를 남겨주시면 센터에서 일정 확인 후 카카오 알림톡으로 최종 확정 안내를 보내드립니다."} />
+                  <BotMessage
+                    content={
+                      <p className="text-foreground text-sm leading-relaxed whitespace-pre-wrap break-words md:text-base">
+                        {"예약자분의 연락처를 남겨주시면 센터에서 일정 확인 후 "}
+                        <strong>{"카카오톡 또는 문자로 최종 확정 안내"}</strong>
+                        {" 드리겠습니다."}
+                      </p>
+                    }
+                  />
 
                   {showContent && step === 5 && (
                     <div className="bg-card rounded-2xl p-5 shadow-sm border border-border animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
                       <div className="space-y-4">
                         <div>
-                          <FieldLabel icon={<Phone className="w-4 h-4 inline mr-1" />}>{"휴대폰 번호"}</FieldLabel>
+                          <FieldLabel icon={<Phone className="w-4 h-4 inline mr-1" />}>{"\uD734\uB300\uD3F0 \uBC88\uD638"}</FieldLabel>
                           <input
                             type="tel"
                             value={phoneNumber}
@@ -1177,14 +1281,14 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                             </button>
                             <div className="flex-1">
                               <p className="text-sm text-foreground leading-relaxed">
-                                {"개인정보 수집 및 이용에 동의합니다"} <span className="text-destructive font-medium">({"필수"})</span>
+                                {"\uAC1C\uC778\uC815\uBCF4 \uC218\uC9D1 \uBC0F \uC774\uC6A9\uC5D0 \uB3D9\uC758\uD569\uB2C8\uB2E4."} <span className="text-destructive font-medium">({"\uD544\uC218"})</span>
                               </p>
                               <button
                                 type="button"
                                 onClick={() => setShowPrivacyModal(true)}
                                 className="text-xs text-primary hover:text-primary/80 underline underline-offset-2 mt-1"
                               >
-                                [{"전문 보기"}]
+                                [{"\uC804\uBB38 \uBCF4\uAE30"}]
                               </button>
                             </div>
                           </div>
@@ -1196,9 +1300,16 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                           </div>
                         )}
 
-                        <Button onClick={handleSubmit} disabled={phoneNumber.length < 13 || !privacyConsent || isSubmitting} className="w-full">
-                          {isSubmitting ? "접수중..." : "최종 예약 접수하기"}
-                        </Button>
+                        <div className="grid grid-cols-4 gap-3">
+                          <BackStepButton onClick={goToPrevStep} className="col-span-1 w-full" />
+                          <Button
+                            onClick={handleSubmit}
+                            disabled={phoneNumber.length < 13 || !privacyConsent || isSubmitting}
+                            className="col-span-3 h-[50px] w-full rounded-[0.7rem] text-[18px] font-semibold"
+                          >
+                            {isSubmitting ? "\uC811\uC218\uC911..." : "\uCD5C\uC885 \uC608\uC57D \uC811\uC218\uD558\uAE30"}
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -1261,7 +1372,7 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                             }}
                             className="w-full"
                           >
-                            {"동의하고 닫기"}
+                            {"\uB3D9\uC758\uD558\uACE0 \uB2EB\uAE30"}
                           </Button>
                         </div>
                       </div>
@@ -1292,9 +1403,9 @@ export function ReservationFlow({ flow }: ReservationFlowProps) {
                 onClick={() => setShowExitModal(false)}
                 className="h-11 cursor-pointer rounded-xl border-[#D4CBB9] bg-white text-[#3D372F] hover:bg-white hover:text-[#3D372F]"
               >
-                {"계속 진행"}              </Button>
+                {"\uACC4\uC18D \uC9C4\uD589"}              </Button>
               <Button type="button" onClick={handleExit} className="h-11 cursor-pointer rounded-xl bg-[#333333] text-white hover:bg-[#333333] hover:text-white">
-                {"나가기"}              </Button>
+                {"\uB098\uAC00\uAE30"}              </Button>
             </div>
           </div>
         </div>

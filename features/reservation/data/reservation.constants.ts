@@ -102,7 +102,7 @@ export const concernData: ConcernDataMap = {
   },
 }
 
-export const relationships: Relationship[] = ["본인", "자녀", "배우자·가족", "기타"]
+export const relationships: Relationship[] = ["본인", "자녀", "기타"]
 export const genders: Gender[] = ["남성", "여성"]
 export const months = Array.from({ length: 12 }, (_, i) => `${i + 1}월`)
 export const timeSlots = [

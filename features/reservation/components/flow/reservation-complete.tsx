@@ -5,7 +5,6 @@ import {
   CalendarDays,
   Check,
   ChevronRight,
-  Clock,
   Home,
   MessageCircle,
   Phone,
@@ -56,12 +55,6 @@ export function ReservationComplete({ flow }: ReservationCompleteProps) {
   const schedulesLabel = selectedSchedules.length > 0 ? selectedSchedules.map((schedule) => formatScheduleDisplay(schedule)).join(", ") : "-"
   const concernThemeLabel = concernTheme.trim() || "-"
 
-  const nextSteps = [
-    "24시간 이내 일정 확정 안내를 드립니다.",
-    "알림톡 또는 문자로 안내가 발송됩니다.",
-    "문의가 필요하시면 언제든 연락주세요.",
-  ]
-
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#F8FAFC] text-gray-900">
       <div className="pointer-events-none absolute top-0 left-1/2 h-96 w-96 -translate-x-[150%] rounded-full bg-blue-400/15 blur-[100px]" />
@@ -86,28 +79,10 @@ export function ReservationComplete({ flow }: ReservationCompleteProps) {
             </div>
 
             <h1 className="mb-2 text-3xl font-extrabold tracking-tight text-gray-900">예약 접수 완료</h1>
-            <p className="mx-auto max-w-sm break-keep text-[16px] leading-relaxed text-gray-500">
-              센터에서 일정 확인 후 최종 확정 안내를 드리겠습니다.
+            <p className="mx-auto max-w-sm break-keep text-[16px] leading-relaxed text-gray-500 md:max-w-none md:whitespace-nowrap">
+              센터에서 일정 확인 후 <strong>카카오톡 또는 문자로 최종 확정 안내</strong> 드리겠습니다.
             </p>
           </div>
-
-          <section className="mb-6 rounded-[32px] border border-gray-100 bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] animate-in fade-in-0 slide-in-from-bottom-6 duration-700 delay-100">
-            <h2 className="mb-4 flex items-center gap-2 text-[17px] font-bold text-gray-900">
-              <Clock className="h-5 w-5 text-blue-500" />
-              다음 안내
-            </h2>
-
-            <div className="space-y-4">
-              {nextSteps.map((stepText, index) => (
-                <div key={stepText} className="flex gap-4">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-bold text-blue-600">
-                    {index + 1}
-                  </div>
-                  <p className="pt-1 text-[15px] font-semibold text-gray-800">{stepText}</p>
-                </div>
-              ))}
-            </div>
-          </section>
 
           <section className="overflow-hidden rounded-[32px] border border-gray-100 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] animate-in fade-in-0 slide-in-from-bottom-8 duration-700 delay-200">
             <div className="flex items-center justify-between border-b border-gray-100 bg-[#F8F9FA] px-7 py-5">
@@ -116,27 +91,6 @@ export function ReservationComplete({ flow }: ReservationCompleteProps) {
             </div>
 
             <div className="space-y-5 p-7">
-              <div className="rounded-2xl border border-[#F0D7AB] bg-[#FFF7EB] p-5">
-                <div className="mb-4 flex items-center gap-3 border-b border-[#F0D7AB] pb-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#FEE500]">
-                    <MessageCircle className="h-5 w-5 text-[#3C1E1E]" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900">어세스타 부모코칭</p>
-                    <p className="text-xs text-gray-500">알림톡</p>
-                  </div>
-                </div>
-
-                <div className="space-y-2 text-sm">
-                  <p className="text-xs text-[#5F5750]">아래와 같은 내용으로 안내가 발송됩니다.</p>
-                  <p className="font-medium text-gray-900">{userInfo.name}님의 예약 접수가 완료되었습니다.</p>
-                  <p className="leading-relaxed text-gray-600 break-keep">
-                    고객님께서 요청하신 내용을 바탕으로 센터에서 일정을 조율 중입니다. 일정이 최종 확정되면 다시 한 번 알림톡을 통해
-                    상세 안내를 보내드리겠습니다.
-                  </p>
-                </div>
-              </div>
-
               <div className="rounded-2xl border border-gray-100 bg-white p-5">
                 <InfoRow label="예약자명" value={userInfo.name || "-"} icon={User} />
                 <InfoRow
