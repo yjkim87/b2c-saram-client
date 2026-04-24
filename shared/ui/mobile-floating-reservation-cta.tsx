@@ -33,11 +33,11 @@ function isMenuDetailPath(pathname: string): boolean {
 
 function getMobileCTAConfig(pathname: string): MobileCTAConfig | null {
   if (pathname === "/") {
-    return DEFAULT_MENU_CTA_CONFIG
+    return null
   }
 
   if (isMenuDetailPath(pathname)) {
-    return DEFAULT_MENU_CTA_CONFIG
+    return null
   }
 
   if (pathname === "/solution" || pathname.startsWith("/solution/")) {
