@@ -14,7 +14,7 @@ const TEXT = {
   subway: "\uB3D9\uD574\uC120 \uC13C\uD140\uC5ED 2\uBC88 \uCD9C\uAD6C \uB3C4\uBCF4 10\uBD84",
   businessHours: "\uC6B4\uC601\uC2DC\uAC04",
   phoneConsult: "\uC804\uD654\uC0C1\uB2F4",
-  phoneNumber: "051-928-0944",
+  phoneNumber: "051-928-0943",
 } as const
 
 const CENTER_MAP_IMAGE_URL = "https://img.assesta.com/saram-me/center_map.png"

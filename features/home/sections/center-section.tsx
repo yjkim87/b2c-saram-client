@@ -108,7 +108,7 @@ export function CenterSection() {
                 <p className={cn(landingTypeTokens.stepDescription, "text-[#1E1611] font-bold")}>운영시간</p>
                 <OperatingHoursGrid />
                 <p className={cn("mt-[var(--landing-space-grid-sm)]", landingTypeTokens.stepDescription)}>
-                  <span className="font-bold">전화상담</span> 051-928-0944
+                  <span className="font-bold">전화상담</span> 051-928-0943
                 </p>
               </div>
 
@@ -169,7 +169,7 @@ export function CenterSection() {
                 <p className={cn(landingTypeTokens.stepDescription, "text-[#1E1611] font-bold")}>운영시간</p>
                 <OperatingHoursGrid />
                 <p className={cn("mt-[var(--landing-space-grid-sm)]", landingTypeTokens.stepDescription)}>
-                  <span className="font-bold">전화상담</span> 051-928-0944
+                  <span className="font-bold">전화상담</span> 051-928-0943
                 </p>
               </article>
             </div>

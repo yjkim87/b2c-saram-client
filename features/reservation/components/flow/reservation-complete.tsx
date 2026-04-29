@@ -131,11 +131,11 @@ export function ReservationComplete({ flow }: ReservationCompleteProps) {
 
             <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
               <a
-                href="tel:051-928-0944"
+                href="tel:051-928-0943"
                 className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-6 py-3 text-[15px] font-bold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 sm:w-auto"
               >
                 <Phone className="h-4 w-4" />
-                051-928-0944
+                051-928-0943
               </a>
 
               <a

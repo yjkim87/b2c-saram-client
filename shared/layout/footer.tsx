@@ -182,7 +182,7 @@ export function Footer() {
 
             <div className="space-y-1 text-sm text-[#C5CBD4]">
               <p>서울시 영등포구 국회대로 68길 11, 삼보호정빌딩 6층</p>
-              <p>TEL 02)787-1402 (월-금 9am-6pm) FAX 02)787-1408</p>
+              <p>TEL 02)787-1400 (월-금 9am-6pm) FAX 02)787-1408</p>
               <p>assestacs@assesta.com</p>
             </div>
 
@@ -226,7 +226,7 @@ export function Footer() {
 
           <div className="space-y-1 pt-2 text-sm text-[#C5CBD4]">
             <p>서울시 영등포구 국회대로 68길 11, 삼보호정빌딩 6층</p>
-            <p>TEL 02)787-1402 (월-금 9am-6pm)</p>
+            <p>TEL 02)787-1400 (월-금 9am-6pm)</p>
             <p>FAX 02)787-1408</p>
             <p>assestacs@assesta.com</p>
           </div>
