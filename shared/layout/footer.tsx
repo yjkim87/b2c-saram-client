@@ -46,7 +46,7 @@ const socialChannels = [
   },
   {
     label: "블로그",
-    href: "https://blog.naver.com/",
+    href: "https://blog.naver.com/assestahrc",
     viewBox: "0 0 24 24",
     path: "M15.12 0v12.283L8.857 0H0v24h8.88V11.717L15.143 24H24V0z",
   },

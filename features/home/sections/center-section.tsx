@@ -17,7 +17,8 @@ const CENTER_GALLERY_IMAGES = [
   "https://img.assesta.com/saram-me/center_04.jpg",
 ]
 
-const CENTER_ADDRESS_QUERY = "부산시 해운대구 센텀동로 99, 백산센텀클래스원(1차) 406호"
+const CENTER_ADDRESS_QUERY = "부산광역시 해운대구 센텀동로 99 벽산e센텀클래스원 406호"
+const CENTER_SUBWAY_TEXT = "동해선 센텀역 2번 출구 도보 10분"
 const NAVER_MAP_URL = `https://map.naver.com/p/search/${encodeURIComponent(CENTER_ADDRESS_QUERY)}`
 const KAKAO_MAP_URL = `https://map.kakao.com/?q=${encodeURIComponent(CENTER_ADDRESS_QUERY)}`
 
@@ -117,7 +118,7 @@ export function CenterSection() {
               <div className="space-y-[var(--landing-space-chip-y)]">
                 <p className={cn(landingTypeTokens.stepDescription, "text-[#1E1611] font-bold")}>오시는 길</p>
                 <p className={cn("break-words", landingTypeTokens.stepDescription)}>
-                  부산시 해운대구 센텀동로 99, 백산센텀클래스원(1차) 406호
+                  부산광역시 해운대구 센텀동로 99 벽산e센텀클래스원 406호
                 </p>
                 <p
                   className={cn(
@@ -127,7 +128,7 @@ export function CenterSection() {
                     landingSpaceTokens.notePadding
                   )}
                 >
-                  동해선 센텀역 2번 출구 도보 10분
+                  {CENTER_SUBWAY_TEXT}
                 </p>
                 <MapButtons className="pt-[var(--landing-space-chip-y)]" />
               </div>
@@ -143,7 +144,7 @@ export function CenterSection() {
               >
                 <p className={cn(landingTypeTokens.stepDescription, "text-[#1E1611] font-bold")}>오시는 길</p>
                 <p className={cn("mt-[var(--landing-space-chip-y)] break-words", landingTypeTokens.stepDescription)}>
-                  부산시 해운대구 센텀동로 99, 백산센텀클래스원(1차) 406호
+                  부산광역시 해운대구 센텀동로 99 벽산e센텀클래스원 406호
                 </p>
                 <p
                   className={cn(
@@ -153,7 +154,7 @@ export function CenterSection() {
                     landingSpaceTokens.notePadding
                   )}
                 >
-                  동해선 센텀역 2번 출구 도보 10분
+                  {CENTER_SUBWAY_TEXT}
                 </p>
 
                 <MapButtons className="mt-[var(--landing-space-grid-sm)]" />

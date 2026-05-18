@@ -3,17 +3,17 @@ import { landingRadiusTokens, landingSpaceTokens, landingTypeTokens } from "@/fe
 import { cn } from "@/shared/lib/utils"
 
 const TEXT = {
-  headerLabel: "\uC13C\uD130 \uC548\uB0B4",
-  headerTitle: "\uD3B8\uC548\uD55C \uC0C1\uB2F4 \uACF5\uAC04, \uC0AC\uBC1C\uBA74 \uC13C\uD130",
+  headerLabel: "센터 안내",
+  headerTitle: "편안한 상담 공간, 사발면 센터",
   headerDescription:
-    "\uB79C\uB529 \uD398\uC774\uC9C0 \uC13C\uD130 \uC548\uB0B4 \uAD6C\uC131\uACFC \uB3D9\uC77C\uD55C \uB0B4\uC6A9\uC73C\uB85C \uC704\uCE58 \uBC0F \uC6B4\uC601 \uC815\uBCF4\uB97C \uD655\uC778\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4.",
-  centerAddress: "\uBD80\uC0B0\uC2DC \uD574\uC6B4\uB300\uAD6C \uC13C\uD140\uB3D9\uB85C 99, \uBC31\uC0B0\uC13C\uD140\uD074\uB798\uC2A4\uC6D0(1\uCC28) 406\uD638",
-  naverMap: "\uB124\uC774\uBC84 \uC9C0\uB3C4",
-  kakaoMap: "\uCE74\uCE74\uC624\uB9F5",
-  directions: "\uC624\uC2DC\uB294 \uAE38",
-  subway: "\uB3D9\uD574\uC120 \uC13C\uD140\uC5ED 2\uBC88 \uCD9C\uAD6C \uB3C4\uBCF4 10\uBD84",
-  businessHours: "\uC6B4\uC601\uC2DC\uAC04",
-  phoneConsult: "\uC804\uD654\uC0C1\uB2F4",
+    "랜딩 페이지 센터 안내 구성과 동일한 내용으로 위치 및 운영 정보를 확인할 수 있습니다.",
+  centerAddress: "부산광역시 해운대구 센텀동로 99 벽산e센텀클래스원 406호",
+  naverMap: "네이버 지도",
+  kakaoMap: "카카오맵",
+  directions: "오시는 길",
+  subway: "동해선 센텀역 2번 출구 도보 10분",
+  businessHours: "운영시간",
+  phoneConsult: "전화상담",
   phoneNumber: "051-928-0943",
 } as const
 
