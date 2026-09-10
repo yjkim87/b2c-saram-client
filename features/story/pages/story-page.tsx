@@ -124,15 +124,15 @@ function FadeInBlock({ children, className = "", threshold = 0.12 }: FadeInBlock
 
 const serviceValues: ServiceValue[] = [
   {
-    icon: Heart,
-    category: "마음 발견",
-    title: "사발면 1:1 심리상담",
-    target: "심리적 어려움을 겪는 개인 및 아동청소년",
-    desc: "전문 상담사가 심리검사 도구를 활용해 내담자의 호소문제 별로 스트레스 원인을 분석합니다. 세계적으로 검증된 심리검사들을 통해 '나의 심리적 특성을 발견하고 치유하는 고품격 심리상담 서비스'입니다.",
-    colorClass: "text-rose-500",
-    bgClass: "bg-rose-50",
-    borderClass: "border-rose-100",
-    ringClass: "ring-rose-50",
+    icon: Users,
+    category: "부모 발견",
+    title: "아이와 말이 통하는, 부모 코칭",
+    target: "자녀의 심리적 성장을 위해 자녀의 잠재력을 깨워주고 싶은 부모",
+    desc: "부모와 자녀의 정식 MBTI 결과를 바탕으로 '소통의 온도 차'를 발견합니다. 아이의 성격에 맞는 학습법과 미래설계를 위해 부모에게 동기부여 방식을 코칭하여 가족의 상호작용을 긍정화합니다.",
+    colorClass: "text-amber-500",
+    bgClass: "bg-amber-50",
+    borderClass: "border-amber-100",
+    ringClass: "ring-amber-50",
   },
   {
     icon: Compass,
@@ -146,15 +146,15 @@ const serviceValues: ServiceValue[] = [
     ringClass: "ring-indigo-50",
   },
   {
-    icon: Users,
-    category: "부모 발견",
-    title: "아이와 말이 통하는, 부모 코칭",
-    target: "자녀의 심리적 성장을 위해 자녀의 잠재력을 깨워주고 싶은 부모",
-    desc: "부모와 자녀의 정식 MBTI 결과를 바탕으로 '소통의 온도 차'를 발견합니다. 아이의 성격에 맞는 학습법과 미래설계를 위해 부모에게 동기부여 방식을 코칭하여 가족의 상호작용을 긍정화합니다.",
-    colorClass: "text-amber-500",
-    bgClass: "bg-amber-50",
-    borderClass: "border-amber-100",
-    ringClass: "ring-amber-50",
+    icon: Heart,
+    category: "마음 발견",
+    title: "사발면 1:1 심리상담",
+    target: "심리적 어려움을 겪는 개인 및 아동청소년",
+    desc: "전문 상담사가 심리검사 도구를 활용해 내담자의 호소문제 별로 스트레스 원인을 분석합니다. 세계적으로 검증된 심리검사들을 통해 '나의 심리적 특성을 발견하고 치유하는 고품격 심리상담 서비스'입니다.",
+    colorClass: "text-rose-500",
+    bgClass: "bg-rose-50",
+    borderClass: "border-rose-100",
+    ringClass: "ring-rose-50",
   },
 ]
 
@@ -178,7 +178,7 @@ function IntroSection() {
               사발면(<span className="text-[#ff7a33]">사</span>람의 <span className="text-[#ff7a33]">발</span>견을 원하
               <span className="text-[#ff7a33]">면</span>)은 세계에서 가장 많이 사용되는 마음발견 검사인 정식 MBTI와 불확실한
               미래의 직업을 발견하는 검사인 Strong 흥미검사를 도구 삼아, 자녀의 내면에 숨겨진 원석을 발견합니다.
-              사발면의 상담사와 코치들은 단순한 결과 수치를 넘어, 아이의 고유한 강점들을 정교하게 연결하여 단
+              사발면의 코치와 상담사들은 단순한 결과 수치를 넘어, 아이의 고유한 강점들을 정교하게 연결하여 단
               하나뿐인 &apos;진로 설계도&apos;를 완성합니다.
             </p>
             <p>우리는 부모님께 아이의 마음을 읽는 법을 알려드리고, 아이에게는 스스로의 미래를 결정할 확신을 선물합니다.</p>

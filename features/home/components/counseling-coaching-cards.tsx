@@ -170,16 +170,6 @@ const COUNSELING_SERVICE_ITEMS: CounselingServiceItem[] = [
 
 const FEATURE_CARDS: readonly FeatureCard[] = [
   {
-    key: "counseling",
-    eyebrow: "마음의 어려움을 읽고 치유하는 과정",
-    title: "심리상담",
-    description: {
-      regular: "심리적 문제나 감정적 어려움을 전문가와 함께 탐색하고 해결하는 치료적 접근법입니다.",
-      emphasized: "아이의 현재 심리 상태를 이해하고 정서적 안정을 회복하는 데 초점을 맞춥니다.",
-    },
-    serviceItems: COUNSELING_SERVICE_ITEMS,
-  },
-  {
     key: "coaching",
     eyebrow: "아이의 강점을 깨우고 미래를 설계하는 과정",
     title: "성장코칭",
@@ -188,6 +178,16 @@ const FEATURE_CARDS: readonly FeatureCard[] = [
       emphasized: "아이 스스로 목표를 세우고 달성하는 과정을 지원합니다.",
     },
     ageItems: AGE_ITEMS,
+  },
+  {
+    key: "counseling",
+    eyebrow: "마음의 어려움을 읽고 치유하는 과정",
+    title: "심리상담",
+    description: {
+      regular: "심리적 문제나 감정적 어려움을 전문가와 함께 탐색하고 해결하는 치료적 접근법입니다.",
+      emphasized: "아이의 현재 심리 상태를 이해하고 정서적 안정을 회복하는 데 초점을 맞춥니다.",
+    },
+    serviceItems: COUNSELING_SERVICE_ITEMS,
   },
 ]
 

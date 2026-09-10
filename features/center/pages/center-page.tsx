@@ -4,7 +4,7 @@ import { cn } from "@/shared/lib/utils"
 
 const TEXT = {
   headerLabel: "센터 안내",
-  headerTitle: "편안한 상담 공간, 사발면 센터",
+  headerTitle: "편안한 공간, 사발면 센터",
   headerDescription:
     "랜딩 페이지 센터 안내 구성과 동일한 내용으로 위치 및 운영 정보를 확인할 수 있습니다.",
   centerAddress: "부산광역시 해운대구 센텀동로 99 벽산e센텀클래스원 406호",

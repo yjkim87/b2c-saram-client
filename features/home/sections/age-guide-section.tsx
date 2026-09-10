@@ -15,11 +15,11 @@ export function AgeGuideSection() {
         <div className={cn("text-center", landingLayoutTokens.sectionHeaderGap)}>
           <span className={cn("mb-4 inline-flex", landingTypeTokens.eyebrow)}>INTEGRATED SOLUTION</span>
           <h2 className={cn("mobile-auto-phrase", landingTypeTokens.sectionTitle)}>
-            <span className="text-[#FF7A33]">심리상담</span>으로 단단하게, <br />
-            <span className="text-[#FF7A33]">성장코칭</span>으로 당당하게
+            <span className="text-[#FF7A33]">성장코칭</span>으로 당당하게, <br />
+            <span className="text-[#FF7A33]">심리상담</span>으로 단단하게
           </h2>
           <p className={cn("mx-auto mt-5 max-w-2xl text-[#3A2F27]", landingTypeTokens.sectionSubtitle)}>
-            아이의 성장 단계와 필요에 따라 심리상담과 성장코칭의 차이를 확인해보세요.
+            아이의 성장 단계와 필요에 따라 성장코칭과 심리상담의 차이를 확인해보세요.
           </p>
         </div>
 

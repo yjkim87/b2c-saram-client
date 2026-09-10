@@ -277,7 +277,7 @@ export function ReviewsSection() {
           <p className={cn("mx-auto mt-5 max-w-2xl text-[#3A2F27]", landingTypeTokens.sectionSubtitle)}>
             초등학교부터 고등학교까지,
             <br />
-            상담/코칭을 경험한 부모님과 학생들의 이야기입니다.
+            코칭/상담을 경험한 부모님과 학생들의 이야기입니다.
           </p>
         </div>
 

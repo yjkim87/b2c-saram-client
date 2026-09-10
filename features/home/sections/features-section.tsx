@@ -69,9 +69,9 @@ export function FeaturesSection() {
 
           <div className="mx-auto mt-8 max-w-full text-center md:mt-9">
             <p className="text-center text-[18px] font-medium leading-[1.45] lg:hidden">
-              사발면은 <span className="font-bold">심리상담의 깊이와</span>
+              사발면은 <span className="font-bold">코칭의 실용성과</span>
               <br />
-              <span className="font-bold">코칭의 실용성으로</span>
+              <span className="font-bold">심리상담의 깊이로</span>
               <br />
               그 과정을 전문적으로 함께합니다.
             </p>
@@ -81,7 +81,7 @@ export function FeaturesSection() {
               아이의 발달 단계에 맞춘
               <br />
               <span className="inline-block rounded-[9px] border-2 border-[#F07C33] px-[0.24em] py-[0.02em] font-bold leading-[1.08] text-[#1A1410]">
-                맞춤형 심리상담·성장 코칭
+                맞춤형 성장코칭·심리상담
               </span>{" "}
               을 제공합니다.
             </p>
@@ -89,13 +89,13 @@ export function FeaturesSection() {
             <div className="hidden text-center text-[28px] font-medium leading-[1.45] lg:block">
               <p className="tracking-[-0.01em]">
                 <span className="whitespace-nowrap">
-                  사발면은 <span className="font-bold">심리상담의 깊이와 코칭의 실용성</span>으로 그 과정을 전문적으로 함께합니다.
+                  사발면은 <span className="font-bold">코칭의 실용성과 심리상담의 깊이</span>로 그 과정을 전문적으로 함께합니다.
                 </span>
                 <br />
                 <span className="whitespace-nowrap">
                   초등학교 입학부터 고등학교 졸업까지. 아이의 발달 단계에 맞춘{" "}
                   <span className="inline-block rounded-[9px] border-2 border-[#F07C33] px-[0.2em] py-[0.02em] font-bold leading-[1.08] text-[#1A1410]">
-                    맞춤형 심리상담·성장 코칭
+                    맞춤형 성장코칭·심리상담
                   </span>
                   을 제공합니다.
                 </span>
