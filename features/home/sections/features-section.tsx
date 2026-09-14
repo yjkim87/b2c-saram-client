@@ -76,7 +76,7 @@ export function FeaturesSection() {
               그 과정을 전문적으로 함께합니다.
             </p>
             <p className="mt-2 text-center text-[18px] font-medium leading-[1.5] lg:hidden sm:text-[20px]">
-              초등학교 입학부터 고등학교 졸업까지.
+              0세부터 18세까지.
               <br />
               아이의 발달 단계에 맞춘
               <br />
@@ -93,7 +93,7 @@ export function FeaturesSection() {
                 </span>
                 <br />
                 <span className="whitespace-nowrap">
-                  초등학교 입학부터 고등학교 졸업까지. 아이의 발달 단계에 맞춘{" "}
+                  0세부터 18세까지. 아이의 발달 단계에 맞춘{" "}
                   <span className="inline-block rounded-[9px] border-2 border-[#F07C33] px-[0.2em] py-[0.02em] font-bold leading-[1.08] text-[#1A1410]">
                     맞춤형 성장코칭·심리상담
                   </span>

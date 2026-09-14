@@ -133,7 +133,7 @@ export function HeroSection() {
 
           <div ref={descRef} className="mt-8 max-w-[min(86vw,440px)] md:mt-10 md:max-w-[520px] lg:max-w-[620px]">
             <p className="text-[clamp(18px,2.2vw,24px)] font-medium leading-[1.5] tracking-[-0.01em] text-[#2F251D] lg:text-[22px]">
-              <span className="block">초등 저학년부터 고등학생까지,</span>
+              <span className="block">0세부터 18세까지,</span>
               <span className="block md:inline">발달 단계에 맞춘</span>{" "}
               <span className="block font-bold md:inline lg:whitespace-nowrap">맞춤형 성장 코칭</span>
             </p>

@@ -275,7 +275,7 @@ export function ReviewsSection() {
             <span className="text-[#FF7A33]">직접</span> 들어보세요
           </h2>
           <p className={cn("mx-auto mt-5 max-w-2xl text-[#3A2F27]", landingTypeTokens.sectionSubtitle)}>
-            초등학교부터 고등학교까지,
+            0세부터 18세까지,
             <br />
             코칭/상담을 경험한 부모님과 학생들의 이야기입니다.
           </p>
